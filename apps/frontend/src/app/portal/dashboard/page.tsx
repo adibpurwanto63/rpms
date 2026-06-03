@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
+import { useRefresh } from "@/lib/refresh-context";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar, Legend } from "recharts";
 
 interface DashData {
@@ -12,6 +13,7 @@ interface DashData {
   riskStatus: { openIncidents: number };
   recentTickets: any[];
   recentProduction: any[];
+  pembelian: { pendingPO: number; recentPO: any[] };
 }
 
 const fmt = (n: number) => `${(n / 1000).toFixed(2)} Ton`;
@@ -25,6 +27,7 @@ export default function DashboardPage() {
   const [trend, setTrend] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split("T")[0]);
+  const { refreshKey } = useRefresh();
 
   useEffect(() => {
     setLoading(true);
@@ -33,7 +36,7 @@ export default function DashboardPage() {
       api.get("/dashboard/kpi-trend?days=7"),
     ]).then(([d, t]) => { setData(d.data); setTrend(t.data); })
       .finally(() => setLoading(false));
-  }, [selectedDate]);
+  }, [selectedDate, refreshKey]);
 
   if (loading) return (
     <div className="flex items-center justify-center h-64">
@@ -409,6 +412,52 @@ export default function DashboardPage() {
           </table>
         </div>
       </div>
+      {/* Pembelian PO Widget */}
+      {data.pembelian && (
+        <div className="erp-card">
+          <div className="erp-card-header">
+            <span className="erp-card-title">🛍️ Purchase Order Terbaru</span>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              {data.pembelian.pendingPO > 0 && (
+                <span style={{ fontSize: 13, fontWeight: 600, color: "var(--color-amber)", background: "#FFF8E7", padding: "4px 10px", borderRadius: 6 }}>
+                  ⏳ {data.pembelian.pendingPO} PO aktif
+                </span>
+              )}
+              <a href="/portal/pembelian" style={{ fontSize: 13, color: "var(--color-purple)", fontWeight: 600, textDecoration: "none" }}>Lihat Semua →</a>
+            </div>
+          </div>
+          <div style={{ overflowX: "auto" }}>
+            <table className="erp-table">
+              <thead>
+                <tr>
+                  <th>No. PO</th>
+                  <th>Supplier</th>
+                  <th>Barang</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.pembelian.recentPO.length === 0 ? (
+                  <tr><td colSpan={5} style={{ textAlign: "center", color: "var(--text-muted)", padding: "2rem" }}>Belum ada PO</td></tr>
+                ) : data.pembelian.recentPO.map((po: any) => (
+                  <tr key={po.id}>
+                    <td style={{ fontFamily: "monospace", fontSize: 13, color: "var(--color-purple)", fontWeight: 600 }}>{po.orderNumber}</td>
+                    <td style={{ fontWeight: 500 }}>{po.supplier?.companyName}</td>
+                    <td>{po.itemName}</td>
+                    <td style={{ fontWeight: 700 }}>Rp {po.totalAmount?.toLocaleString("id-ID")}</td>
+                    <td>
+                      <span className={`badge ${{ PENDING: "badge-warning", APPROVED: "badge-info", ORDERED: "badge-purple", RECEIVED: "badge-success", CANCELLED: "badge-danger" }[po.status as string] || "badge-neutral"}`}>
+                        {{ PENDING: "Menunggu", APPROVED: "Disetujui", ORDERED: "Dipesan", RECEIVED: "Diterima", CANCELLED: "Dibatalkan" }[po.status as string]}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

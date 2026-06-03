@@ -38,6 +38,7 @@ model Supplier {
   updatedAt       DateTime         @updatedAt @map("updated_at")
   users           User[]
   weighingTickets WeighingTicket[]
+  purchaseOrders  PurchaseOrder[]
 
   @@map("suppliers")
 }
@@ -216,6 +217,26 @@ model AuditLog {
   @@map("audit_logs")
 }
 
+model PurchaseOrder {
+  id            String              @id @default(cuid())
+  orderNumber   String              @unique @map("order_number")
+  supplierId    String              @map("supplier_id")
+  itemName      String              @map("item_name")
+  quantity      Float
+  unit          String              @default("kg")
+  unitPrice     Float               @map("unit_price")
+  totalAmount   Float               @map("total_amount")
+  status        PurchaseOrderStatus @default(PENDING)
+  notes         String?
+  deliveryDate  DateTime?           @map("delivery_date")
+  receivedAt    DateTime?           @map("received_at")
+  createdAt     DateTime            @default(now()) @map("created_at")
+  updatedAt     DateTime            @updatedAt @map("updated_at")
+  supplier      Supplier            @relation(fields: [supplierId], references: [id])
+
+  @@map("purchase_orders")
+}
+
 enum UserRole {
   SUPER_ADMIN
   DIRECTOR
@@ -319,4 +340,12 @@ enum AlertType {
   CASH_CRISIS
   QUOTA_CLOSURE
   OTHER
+}
+
+enum PurchaseOrderStatus {
+  PENDING
+  APPROVED
+  ORDERED
+  RECEIVED
+  CANCELLED
 }

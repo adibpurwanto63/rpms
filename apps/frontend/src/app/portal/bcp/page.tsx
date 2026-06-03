@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
+import { useRefresh } from "@/lib/refresh-context";
 
 const sevColor: any = { LOW: "badge-info", MEDIUM: "badge-warning", HIGH: "badge-pink", CRITICAL: "badge-danger" };
 const statusColor: any = { OPEN: "badge-danger", IN_PROGRESS: "badge-warning", RESOLVED: "badge-success", CLOSED: "badge-neutral" };
@@ -13,6 +14,7 @@ export default function BcpPage() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ type: "DOWNTIME", severity: "MEDIUM", title: "", description: "" });
+  const { triggerRefresh } = useRefresh();
 
   const load = () => {
     Promise.all([api.get("/bcp/incidents"), api.get("/bcp/risks"), api.get("/bcp/alerts")])
@@ -23,12 +25,15 @@ export default function BcpPage() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     await api.post("/bcp/incidents", form);
-    setShowForm(false); load();
+    setShowForm(false);
+    load();
+    triggerRefresh();
   };
 
   const resolve = async (id: string) => {
     await api.put(`/bcp/incidents/${id}/resolve`);
     load();
+    triggerRefresh();
   };
 
   const riskScore = (likelihood: number, impact: number) => {
@@ -71,39 +76,47 @@ export default function BcpPage() {
       )}
 
       {showForm && (
-        <div className="erp-card animate-fade-in" style={{ borderLeft: "4px solid var(--brand-pink)" }}>
-          <div className="erp-card-header">
-            <h3 className="erp-card-title">Form Laporan Insiden</h3>
-          </div>
-          <div className="erp-card-body">
-            <form onSubmit={submit}>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
-                <div>
-                  <label className="form-label">Tipe Insiden</label>
-                  <select className="form-input" value={form.type} onChange={e => setForm({ ...form, type: e.target.value })}>
-                    {["FIRE", "DOWNTIME", "POWER_FAILURE", "INTERNET_FAILURE", "CASH_CRISIS", "QUOTA_CLOSURE", "OTHER"].map(t => <option key={t} value={t}>{t}</option>)}
-                  </select>
+        <div style={{
+          position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
+          background: "rgba(0,0,0,0.5)", zIndex: 9999,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          backdropFilter: "blur(4px)"
+        }}>
+          <div className="erp-card animate-fade-in" style={{ width: "100%", maxWidth: 700, margin: 20, maxHeight: "90vh", overflowY: "auto", border: "none", boxShadow: "0 20px 40px rgba(0,0,0,0.2)", borderLeft: "4px solid var(--brand-pink)" }}>
+            <div className="erp-card-header" style={{ position: "sticky", top: 0, background: "#fff", zIndex: 10, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <h3 className="erp-card-title" style={{ fontSize: 20 }}>Form Laporan Insiden</h3>
+              <button type="button" onClick={() => setShowForm(false)} style={{ background: "transparent", border: "none", fontSize: 20, cursor: "pointer", color: "var(--text-muted)" }}>✕</button>
+            </div>
+            <div className="erp-card-body" style={{ padding: 24 }}>
+              <form onSubmit={submit}>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
+                  <div>
+                    <label className="form-label">Tipe Insiden</label>
+                    <select className="form-input" value={form.type} onChange={e => setForm({ ...form, type: e.target.value })}>
+                      {["FIRE", "DOWNTIME", "POWER_FAILURE", "INTERNET_FAILURE", "CASH_CRISIS", "QUOTA_CLOSURE", "OTHER"].map(t => <option key={t} value={t}>{t}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="form-label">Tingkat Keparahan</label>
+                    <select className="form-input" value={form.severity} onChange={e => setForm({ ...form, severity: e.target.value })}>
+                      {["LOW", "MEDIUM", "HIGH", "CRITICAL"].map(s => <option key={s} value={s}>{s}</option>)}
+                    </select>
+                  </div>
+                  <div style={{ gridColumn: "span 2" }}>
+                    <label className="form-label">Judul Insiden</label>
+                    <input className="form-input" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} placeholder="Cth: Kebakaran di Gudang A" required />
+                  </div>
+                  <div style={{ gridColumn: "span 2" }}>
+                    <label className="form-label">Deskripsi & Dampak</label>
+                    <textarea className="form-input" rows={3} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} placeholder="Jelaskan detail insiden yang terjadi..." style={{ height: "auto" }} required />
+                  </div>
                 </div>
-                <div>
-                  <label className="form-label">Tingkat Keparahan</label>
-                  <select className="form-input" value={form.severity} onChange={e => setForm({ ...form, severity: e.target.value })}>
-                    {["LOW", "MEDIUM", "HIGH", "CRITICAL"].map(s => <option key={s} value={s}>{s}</option>)}
-                  </select>
+                <div style={{ paddingTop: 20, borderTop: "1px solid var(--border-light)", display: "flex", gap: 12, justifyContent: "flex-end" }}>
+                  <button type="button" className="btn btn-secondary" onClick={() => setShowForm(false)}>Batal</button>
+                  <button type="submit" className="btn btn-primary" style={{ padding: "0 24px", background: "var(--brand-pink)", borderColor: "transparent" }}>🚨 Kirim Laporan</button>
                 </div>
-                <div style={{ gridColumn: "span 2" }}>
-                  <label className="form-label">Judul Insiden</label>
-                  <input className="form-input" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} placeholder="Cth: Kebakaran di Gudang A" required />
-                </div>
-                <div style={{ gridColumn: "span 2" }}>
-                  <label className="form-label">Deskripsi & Dampak</label>
-                  <textarea className="form-input" rows={3} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} placeholder="Jelaskan detail insiden yang terjadi..." style={{ height: "auto" }} required />
-                </div>
-              </div>
-              <div style={{ paddingTop: 16, borderTop: "1px solid var(--border-light)", display: "flex", gap: 8 }}>
-                <button type="submit" className="btn btn-primary" style={{ background: "var(--brand-pink)", borderColor: "transparent" }}>🚨 Kirim Laporan</button>
-                <button type="button" className="btn btn-secondary" onClick={() => setShowForm(false)}>Batal</button>
-              </div>
-            </form>
+              </form>
+            </div>
           </div>
         </div>
       )}

@@ -51,36 +51,45 @@ export default function SettingsPage() {
       </div>
 
       {showForm && (
-        <div className="erp-card mb-4 animate-fade-in">
-          <div className="erp-card-header">
-            <h3 className="erp-card-title">Tambah Pengguna Baru</h3>
-          </div>
-          <div className="erp-card-body">
-            <form onSubmit={submit}>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div className="form-group mb-0">
-                  <label>Nama Lengkap</label>
-                  <input value={form.name} onChange={e => setForm({...form, name: e.target.value})} placeholder="Nama pengguna" required />
+        <div style={{
+          position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
+          background: "rgba(0,0,0,0.5)", zIndex: 9999,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          backdropFilter: "blur(4px)"
+        }}>
+          <div className="erp-card animate-fade-in" style={{ width: "100%", maxWidth: 700, margin: 20, maxHeight: "90vh", overflowY: "auto", border: "none", boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}>
+            <div className="erp-card-header" style={{ position: "sticky", top: 0, background: "#fff", zIndex: 10, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <h3 className="erp-card-title" style={{ fontSize: 20 }}>Tambah Pengguna Baru</h3>
+              <button type="button" onClick={() => setShowForm(false)} style={{ background: "transparent", border: "none", fontSize: 20, cursor: "pointer", color: "var(--text-muted)" }}>✕</button>
+            </div>
+            <div className="erp-card-body" style={{ padding: 24 }}>
+              <form onSubmit={submit}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div className="form-group mb-0">
+                    <label>Nama Lengkap</label>
+                    <input className="form-input" value={form.name} onChange={e => setForm({...form, name: e.target.value})} placeholder="Nama pengguna" required />
+                  </div>
+                  <div className="form-group mb-0">
+                    <label>Email</label>
+                    <input className="form-input" type="email" value={form.email} onChange={e => setForm({...form, email: e.target.value})} placeholder="user@rpms.id" required />
+                  </div>
+                  <div className="form-group mb-0">
+                    <label>Password</label>
+                    <input className="form-input" type="password" value={form.password} onChange={e => setForm({...form, password: e.target.value})} required />
+                  </div>
+                  <div className="form-group mb-0">
+                    <label>Role</label>
+                    <select className="form-input" value={form.role} onChange={e => setForm({...form, role: e.target.value})}>
+                      {roles.map(r => <option key={r} value={r}>{r.replace(/_/g," ")}</option>)}
+                    </select>
+                  </div>
                 </div>
-                <div className="form-group mb-0">
-                  <label>Email</label>
-                  <input type="email" value={form.email} onChange={e => setForm({...form, email: e.target.value})} placeholder="user@rpms.id" required />
+                <div style={{ paddingTop: 20, borderTop: "1px solid var(--border-light)", display: "flex", gap: 12, justifyContent: "flex-end" }}>
+                  <button type="button" className="btn btn-secondary" onClick={() => setShowForm(false)}>Batal</button>
+                  <button type="submit" className="btn btn-primary" style={{ padding: "0 24px" }}>💾 Simpan Pengguna</button>
                 </div>
-                <div className="form-group mb-0">
-                  <label>Password</label>
-                  <input type="password" value={form.password} onChange={e => setForm({...form, password: e.target.value})} required />
-                </div>
-                <div className="form-group mb-0">
-                  <label>Role</label>
-                  <select value={form.role} onChange={e => setForm({...form, role: e.target.value})}>
-                    {roles.map(r => <option key={r} value={r}>{r.replace(/_/g," ")}</option>)}
-                  </select>
-                </div>
-              </div>
-              <div className="mt-4 pt-3 border-t border-gray-200">
-                <button type="submit" className="btn btn-primary">💾 Simpan Pengguna</button>
-              </div>
-            </form>
+              </form>
+            </div>
           </div>
         </div>
       )}

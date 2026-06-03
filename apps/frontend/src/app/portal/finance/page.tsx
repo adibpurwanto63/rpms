@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
+import { useRefresh } from "@/lib/refresh-context";
 
 const paymentStatusBadge: any = {
   PENDING: "badge-purple",
@@ -16,6 +17,7 @@ export default function FinancePage() {
   const [tab, setTab] = useState<"all" | "AP" | "AR">("all");
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ type: "ACCOUNTS_PAYABLE", supplierOrCustomer: "", amount: "", dueDate: "", description: "" });
+  const { triggerRefresh } = useRefresh();
 
   const load = () => {
     const params = tab !== "all" ? (tab === "AP" ? "?type=ACCOUNTS_PAYABLE" : "?type=ACCOUNTS_RECEIVABLE") : "";
@@ -28,7 +30,9 @@ export default function FinancePage() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     await api.post("/finance/invoices", { ...form, amount: parseFloat(form.amount) });
-    setShowForm(false); load();
+    setShowForm(false);
+    load();
+    triggerRefresh();
   };
 
   const fmtRp = (n: number) => `Rp ${(n / 1000000).toFixed(1)}M`;
@@ -77,45 +81,52 @@ export default function FinancePage() {
         </div>
       )}
 
-      {/* Add Invoice Form */}
+      {/* Add Invoice Form Modal */}
       {showForm && (
-        <div className="erp-card animate-fade-in">
-          <div className="erp-card-header">
-            <h3 className="erp-card-title">Invoice Baru</h3>
-            <button className="btn btn-ghost btn-sm" onClick={() => setShowForm(false)}>✕</button>
-          </div>
-          <div className="erp-card-body">
-            <form onSubmit={submit}>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
-                <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label className="form-label">Tipe Invoice</label>
-                  <select className="form-select" value={form.type} onChange={e => setForm({ ...form, type: e.target.value })}>
-                    <option value="ACCOUNTS_PAYABLE">Accounts Payable (Hutang)</option>
-                    <option value="ACCOUNTS_RECEIVABLE">Accounts Receivable (Piutang)</option>
-                  </select>
+        <div style={{
+          position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
+          background: "rgba(0,0,0,0.5)", zIndex: 9999,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          backdropFilter: "blur(4px)"
+        }}>
+          <div className="erp-card animate-fade-in" style={{ width: "100%", maxWidth: 700, margin: 20, maxHeight: "90vh", overflowY: "auto", border: "none", boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}>
+            <div className="erp-card-header" style={{ position: "sticky", top: 0, background: "#fff", zIndex: 10, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <h3 className="erp-card-title" style={{ fontSize: 20 }}>Invoice Baru</h3>
+              <button type="button" onClick={() => setShowForm(false)} style={{ background: "transparent", border: "none", fontSize: 20, cursor: "pointer", color: "var(--text-muted)" }}>✕</button>
+            </div>
+            <div className="erp-card-body" style={{ padding: 24 }}>
+              <form onSubmit={submit}>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
+                  <div className="form-group" style={{ marginBottom: 0 }}>
+                    <label className="form-label">Tipe Invoice</label>
+                    <select className="form-select" value={form.type} onChange={e => setForm({ ...form, type: e.target.value })}>
+                      <option value="ACCOUNTS_PAYABLE">Accounts Payable (Hutang)</option>
+                      <option value="ACCOUNTS_RECEIVABLE">Accounts Receivable (Piutang)</option>
+                    </select>
+                  </div>
+                  <div className="form-group" style={{ marginBottom: 0 }}>
+                    <label className="form-label">{form.type === "ACCOUNTS_PAYABLE" ? "Supplier" : "Customer"}</label>
+                    <input className="form-input" value={form.supplierOrCustomer} onChange={e => setForm({ ...form, supplierOrCustomer: e.target.value })} placeholder="Nama perusahaan" required />
+                  </div>
+                  <div className="form-group" style={{ marginBottom: 0 }}>
+                    <label className="form-label">Jumlah (Rp)</label>
+                    <input className="form-input" type="number" value={form.amount} onChange={e => setForm({ ...form, amount: e.target.value })} placeholder="50000000" required />
+                  </div>
+                  <div className="form-group" style={{ marginBottom: 0 }}>
+                    <label className="form-label">Jatuh Tempo</label>
+                    <input className="form-input" type="date" value={form.dueDate} onChange={e => setForm({ ...form, dueDate: e.target.value })} required />
+                  </div>
+                  <div className="form-group" style={{ marginBottom: 0, gridColumn: "span 2" }}>
+                    <label className="form-label">Deskripsi</label>
+                    <input className="form-input" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} placeholder="Pembelian OCC bulan Desember" />
+                  </div>
                 </div>
-                <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label className="form-label">{form.type === "ACCOUNTS_PAYABLE" ? "Supplier" : "Customer"}</label>
-                  <input className="form-input" value={form.supplierOrCustomer} onChange={e => setForm({ ...form, supplierOrCustomer: e.target.value })} placeholder="Nama perusahaan" required />
+                <div style={{ paddingTop: 20, borderTop: "1px solid var(--border-light)", display: "flex", gap: 12, justifyContent: "flex-end" }}>
+                  <button type="button" className="btn btn-secondary" onClick={() => setShowForm(false)}>Batal</button>
+                  <button type="submit" className="btn btn-primary" style={{ padding: "0 24px" }}>💾 Simpan Invoice</button>
                 </div>
-                <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label className="form-label">Jumlah (Rp)</label>
-                  <input className="form-input" type="number" value={form.amount} onChange={e => setForm({ ...form, amount: e.target.value })} placeholder="50000000" required />
-                </div>
-                <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label className="form-label">Jatuh Tempo</label>
-                  <input className="form-input" type="date" value={form.dueDate} onChange={e => setForm({ ...form, dueDate: e.target.value })} required />
-                </div>
-                <div className="form-group" style={{ marginBottom: 0, gridColumn: "span 2" }}>
-                  <label className="form-label">Deskripsi</label>
-                  <input className="form-input" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} placeholder="Pembelian OCC bulan Desember" />
-                </div>
-              </div>
-              <div style={{ paddingTop: 16, borderTop: "1px solid var(--border-light)", display: "flex", gap: 8 }}>
-                <button type="submit" className="btn btn-primary">💾 Simpan Invoice</button>
-                <button type="button" className="btn btn-secondary" onClick={() => setShowForm(false)}>Batal</button>
-              </div>
-            </form>
+              </form>
+            </div>
           </div>
         </div>
       )}

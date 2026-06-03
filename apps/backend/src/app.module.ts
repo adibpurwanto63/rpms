@@ -12,6 +12,7 @@ import { LogisticsModule } from './logistics/logistics.module';
 import { FinanceModule } from './finance/finance.module';
 import { BcpModule } from './bcp/bcp.module';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { PembelianModule } from './pembelian/pembelian.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
     FinanceModule,
     BcpModule,
     DashboardModule,
+    PembelianModule,
   ],
 })
 export class AppModule {}

@@ -4,12 +4,13 @@ import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { canAccess } from "@/lib/permissions";
+import { RefreshProvider } from "@/lib/refresh-context";
 
 const navItems = [
   { href: "/portal/dashboard", icon: "⊞", label: "Dashboard", module: "dashboard" },
   { href: "/portal/purchase", icon: "🛒", label: "Procurement", module: "purchase" },
   { href: "/portal/weighbridge", icon: "⚖️", label: "Timbangan", module: "weighbridge" },
-  { href: "/portal/qc", icon: "🔬", label: "Quality Control", module: "qc" },
+  { href: "/portal/pembelian", icon: "🛍️", label: "Pembelian", module: "pembelian" },
   { href: "/portal/production", icon: "🏭", label: "Produksi", module: "production" },
   { href: "/portal/warehouse", icon: "📦", label: "Gudang", module: "warehouse" },
   { href: "/portal/logistics", icon: "🚛", label: "Logistik", module: "logistics" },
@@ -338,7 +339,9 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
 
         {/* Page Content */}
         <main style={{ flex: 1, padding: "28px 32px", animationName: "fadeInUp", animationDuration: "0.4s", animationTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}>
-          {children}
+          <RefreshProvider>
+            {children}
+          </RefreshProvider>
         </main>
       </div>
     </div>

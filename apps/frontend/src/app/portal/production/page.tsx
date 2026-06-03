@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
+import { useRefresh } from "@/lib/refresh-context";
 
 const machineStatusColor: any = { RUNNING: "badge-success", IDLE: "badge-neutral", MAINTENANCE: "badge-warning", BREAKDOWN: "badge-danger" };
 const machineStatusLabel: any = { RUNNING: "Berjalan", IDLE: "Standby", MAINTENANCE: "Maintenance", BREAKDOWN: "Rusak" };
@@ -12,6 +13,7 @@ export default function ProductionPage() {
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState({ machineId: "", inputWeight: "", outputWeight: "", baleCount: "", runtimeMinutes: "", downtimeMinutes: "0" });
+  const { triggerRefresh } = useRefresh();
 
   const load = () => {
     Promise.all([api.get("/production/machines"), api.get("/production"), api.get("/production/stats/today")])
@@ -23,7 +25,10 @@ export default function ProductionPage() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     await api.post("/production", { machineId: form.machineId, inputWeight: parseFloat(form.inputWeight), outputWeight: parseFloat(form.outputWeight), baleCount: parseInt(form.baleCount), runtimeMinutes: parseInt(form.runtimeMinutes), downtimeMinutes: parseInt(form.downtimeMinutes) });
-    setShowForm(false); load();
+    setShowForm(false);
+    setForm({ machineId: "", inputWeight: "", outputWeight: "", baleCount: "", runtimeMinutes: "", downtimeMinutes: "0" });
+    load();
+    triggerRefresh(); // Notify dashboard to re-fetch
   };
 
   return (
@@ -73,40 +78,48 @@ export default function ProductionPage() {
         </div>
       )}
 
-      {/* Add Record Form */}
+      {/* Add Record Form Modal */}
       {showForm && (
-        <div className="erp-card animate-fade-in">
-          <div className="erp-card-header">
-            <h3 className="erp-card-title">Catat Hasil Produksi</h3>
-          </div>
-          <div className="erp-card-body">
-            <form onSubmit={submit}>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginBottom: 16 }}>
-                <div style={{ gridColumn: "span 3" }}>
-                  <label className="form-label">Pilih Mesin</label>
-                  <select className="form-input" value={form.machineId} onChange={e => setForm({ ...form, machineId: e.target.value })} required>
-                    <option value="">-- Pilih Mesin --</option>
-                    {machines.map((m: any) => <option key={m.id} value={m.id}>{m.name} ({machineStatusLabel[m.status]})</option>)}
-                  </select>
-                </div>
-                {[
-                  { key: "inputWeight", label: "Input Material (kg)", placeholder: "5000" },
-                  { key: "outputWeight", label: "Output Produksi (kg)", placeholder: "4500" },
-                  { key: "baleCount", label: "Jumlah Bale", placeholder: "9" },
-                  { key: "runtimeMinutes", label: "Waktu Jalan (Menit)", placeholder: "420" },
-                  { key: "downtimeMinutes", label: "Waktu Henti (Menit)", placeholder: "0" },
-                ].map(f => (
-                  <div key={f.key}>
-                    <label className="form-label">{f.label}</label>
-                    <input className="form-input" type="number" value={(form as any)[f.key]} onChange={e => setForm({ ...form, [f.key]: e.target.value })} placeholder={f.placeholder} required />
+        <div style={{
+          position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
+          background: "rgba(0,0,0,0.5)", zIndex: 9999,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          backdropFilter: "blur(4px)"
+        }}>
+          <div className="erp-card animate-fade-in" style={{ width: "100%", maxWidth: 700, margin: 20, maxHeight: "90vh", overflowY: "auto", border: "none", boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}>
+            <div className="erp-card-header" style={{ position: "sticky", top: 0, background: "#fff", zIndex: 10, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <h3 className="erp-card-title" style={{ fontSize: 20 }}>Catat Hasil Produksi</h3>
+              <button type="button" onClick={() => setShowForm(false)} style={{ background: "transparent", border: "none", fontSize: 20, cursor: "pointer", color: "var(--text-muted)" }}>✕</button>
+            </div>
+            <div className="erp-card-body" style={{ padding: 24 }}>
+              <form onSubmit={submit}>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginBottom: 16 }}>
+                  <div style={{ gridColumn: "span 3" }}>
+                    <label className="form-label">Pilih Mesin</label>
+                    <select className="form-input" value={form.machineId} onChange={e => setForm({ ...form, machineId: e.target.value })} required>
+                      <option value="">-- Pilih Mesin --</option>
+                      {machines.map((m: any) => <option key={m.id} value={m.id}>{m.name} ({machineStatusLabel[m.status]})</option>)}
+                    </select>
                   </div>
-                ))}
-              </div>
-              <div style={{ paddingTop: 16, borderTop: "1px solid var(--border-light)", display: "flex", gap: 8 }}>
-                <button type="submit" className="btn btn-primary">💾 Simpan Catatan</button>
-                <button type="button" className="btn btn-secondary" onClick={() => setShowForm(false)}>Batal</button>
-              </div>
-            </form>
+                  {[
+                    { key: "inputWeight", label: "Input Material (kg)", placeholder: "5000" },
+                    { key: "outputWeight", label: "Output Produksi (kg)", placeholder: "4500" },
+                    { key: "baleCount", label: "Jumlah Bale", placeholder: "9" },
+                    { key: "runtimeMinutes", label: "Waktu Jalan (Menit)", placeholder: "420" },
+                    { key: "downtimeMinutes", label: "Waktu Henti (Menit)", placeholder: "0" },
+                  ].map(f => (
+                    <div key={f.key}>
+                      <label className="form-label">{f.label}</label>
+                      <input className="form-input" type="number" value={(form as any)[f.key]} onChange={e => setForm({ ...form, [f.key]: e.target.value })} placeholder={f.placeholder} required />
+                    </div>
+                  ))}
+                </div>
+                <div style={{ paddingTop: 20, borderTop: "1px solid var(--border-light)", display: "flex", gap: 12, justifyContent: "flex-end" }}>
+                  <button type="button" className="btn btn-secondary" onClick={() => setShowForm(false)}>Batal</button>
+                  <button type="submit" className="btn btn-primary" style={{ padding: "0 24px" }}>💾 Simpan Catatan</button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}

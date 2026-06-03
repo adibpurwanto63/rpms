@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
-import { InvoiceType, InventoryStatus, DeliveryStatus, IncidentStatus } from "@prisma/client";
+import { InvoiceType, InventoryStatus, DeliveryStatus, IncidentStatus, PurchaseOrderStatus } from "@prisma/client";
 
 @Injectable()
 export class DashboardService {
@@ -13,7 +13,8 @@ export class DashboardService {
 
     const [
       todayPurchase, todayProduction, todayShipment,
-      inventory, ar, ap, incidents, recentTickets, recentProduction
+      inventory, ar, ap, incidents, recentTickets, recentProduction,
+      pendingPO, recentPO
     ] = await Promise.all([
       this.prisma.weighingTicket.aggregate({ where: { date: { gte: today, lt: tomorrow } }, _count: true, _sum: { netWeight: true } }),
       this.prisma.productionRecord.aggregate({ where: { date: { gte: today, lt: tomorrow } }, _sum: { outputWeight: true, baleCount: true }, _avg: { oee: true } }),
@@ -24,6 +25,8 @@ export class DashboardService {
       this.prisma.incident.count({ where: { status: IncidentStatus.OPEN } }),
       this.prisma.weighingTicket.findMany({ orderBy: { date: "desc" }, take: 5, include: { supplier: { select: { companyName: true } } } }),
       this.prisma.productionRecord.findMany({ orderBy: { date: "desc" }, take: 5, include: { machine: true } }),
+      this.prisma.purchaseOrder.count({ where: { status: { in: [PurchaseOrderStatus.PENDING, PurchaseOrderStatus.APPROVED, PurchaseOrderStatus.ORDERED] } } }),
+      this.prisma.purchaseOrder.findMany({ orderBy: { createdAt: "desc" }, take: 5, include: { supplier: { select: { companyName: true } } } }),
     ]);
 
     const revenue = ar._sum.amount || 0;
@@ -40,6 +43,7 @@ export class DashboardService {
       riskStatus: { openIncidents: incidents },
       recentTickets,
       recentProduction,
+      pembelian: { pendingPO, recentPO },
     };
   }
 

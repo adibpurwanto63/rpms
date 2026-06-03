@@ -56,38 +56,44 @@ export default function PurchasePage() {
         </div>
       )}
 
-      {/* Add Supplier Form */}
       {showForm && (
-        <div className="erp-card animate-fade-in">
-          <div className="erp-card-header">
-            <h3 className="erp-card-title">Registrasi Supplier Baru</h3>
-            <button className="btn btn-ghost btn-sm" onClick={() => setShowForm(false)}>✕</button>
-          </div>
-          <div className="erp-card-body">
-            <form onSubmit={submit}>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
-                {[
-                  { key: "companyName", label: "Nama Perusahaan", placeholder: "PT Contoh Jaya" },
-                  { key: "picName", label: "Nama PIC", placeholder: "Budi Santoso" },
-                  { key: "phone", label: "Telepon", placeholder: "021-xxxxxxx" },
-                  { key: "email", label: "Email", placeholder: "pic@perusahaan.com" },
-                  { key: "taxNumber", label: "NPWP", placeholder: "xx.xxx.xxx.x-xxx.xxx" },
-                ].map(f => (
-                  <div key={f.key}>
-                    <label className="form-label">{f.label}</label>
-                    <input className="form-input" value={(form as any)[f.key]} onChange={e => setForm({ ...form, [f.key]: e.target.value })} placeholder={f.placeholder} />
+        <div style={{
+          position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
+          background: "rgba(0,0,0,0.5)", zIndex: 9999,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          backdropFilter: "blur(4px)"
+        }}>
+          <div className="erp-card animate-fade-in" style={{ width: "100%", maxWidth: 700, margin: 20, maxHeight: "90vh", overflowY: "auto", border: "none", boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}>
+            <div className="erp-card-header" style={{ position: "sticky", top: 0, background: "#fff", zIndex: 10, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <h3 className="erp-card-title" style={{ fontSize: 20 }}>Registrasi Supplier Baru</h3>
+              <button type="button" onClick={() => setShowForm(false)} style={{ background: "transparent", border: "none", fontSize: 20, cursor: "pointer", color: "var(--text-muted)" }}>✕</button>
+            </div>
+            <div className="erp-card-body" style={{ padding: 24 }}>
+              <form onSubmit={submit}>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
+                  {[
+                    { key: "companyName", label: "Nama Perusahaan", placeholder: "PT Contoh Jaya" },
+                    { key: "picName", label: "Nama PIC", placeholder: "Budi Santoso" },
+                    { key: "phone", label: "Telepon", placeholder: "021-xxxxxxx" },
+                    { key: "email", label: "Email", placeholder: "pic@perusahaan.com" },
+                    { key: "taxNumber", label: "NPWP", placeholder: "xx.xxx.xxx.x-xxx.xxx" },
+                  ].map(f => (
+                    <div key={f.key}>
+                      <label className="form-label">{f.label}</label>
+                      <input className="form-input" value={(form as any)[f.key]} onChange={e => setForm({ ...form, [f.key]: e.target.value })} placeholder={f.placeholder} required />
+                    </div>
+                  ))}
+                  <div style={{ gridColumn: "span 2" }}>
+                    <label className="form-label">Alamat</label>
+                    <textarea className="form-input" rows={2} value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} placeholder="Jl. Contoh No. 1, Kota, Provinsi" style={{ height: "auto" }} required />
                   </div>
-                ))}
-                <div style={{ gridColumn: "span 2" }}>
-                  <label className="form-label">Alamat</label>
-                  <textarea className="form-input" rows={2} value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} placeholder="Jl. Contoh No. 1, Kota, Provinsi" style={{ height: "auto" }} />
                 </div>
-              </div>
-              <div style={{ paddingTop: 16, borderTop: "1px solid var(--border-light)", display: "flex", gap: 8 }}>
-                <button type="submit" className="btn btn-primary">💾 Simpan Supplier</button>
-                <button type="button" className="btn btn-secondary" onClick={() => setShowForm(false)}>Batal</button>
-              </div>
-            </form>
+                <div style={{ paddingTop: 20, borderTop: "1px solid var(--border-light)", display: "flex", gap: 12, justifyContent: "flex-end" }}>
+                  <button type="button" className="btn btn-secondary" onClick={() => setShowForm(false)}>Batal</button>
+                  <button type="submit" className="btn btn-primary" style={{ padding: "0 24px" }}>💾 Simpan Supplier</button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}

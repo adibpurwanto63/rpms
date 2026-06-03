@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
+import { useRefresh } from "@/lib/refresh-context";
 
 export default function WeighbridgePage() {
   const [tickets, setTickets] = useState<any[]>([]);
@@ -9,6 +10,7 @@ export default function WeighbridgePage() {
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState({ supplierId: "", truckNumber: "", driverName: "", materialType: "OCC", grossWeight: "", tareWeight: "" });
+  const { triggerRefresh } = useRefresh();
 
   const load = () => {
     Promise.all([
@@ -26,6 +28,7 @@ export default function WeighbridgePage() {
     setShowForm(false);
     setForm({ supplierId: "", truckNumber: "", driverName: "", materialType: "OCC", grossWeight: "", tareWeight: "" });
     load();
+    triggerRefresh();
   };
 
   const net = form.grossWeight && form.tareWeight ? parseFloat(form.grossWeight) - parseFloat(form.tareWeight) : 0;

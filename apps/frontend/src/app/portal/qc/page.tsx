@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
+import { useRefresh } from "@/lib/refresh-context";
 
 const gradeColor: any = { A: "badge-success", B: "badge-warning", REJECT: "badge-danger" };
 const gradeLabel: any = { A: "Grade A", B: "Grade B", REJECT: "Reject" };
@@ -12,6 +13,7 @@ export default function QcPage() {
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState({ ticketId: "", grade: "A", moisturePct: 0, plasticPct: 0, metalPct: 0, contaminationPct: 0, notes: "" });
+  const { triggerRefresh } = useRefresh();
 
   const load = () => {
     Promise.all([api.get("/qc"), api.get("/qc/stats"), api.get("/weighbridge")]).then(([q, s, t]) => {
@@ -23,7 +25,9 @@ export default function QcPage() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     await api.post("/qc", form);
-    setShowForm(false); load();
+    setShowForm(false);
+    load();
+    triggerRefresh();
   };
 
   const getStat = (grade: string) => stats.find(s => s.grade === grade)?._count || 0;
@@ -60,57 +64,65 @@ export default function QcPage() {
         </div>
       )}
 
-      {/* Form */}
+      {/* Form Modal */}
       {showForm && (
-        <div className="erp-card animate-fade-in">
-          <div className="erp-card-header">
-            <h3 className="erp-card-title">Form Inspeksi Baru</h3>
-          </div>
-          <div className="erp-card-body">
-            <form onSubmit={submit}>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
-                <div>
-                  <label className="form-label">Tiket Timbangan</label>
-                  <select className="form-input" value={form.ticketId} onChange={e => setForm({ ...form, ticketId: e.target.value })} required>
-                    <option value="">Pilih Tiket yang Belum Diinspeksi</option>
-                    {tickets.map((t: any) => <option key={t.id} value={t.id}>{t.ticketNumber} — {t.supplier?.companyName}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label className="form-label">Keputusan Grade</label>
-                  <select className="form-input" value={form.grade} onChange={e => setForm({ ...form, grade: e.target.value })}>
-                    <option value="A">Grade A (Sesuai Standar)</option>
-                    <option value="B">Grade B (Di Bawah Standar)</option>
-                    <option value="REJECT">Reject (Ditolak)</option>
-                  </select>
-                </div>
-                
-                {[{ label: "Kadar Air (Moisture) %", field: "moisturePct" },
-                  { label: "Kontaminasi Plastik %", field: "plasticPct" },
-                  { label: "Kontaminasi Metal %", field: "metalPct" },
-                  { label: "Kontaminasi Total %", field: "contaminationPct" }
-                ].map((s: any) => (
-                  <div key={s.field}>
-                    <label className="form-label" style={{ display: "flex", justifyContent: "space-between" }}>
-                      <span>{s.label}</span>
-                      <span style={{ fontWeight: 700, color: "var(--brand-purple)" }}>{(form as any)[s.field]}%</span>
-                    </label>
-                    <input type="range" min={0} max={50} step={0.5} value={(form as any)[s.field]}
-                      onChange={e => setForm({ ...form, [s.field]: parseFloat(e.target.value) })}
-                      style={{ width: "100%", accentColor: "var(--brand-purple)" }} />
+        <div style={{
+          position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
+          background: "rgba(0,0,0,0.5)", zIndex: 9999,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          backdropFilter: "blur(4px)"
+        }}>
+          <div className="erp-card animate-fade-in" style={{ width: "100%", maxWidth: 700, margin: 20, maxHeight: "90vh", overflowY: "auto", border: "none", boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}>
+            <div className="erp-card-header" style={{ position: "sticky", top: 0, background: "#fff", zIndex: 10, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <h3 className="erp-card-title" style={{ fontSize: 20 }}>Form Inspeksi Baru</h3>
+              <button type="button" onClick={() => setShowForm(false)} style={{ background: "transparent", border: "none", fontSize: 20, cursor: "pointer", color: "var(--text-muted)" }}>✕</button>
+            </div>
+            <div className="erp-card-body" style={{ padding: 24 }}>
+              <form onSubmit={submit}>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
+                  <div>
+                    <label className="form-label">Tiket Timbangan</label>
+                    <select className="form-input" value={form.ticketId} onChange={e => setForm({ ...form, ticketId: e.target.value })} required>
+                      <option value="">Pilih Tiket yang Belum Diinspeksi</option>
+                      {tickets.map((t: any) => <option key={t.id} value={t.id}>{t.ticketNumber} — {t.supplier?.companyName}</option>)}
+                    </select>
                   </div>
-                ))}
-                
-                <div style={{ gridColumn: "span 2" }}>
-                  <label className="form-label">Catatan QC</label>
-                  <textarea className="form-input" rows={2} value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} placeholder="Masukkan catatan tambahan bila perlu..." style={{ height: "auto" }} />
+                  <div>
+                    <label className="form-label">Keputusan Grade</label>
+                    <select className="form-input" value={form.grade} onChange={e => setForm({ ...form, grade: e.target.value })}>
+                      <option value="A">Grade A (Sesuai Standar)</option>
+                      <option value="B">Grade B (Di Bawah Standar)</option>
+                      <option value="REJECT">Reject (Ditolak)</option>
+                    </select>
+                  </div>
+                  
+                  {[{ label: "Kadar Air (Moisture) %", field: "moisturePct" },
+                    { label: "Kontaminasi Plastik %", field: "plasticPct" },
+                    { label: "Kontaminasi Metal %", field: "metalPct" },
+                    { label: "Kontaminasi Total %", field: "contaminationPct" }
+                  ].map((s: any) => (
+                    <div key={s.field}>
+                      <label className="form-label" style={{ display: "flex", justifyContent: "space-between" }}>
+                        <span>{s.label}</span>
+                        <span style={{ fontWeight: 700, color: "var(--brand-purple)" }}>{(form as any)[s.field]}%</span>
+                      </label>
+                      <input type="range" min={0} max={50} step={0.5} value={(form as any)[s.field]}
+                        onChange={e => setForm({ ...form, [s.field]: parseFloat(e.target.value) })}
+                        style={{ width: "100%", accentColor: "var(--brand-purple)" }} />
+                    </div>
+                  ))}
+                  
+                  <div style={{ gridColumn: "span 2" }}>
+                    <label className="form-label">Catatan QC</label>
+                    <textarea className="form-input" rows={2} value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} placeholder="Masukkan catatan tambahan bila perlu..." style={{ height: "auto" }} />
+                  </div>
                 </div>
-              </div>
-              <div style={{ paddingTop: 16, borderTop: "1px solid var(--border-light)", display: "flex", gap: 8 }}>
-                <button type="submit" className="btn btn-primary">💾 Simpan Inspeksi</button>
-                <button type="button" className="btn btn-secondary" onClick={() => setShowForm(false)}>Batal</button>
-              </div>
-            </form>
+                <div style={{ paddingTop: 20, borderTop: "1px solid var(--border-light)", display: "flex", gap: 12, justifyContent: "flex-end" }}>
+                  <button type="button" className="btn btn-secondary" onClick={() => setShowForm(false)}>Batal</button>
+                  <button type="submit" className="btn btn-primary" style={{ padding: "0 24px" }}>💾 Simpan Inspeksi</button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}
