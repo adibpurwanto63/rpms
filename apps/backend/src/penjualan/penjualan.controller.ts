@@ -28,7 +28,7 @@ export class PenjualanController {
 
   @Post()
   create(@Body() dto: {
-    customerName: string;
+    customerId: string;
     itemName: string;
     quantity: number;
     unit?: string;

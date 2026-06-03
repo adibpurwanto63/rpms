@@ -17,19 +17,21 @@ export class PenjualanService {
     return this.prisma.salesOrder.findMany({
       where: status && status !== "all" ? { status: status as SalesOrderStatus } : undefined,
       orderBy: { createdAt: "desc" },
+      include: { customer: { select: { companyName: true, picName: true } } }
     });
   }
 
   async findOne(id: string) {
     const so = await this.prisma.salesOrder.findUnique({
       where: { id },
+      include: { customer: true }
     });
     if (!so) throw new NotFoundException("Sales order not found");
     return so;
   }
 
   async create(dto: {
-    customerName: string;
+    customerId: string;
     itemName: string;
     quantity: number;
     unit?: string;
@@ -40,7 +42,7 @@ export class PenjualanService {
     return this.prisma.salesOrder.create({
       data: {
         orderNumber: this.generateOrderNumber(),
-        customerName: dto.customerName,
+        customerId: dto.customerId,
         itemName: dto.itemName,
         quantity: dto.quantity,
         unit: dto.unit || "kg",
@@ -114,6 +116,7 @@ export class PenjualanService {
       this.prisma.salesOrder.findMany({
         orderBy: { createdAt: "desc" },
         take: 5,
+        include: { customer: { select: { companyName: true } } }
       }),
     ]);
 

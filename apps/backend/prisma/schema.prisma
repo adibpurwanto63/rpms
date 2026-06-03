@@ -237,10 +237,26 @@ model PurchaseOrder {
   @@map("purchase_orders")
 }
 
+model Customer {
+  id              String           @id @default(cuid())
+  companyName     String           @map("company_name")
+  picName         String           @map("pic_name")
+  phone           String
+  email           String?
+  address         String
+  taxNumber       String?          @map("tax_number")
+  status          SupplierStatus   @default(ACTIVE)
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+  salesOrders     SalesOrder[]
+
+  @@map("customers")
+}
+
 model SalesOrder {
   id            String           @id @default(cuid())
   orderNumber   String           @unique @map("order_number")
-  customerName  String           @map("customer_name")
+  customerId    String           @map("customer_id")
   itemName      String           @map("item_name")
   quantity      Float
   unit          String           @default("kg")
@@ -251,6 +267,7 @@ model SalesOrder {
   shippedAt     DateTime?        @map("shipped_at")
   createdAt     DateTime         @default(now()) @map("created_at")
   updatedAt     DateTime         @updatedAt @map("updated_at")
+  customer      Customer         @relation(fields: [customerId], references: [id])
 
   @@map("sales_orders")
 }

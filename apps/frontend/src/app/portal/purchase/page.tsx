@@ -7,7 +7,7 @@ const fmtRp = (n: number) =>
   new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(n);
 
 export default function PurchasePage() {
-  const [activeTab, setActiveTab] = useState("supplier"); // 'supplier' | 'penjualan'
+  const [activeTab, setActiveTab] = useState("supplier"); // 'supplier' | 'penjualan' | 'customer'
   
   // Supplier State
   const [suppliers, setSuppliers] = useState<any[]>([]);
@@ -15,11 +15,17 @@ export default function PurchasePage() {
   const [showSupplierForm, setShowSupplierForm] = useState(false);
   const [supplierForm, setSupplierForm] = useState({ companyName: "", picName: "", phone: "", email: "", address: "", taxNumber: "" });
 
+  // Customer State
+  const [customers, setCustomers] = useState<any[]>([]);
+  const [loadingCustomers, setLoadingCustomers] = useState(true);
+  const [showCustomerForm, setShowCustomerForm] = useState(false);
+  const [customerForm, setCustomerForm] = useState({ companyName: "", picName: "", phone: "", email: "", address: "", taxNumber: "" });
+
   // Penjualan State
   const [salesOrders, setSalesOrders] = useState<any[]>([]);
   const [loadingSales, setLoadingSales] = useState(true);
   const [showSalesForm, setShowSalesForm] = useState(false);
-  const [salesForm, setSalesForm] = useState({ customerName: "", itemName: "Kardus Bekas (OCC)", quantity: "", unit: "ton", unitPrice: "", notes: "" });
+  const [salesForm, setSalesForm] = useState({ customerId: "", itemName: "Kardus Bekas (OCC)", quantity: "", unit: "ton", unitPrice: "", notes: "" });
 
   const { triggerRefresh } = useRefresh();
 
@@ -27,13 +33,20 @@ export default function PurchasePage() {
   const loadSuppliers = () => {
     api.get("/suppliers").then(r => setSuppliers(r.data)).finally(() => setLoadingSuppliers(false));
   };
+  const loadCustomers = () => {
+    api.get("/customers").then(r => setCustomers(r.data)).finally(() => setLoadingCustomers(false));
+  };
   const loadSales = () => {
     api.get("/penjualan").then(r => setSalesOrders(r.data)).finally(() => setLoadingSales(false));
   };
 
   useEffect(() => {
     if (activeTab === "supplier") loadSuppliers();
-    else loadSales();
+    else if (activeTab === "customer") loadCustomers();
+    else {
+      loadSales();
+      loadCustomers(); // Load customers for dropdown
+    }
   }, [activeTab]);
 
   // Actions Supplier
@@ -67,6 +80,37 @@ export default function PurchasePage() {
     }
   };
 
+  // Actions Customer
+  const submitCustomer = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await api.post("/customers", customerForm);
+    setShowCustomerForm(false);
+    setCustomerForm({ companyName: "", picName: "", phone: "", email: "", address: "", taxNumber: "" });
+    loadCustomers();
+    triggerRefresh();
+  };
+
+  const updateCustomerStatus = async (id: string, status: string) => {
+    try {
+      await api.put(`/customers/${id}/status`, { status });
+      loadCustomers();
+      triggerRefresh();
+    } catch (e: any) {
+      alert(e.response?.data?.message || "Error updating status");
+    }
+  };
+
+  const deleteCustomer = async (id: string) => {
+    if (!confirm("Hapus customer ini? (Akan gagal jika masih ada data SO terkait)")) return;
+    try {
+      await api.delete(`/customers/${id}`);
+      loadCustomers();
+      triggerRefresh();
+    } catch (e: any) {
+      alert("Gagal menghapus customer. Pastikan tidak ada data yang terkait dengan customer ini.");
+    }
+  };
+
   // Actions Penjualan
   const submitSales = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,7 +120,7 @@ export default function PurchasePage() {
       unitPrice: parseFloat(salesForm.unitPrice),
     });
     setShowSalesForm(false);
-    setSalesForm({ customerName: "", itemName: "Kardus Bekas (OCC)", quantity: "", unit: "ton", unitPrice: "", notes: "" });
+    setSalesForm({ customerId: "", itemName: "Kardus Bekas (OCC)", quantity: "", unit: "ton", unitPrice: "", notes: "" });
     loadSales();
     triggerRefresh();
   };
@@ -110,14 +154,12 @@ export default function PurchasePage() {
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div>
           <h2 style={{ fontSize: 22, fontWeight: 700, color: "var(--text-primary)", letterSpacing: "-0.02em" }}>Procurement & Sales</h2>
-          <p style={{ fontSize: 14, color: "var(--text-secondary)", marginTop: 4 }}>Manajemen Supplier & Penjualan Barang</p>
+          <p style={{ fontSize: 14, color: "var(--text-secondary)", marginTop: 4 }}>Manajemen Supplier, Customer & Penjualan Barang</p>
         </div>
         <div style={{ display: "flex", gap: 12 }}>
-          {activeTab === "supplier" ? (
-            <button className="btn btn-primary" onClick={() => setShowSupplierForm(true)}>+ Tambah Supplier</button>
-          ) : (
-            <button className="btn btn-primary" onClick={() => setShowSalesForm(true)}>+ Buat Sales Order</button>
-          )}
+          {activeTab === "supplier" && <button className="btn btn-primary" onClick={() => setShowSupplierForm(true)}>+ Tambah Supplier</button>}
+          {activeTab === "customer" && <button className="btn btn-primary" onClick={() => setShowCustomerForm(true)}>+ Tambah Customer</button>}
+          {activeTab === "penjualan" && <button className="btn btn-primary" onClick={() => setShowSalesForm(true)}>+ Buat Sales Order</button>}
         </div>
       </div>
 
@@ -132,6 +174,16 @@ export default function PurchasePage() {
           }}
         >
           🏢 Manajemen Supplier
+        </button>
+        <button
+          onClick={() => setActiveTab("customer")}
+          style={{
+            padding: "8px 20px", borderRadius: 8, fontSize: 14, fontWeight: 600, border: "none", cursor: "pointer",
+            background: activeTab === "customer" ? "var(--color-purple)" : "transparent",
+            color: activeTab === "customer" ? "#fff" : "var(--text-secondary)"
+          }}
+        >
+          👥 Manajemen Customer
         </button>
         <button
           onClick={() => setActiveTab("penjualan")}
@@ -239,6 +291,83 @@ export default function PurchasePage() {
         </>
       )}
 
+      {/* TAB: CUSTOMER */}
+      {activeTab === "customer" && (
+        <>
+          {showCustomerForm && (
+            <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.5)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", backdropFilter: "blur(4px)" }}>
+              <div className="erp-card animate-fade-in" style={{ width: "100%", maxWidth: 700, margin: 20, maxHeight: "90vh", overflowY: "auto", border: "none", boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}>
+                <div className="erp-card-header" style={{ position: "sticky", top: 0, background: "#fff", zIndex: 10, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <h3 className="erp-card-title" style={{ fontSize: 20 }}>Registrasi Customer Baru</h3>
+                  <button type="button" onClick={() => setShowCustomerForm(false)} style={{ background: "transparent", border: "none", fontSize: 20, cursor: "pointer", color: "var(--text-muted)" }}>✕</button>
+                </div>
+                <div className="erp-card-body" style={{ padding: 24 }}>
+                  <form onSubmit={submitCustomer}>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
+                      {[
+                        { key: "companyName", label: "Nama Perusahaan (Customer)", placeholder: "PT Contoh Pembeli" },
+                        { key: "picName", label: "Nama PIC", placeholder: "Budi Santoso" },
+                        { key: "phone", label: "Telepon", placeholder: "021-xxxxxxx" },
+                        { key: "email", label: "Email", placeholder: "pic@perusahaan.com" },
+                        { key: "taxNumber", label: "NPWP", placeholder: "xx.xxx.xxx.x-xxx.xxx" },
+                      ].map(f => (
+                        <div key={f.key}>
+                          <label className="form-label">{f.label}</label>
+                          <input className="form-input" value={(customerForm as any)[f.key]} onChange={e => setCustomerForm({ ...customerForm, [f.key]: e.target.value })} placeholder={f.placeholder} required />
+                        </div>
+                      ))}
+                      <div style={{ gridColumn: "span 2" }}>
+                        <label className="form-label">Alamat</label>
+                        <textarea className="form-input" rows={2} value={customerForm.address} onChange={e => setCustomerForm({ ...customerForm, address: e.target.value })} placeholder="Jl. Contoh No. 1, Kota, Provinsi" style={{ height: "auto" }} required />
+                      </div>
+                    </div>
+                    <div style={{ paddingTop: 20, borderTop: "1px solid var(--border-light)", display: "flex", gap: 12, justifyContent: "flex-end" }}>
+                      <button type="button" className="btn btn-secondary" onClick={() => setShowCustomerForm(false)}>Batal</button>
+                      <button type="submit" className="btn btn-primary" style={{ padding: "0 24px" }}>💾 Simpan Customer</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="erp-card">
+            <div className="erp-card-header">
+              <span className="erp-card-title">Daftar Customer Pembeli</span>
+            </div>
+            <div style={{ overflowX: "auto" }}>
+              <table className="erp-table">
+                <thead>
+                  <tr><th>Nama Perusahaan</th><th>PIC</th><th>Kontak</th><th>Status</th><th>Aksi</th></tr>
+                </thead>
+                <tbody>
+                  {customers.length === 0 ? (
+                    <tr><td colSpan={5} style={{ textAlign: "center", padding: "3rem", color: "var(--text-muted)" }}>Belum ada data customer</td></tr>
+                  ) : customers.map((c: any) => (
+                    <tr key={c.id}>
+                      <td><div style={{ fontWeight: 600 }}>{c.companyName}</div></td>
+                      <td style={{ fontWeight: 500 }}>{c.picName}</td>
+                      <td style={{ color: "var(--text-secondary)" }}>{c.phone}</td>
+                      <td><span className={`badge ${statusBadge(c.status)}`}>{statusLabel(c.status)}</span></td>
+                      <td>
+                        <div style={{ display: "flex", gap: 6 }}>
+                          {c.status === "ACTIVE" ? (
+                            <button onClick={() => updateCustomerStatus(c.id, "INACTIVE")} className="btn btn-secondary" style={{ padding: "4px 8px", fontSize: 12 }}>Nonaktifkan</button>
+                          ) : (
+                            <button onClick={() => updateCustomerStatus(c.id, "ACTIVE")} className="btn btn-primary" style={{ padding: "4px 8px", fontSize: 12 }}>Aktifkan</button>
+                          )}
+                          <button onClick={() => deleteCustomer(c.id)} style={{ padding: "4px 8px", fontSize: 12, border: "1px solid red", color: "red", background: "none", borderRadius: 6, cursor: "pointer" }}>Hapus</button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
+      )}
+
       {/* TAB: PENJUALAN */}
       {activeTab === "penjualan" && (
         <>
@@ -254,7 +383,12 @@ export default function PurchasePage() {
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
                       <div className="form-group" style={{ gridColumn: "span 2", marginBottom: 0 }}>
                         <label className="form-label">Nama Pembeli (Customer)</label>
-                        <input className="form-input" value={salesForm.customerName} onChange={e => setSalesForm({ ...salesForm, customerName: e.target.value })} required placeholder="PT Pembeli Kertas" />
+                        <select className="form-input" value={salesForm.customerId} onChange={e => setSalesForm({ ...salesForm, customerId: e.target.value })} required>
+                          <option value="">-- Pilih Customer --</option>
+                          {customers.filter(c => c.status === "ACTIVE").map(c => (
+                            <option key={c.id} value={c.id}>{c.companyName}</option>
+                          ))}
+                        </select>
                       </div>
                       <div className="form-group" style={{ gridColumn: "span 2", marginBottom: 0 }}>
                         <label className="form-label">Nama Barang</label>
@@ -322,7 +456,7 @@ export default function PurchasePage() {
                   ) : salesOrders.map((so: any) => (
                     <tr key={so.id}>
                       <td style={{ fontFamily: "monospace", color: "var(--color-purple)", fontWeight: 600 }}>{so.orderNumber}</td>
-                      <td style={{ fontWeight: 500 }}>{so.customerName}</td>
+                      <td style={{ fontWeight: 500 }}>{so.customer?.companyName || "N/A"}</td>
                       <td>{so.itemName}</td>
                       <td style={{ color: "var(--text-secondary)" }}>{so.quantity} {so.unit}</td>
                       <td style={{ fontWeight: 700, color: "var(--color-teal)" }}>{fmtRp(so.totalAmount)}</td>
@@ -351,3 +485,4 @@ export default function PurchasePage() {
     </div>
   );
 }
+

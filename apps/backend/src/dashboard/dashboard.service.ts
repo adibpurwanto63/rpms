@@ -32,7 +32,7 @@ export class DashboardService {
       this.prisma.purchaseOrder.count(),
       this.prisma.purchaseOrder.aggregate({ _sum: { totalAmount: true } }),
       this.prisma.salesOrder.count({ where: { status: { in: [SalesOrderStatus.PENDING, SalesOrderStatus.APPROVED] } } }),
-      this.prisma.salesOrder.findMany({ orderBy: { createdAt: "desc" }, take: 5 }),
+      this.prisma.salesOrder.findMany({ orderBy: { createdAt: "desc" }, take: 5, include: { customer: { select: { companyName: true } } } }),
       this.prisma.salesOrder.count(),
       this.prisma.salesOrder.aggregate({ _sum: { totalAmount: true } }),
     ]);

@@ -4,6 +4,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { SuppliersModule } from './suppliers/suppliers.module';
+import { CustomersModule } from './customers/customers.module';
 import { WeighbridgeModule } from './weighbridge/weighbridge.module';
 import { QcModule } from './qc/qc.module';
 import { ProductionModule } from './production/production.module';
@@ -22,6 +23,7 @@ import { PenjualanModule } from './penjualan/penjualan.module';
     AuthModule,
     UsersModule,
     SuppliersModule,
+    CustomersModule,
     WeighbridgeModule,
     QcModule,
     ProductionModule,
