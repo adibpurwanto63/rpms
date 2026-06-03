@@ -13,7 +13,7 @@ interface DashData {
   riskStatus: { openIncidents: number };
   recentTickets: any[];
   recentProduction: any[];
-  pembelian: { pendingPO: number; recentPO: any[] };
+  pembelian: { pendingPO: number; recentPO: any[]; totalPO: number; totalSpend: number };
 }
 
 const fmt = (n: number) => `${(n / 1000).toFixed(2)} Ton`;
