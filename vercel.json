@@ -1,0 +1,23 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "apps/backend/src/main.ts",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "apps/frontend/package.json",
+      "use": "@vercel/next"
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/apps/backend/src/main.ts"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/apps/frontend/$1"
+    }
+  ]
+}
