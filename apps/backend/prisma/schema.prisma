@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -9,6 +6,215 @@ datasource db {
   provider = "postgresql"
 }
 
+model User {
+  id           String             @id @default(cuid())
+  name         String
+  email        String             @unique
+  passwordHash String             @map("password_hash")
+  role         UserRole
+  isActive     Boolean            @default(true) @map("is_active")
+  supplierId   String?            @map("supplier_id")
+  createdAt    DateTime           @default(now()) @map("created_at")
+  updatedAt    DateTime           @updatedAt @map("updated_at")
+  auditLogs    AuditLog[]
+  productions  ProductionRecord[]
+  qcRecords    QcInspection[]
+  supplier     Supplier?          @relation(fields: [supplierId], references: [id])
+
+  @@map("users")
+}
+
+model Supplier {
+  id              String           @id @default(cuid())
+  companyName     String           @map("company_name")
+  picName         String           @map("pic_name")
+  phone           String
+  email           String?
+  address         String
+  taxNumber       String?          @map("tax_number")
+  status          SupplierStatus   @default(ACTIVE)
+  rating          Float            @default(5.0)
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+  users           User[]
+  weighingTickets WeighingTicket[]
+
+  @@map("suppliers")
+}
+
+model WeighingTicket {
+  id           String        @id @default(cuid())
+  ticketNumber String        @unique @map("ticket_number")
+  supplierId   String        @map("supplier_id")
+  truckNumber  String        @map("truck_number")
+  driverName   String        @map("driver_name")
+  materialType String        @map("material_type")
+  grossWeight  Float         @map("gross_weight")
+  tareWeight   Float         @map("tare_weight")
+  netWeight    Float         @map("net_weight")
+  operatorId   String?       @map("operator_id")
+  date         DateTime      @default(now())
+  createdAt    DateTime      @default(now()) @map("created_at")
+  qcInspection QcInspection?
+  supplier     Supplier      @relation(fields: [supplierId], references: [id])
+
+  @@map("weighing_tickets")
+}
+
+model QcInspection {
+  id               String         @id @default(cuid())
+  ticketId         String         @unique @map("ticket_id")
+  grade            QcGrade
+  moisturePct      Float          @default(0) @map("moisture_pct")
+  plasticPct       Float          @default(0) @map("plastic_pct")
+  metalPct         Float          @default(0) @map("metal_pct")
+  contaminationPct Float          @default(0) @map("contamination_pct")
+  photoUrls        String[]       @map("photo_urls")
+  notes            String?
+  officerId        String?        @map("officer_id")
+  inspectedAt      DateTime       @default(now()) @map("inspected_at")
+  officer          User?          @relation(fields: [officerId], references: [id])
+  ticket           WeighingTicket @relation(fields: [ticketId], references: [id])
+
+  @@map("qc_inspections")
+}
+
+model Machine {
+  id                String             @id @default(cuid())
+  name              String
+  type              MachineType
+  status            MachineStatus      @default(IDLE)
+  location          String?
+  installedAt       DateTime?          @map("installed_at")
+  createdAt         DateTime           @default(now()) @map("created_at")
+  productionRecords ProductionRecord[]
+
+  @@map("machines")
+}
+
+model ProductionRecord {
+  id              String          @id @default(cuid())
+  machineId       String          @map("machine_id")
+  inputWeight     Float           @map("input_weight")
+  outputWeight    Float           @map("output_weight")
+  baleCount       Int             @map("bale_count")
+  runtimeMinutes  Int             @default(0) @map("runtime_minutes")
+  downtimeMinutes Int             @default(0) @map("downtime_minutes")
+  oee             Float           @default(0)
+  operatorId      String?         @map("operator_id")
+  date            DateTime        @default(now())
+  createdAt       DateTime        @default(now()) @map("created_at")
+  bales           InventoryItem[]
+  machine         Machine         @relation(fields: [machineId], references: [id])
+  operator        User?           @relation(fields: [operatorId], references: [id])
+
+  @@map("production_records")
+}
+
+model InventoryItem {
+  id               String            @id @default(cuid())
+  baleId           String            @unique @map("bale_id")
+  weight           Float
+  grade            QcGrade
+  area             InventoryArea     @default(RAW_MATERIAL)
+  location         String?
+  status           InventoryStatus   @default(IN_STOCK)
+  productionId     String?           @map("production_id")
+  productionDate   DateTime?         @map("production_date")
+  createdAt        DateTime          @default(now()) @map("created_at")
+  updatedAt        DateTime          @updatedAt @map("updated_at")
+  productionRecord ProductionRecord? @relation(fields: [productionId], references: [id])
+
+  @@map("inventory_items")
+}
+
+model Vehicle {
+  id         String          @id @default(cuid())
+  plate      String          @unique
+  type       VehicleType
+  driverName String          @map("driver_name")
+  status     VehicleStatus   @default(AVAILABLE)
+  createdAt  DateTime        @default(now()) @map("created_at")
+  deliveries DeliveryOrder[]
+
+  @@map("vehicles")
+}
+
+model DeliveryOrder {
+  id            String         @id @default(cuid())
+  orderNumber   String         @unique @map("order_number")
+  vehicleId     String         @map("vehicle_id")
+  destination   String
+  loadingWeight Float          @map("loading_weight")
+  loadingTime   DateTime?      @map("loading_time")
+  arrivalTime   DateTime?      @map("arrival_time")
+  podUrl        String?        @map("pod_url")
+  status        DeliveryStatus @default(SCHEDULED)
+  notes         String?
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
+  vehicle       Vehicle        @relation(fields: [vehicleId], references: [id])
+
+  @@map("delivery_orders")
+}
+
+model Invoice {
+  id                 String        @id @default(cuid())
+  invoiceNumber      String        @unique @map("invoice_number")
+  type               InvoiceType
+  supplierOrCustomer String        @map("supplier_or_customer")
+  amount             Float
+  paidAmount         Float         @default(0) @map("paid_amount")
+  dueDate            DateTime      @map("due_date")
+  paymentStatus      PaymentStatus @default(PENDING) @map("payment_status")
+  description        String?
+  createdAt          DateTime      @default(now()) @map("created_at")
+  updatedAt          DateTime      @updatedAt @map("updated_at")
+
+  @@map("invoices")
+}
+
+model Incident {
+  id          String           @id @default(cuid())
+  type        AlertType
+  severity    IncidentSeverity
+  title       String
+  description String
+  status      IncidentStatus   @default(OPEN)
+  reportedBy  String?          @map("reported_by")
+  resolvedAt  DateTime?        @map("resolved_at")
+  createdAt   DateTime         @default(now()) @map("created_at")
+  updatedAt   DateTime         @updatedAt @map("updated_at")
+
+  @@map("incidents")
+}
+
+model RiskRegister {
+  id          String   @id @default(cuid())
+  category    String
+  description String
+  likelihood  Int
+  impact      Int
+  mitigation  String
+  owner       String
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("risk_register")
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  action    String
+  entity    String
+  entityId  String   @map("entity_id")
+  metadata  Json?
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@map("audit_logs")
+}
 
 enum UserRole {
   SUPER_ADMIN
@@ -113,234 +319,4 @@ enum AlertType {
   CASH_CRISIS
   QUOTA_CLOSURE
   OTHER
-}
-
-// ==================== USERS ====================
-model User {
-  id           String   @id @default(cuid())
-  name         String
-  email        String   @unique
-  passwordHash String   @map("password_hash")
-  role         UserRole
-  isActive     Boolean  @default(true) @map("is_active")
-  supplierId   String?  @map("supplier_id")
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
-
-  supplier     Supplier?         @relation(fields: [supplierId], references: [id])
-  auditLogs    AuditLog[]
-  qcRecords    QcInspection[]
-  productions  ProductionRecord[]
-
-  @@map("users")
-}
-
-// ==================== SUPPLIERS ====================
-model Supplier {
-  id          String         @id @default(cuid())
-  companyName String         @map("company_name")
-  picName     String         @map("pic_name")
-  phone       String
-  email       String?
-  address     String
-  taxNumber   String?        @map("tax_number")
-  status      SupplierStatus @default(ACTIVE)
-  rating      Float          @default(5.0)
-  createdAt   DateTime       @default(now()) @map("created_at")
-  updatedAt   DateTime       @updatedAt @map("updated_at")
-
-  users           User[]
-  weighingTickets WeighingTicket[]
-
-  @@map("suppliers")
-}
-
-// ==================== WEIGHBRIDGE ====================
-model WeighingTicket {
-  id           String   @id @default(cuid())
-  ticketNumber String   @unique @map("ticket_number")
-  supplierId   String   @map("supplier_id")
-  truckNumber  String   @map("truck_number")
-  driverName   String   @map("driver_name")
-  materialType String   @map("material_type")
-  grossWeight  Float    @map("gross_weight")
-  tareWeight   Float    @map("tare_weight")
-  netWeight    Float    @map("net_weight")
-  operatorId   String?  @map("operator_id")
-  date         DateTime @default(now())
-  createdAt    DateTime @default(now()) @map("created_at")
-
-  supplier     Supplier      @relation(fields: [supplierId], references: [id])
-  qcInspection QcInspection?
-
-  @@map("weighing_tickets")
-}
-
-// ==================== QUALITY CONTROL ====================
-model QcInspection {
-  id              String   @id @default(cuid())
-  ticketId        String   @unique @map("ticket_id")
-  grade           QcGrade
-  moisturePct     Float    @default(0) @map("moisture_pct")
-  plasticPct      Float    @default(0) @map("plastic_pct")
-  metalPct        Float    @default(0) @map("metal_pct")
-  contaminationPct Float   @default(0) @map("contamination_pct")
-  photoUrls       String[] @map("photo_urls")
-  notes           String?
-  officerId       String?  @map("officer_id")
-  inspectedAt     DateTime @default(now()) @map("inspected_at")
-
-  ticket          WeighingTicket @relation(fields: [ticketId], references: [id])
-  officer         User?          @relation(fields: [officerId], references: [id])
-
-  @@map("qc_inspections")
-}
-
-// ==================== PRODUCTION ====================
-model Machine {
-  id          String        @id @default(cuid())
-  name        String
-  type        MachineType
-  status      MachineStatus @default(IDLE)
-  location    String?
-  installedAt DateTime?     @map("installed_at")
-  createdAt   DateTime      @default(now()) @map("created_at")
-
-  productionRecords ProductionRecord[]
-
-  @@map("machines")
-}
-
-model ProductionRecord {
-  id              String   @id @default(cuid())
-  machineId       String   @map("machine_id")
-  inputWeight     Float    @map("input_weight")
-  outputWeight    Float    @map("output_weight")
-  baleCount       Int      @map("bale_count")
-  runtimeMinutes  Int      @default(0) @map("runtime_minutes")
-  downtimeMinutes Int      @default(0) @map("downtime_minutes")
-  oee             Float    @default(0)
-  operatorId      String?  @map("operator_id")
-  date            DateTime @default(now())
-  createdAt       DateTime @default(now()) @map("created_at")
-
-  machine  Machine @relation(fields: [machineId], references: [id])
-  operator User?   @relation(fields: [operatorId], references: [id])
-  bales    InventoryItem[]
-
-  @@map("production_records")
-}
-
-// ==================== WAREHOUSE ====================
-model InventoryItem {
-  id               String          @id @default(cuid())
-  baleId           String          @unique @map("bale_id")
-  weight           Float
-  grade            QcGrade
-  area             InventoryArea   @default(RAW_MATERIAL)
-  location         String?
-  status           InventoryStatus @default(IN_STOCK)
-  productionId     String?         @map("production_id")
-  productionDate   DateTime?       @map("production_date")
-  createdAt        DateTime        @default(now()) @map("created_at")
-  updatedAt        DateTime        @updatedAt @map("updated_at")
-
-  productionRecord ProductionRecord? @relation(fields: [productionId], references: [id])
-
-  @@map("inventory_items")
-}
-
-// ==================== LOGISTICS ====================
-model Vehicle {
-  id         String        @id @default(cuid())
-  plate      String        @unique
-  type       VehicleType
-  driverName String        @map("driver_name")
-  status     VehicleStatus @default(AVAILABLE)
-  createdAt  DateTime      @default(now()) @map("created_at")
-
-  deliveries DeliveryOrder[]
-
-  @@map("vehicles")
-}
-
-model DeliveryOrder {
-  id            String         @id @default(cuid())
-  orderNumber   String         @unique @map("order_number")
-  vehicleId     String         @map("vehicle_id")
-  destination   String
-  loadingWeight Float          @map("loading_weight")
-  loadingTime   DateTime?      @map("loading_time")
-  arrivalTime   DateTime?      @map("arrival_time")
-  podUrl        String?        @map("pod_url")
-  status        DeliveryStatus @default(SCHEDULED)
-  notes         String?
-  createdAt     DateTime       @default(now()) @map("created_at")
-  updatedAt     DateTime       @updatedAt @map("updated_at")
-
-  vehicle Vehicle @relation(fields: [vehicleId], references: [id])
-
-  @@map("delivery_orders")
-}
-
-// ==================== FINANCE ====================
-model Invoice {
-  id                    String        @id @default(cuid())
-  invoiceNumber         String        @unique @map("invoice_number")
-  type                  InvoiceType
-  supplierOrCustomer    String        @map("supplier_or_customer")
-  amount                Float
-  paidAmount            Float         @default(0) @map("paid_amount")
-  dueDate               DateTime      @map("due_date")
-  paymentStatus         PaymentStatus @default(PENDING) @map("payment_status")
-  description           String?
-  createdAt             DateTime      @default(now()) @map("created_at")
-  updatedAt             DateTime      @updatedAt @map("updated_at")
-
-  @@map("invoices")
-}
-
-// ==================== BCP ====================
-model Incident {
-  id          String           @id @default(cuid())
-  type        AlertType
-  severity    IncidentSeverity
-  title       String
-  description String
-  status      IncidentStatus   @default(OPEN)
-  reportedBy  String?          @map("reported_by")
-  resolvedAt  DateTime?        @map("resolved_at")
-  createdAt   DateTime         @default(now()) @map("created_at")
-  updatedAt   DateTime         @updatedAt @map("updated_at")
-
-  @@map("incidents")
-}
-
-model RiskRegister {
-  id          String @id @default(cuid())
-  category    String
-  description String
-  likelihood  Int    // 1-5
-  impact      Int    // 1-5
-  mitigation  String
-  owner       String
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
-
-  @@map("risk_register")
-}
-
-// ==================== AUDIT LOGS ====================
-model AuditLog {
-  id        String   @id @default(cuid())
-  userId    String   @map("user_id")
-  action    String
-  entity    String
-  entityId  String   @map("entity_id")
-  metadata  Json?
-  createdAt DateTime @default(now()) @map("created_at")
-
-  user User @relation(fields: [userId], references: [id])
-
-  @@map("audit_logs")
 }

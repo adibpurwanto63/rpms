@@ -4,40 +4,29 @@ import api from "@/lib/api";
 import { useAuth } from "@/lib/auth-context";
 
 const roleColors: any = {
-  SUPER_ADMIN: "#7C6FE0", DIRECTOR: "#4ECDC4", FINANCE_MANAGER: "#FF6B9D",
-  PROCUREMENT_MANAGER: "#7C6FE0", QC_OFFICER: "#FFB020",
-  PRODUCTION_SUPERVISOR: "#4ECDC4", WAREHOUSE_SUPERVISOR: "#FF6B9D",
-  LOGISTICS_MANAGER: "#7C6FE0", SUPPLIER: "#9CA3AF",
+  SUPER_ADMIN: "#6f42c1", DIRECTOR: "#007bff", FINANCE_MANAGER: "#fd7e14",
+  PROCUREMENT_MANAGER: "#28a745", QC_OFFICER: "#e83e8c", PRODUCTION_SUPERVISOR: "#17a2b8",
+  WAREHOUSE_SUPERVISOR: "#d63384", LOGISTICS_MANAGER: "#6610f2", SUPPLIER: "#dc3545",
 };
-
-const roles = [
-  "SUPER_ADMIN", "DIRECTOR", "FINANCE_MANAGER", "PROCUREMENT_MANAGER",
-  "QC_OFFICER", "PRODUCTION_SUPERVISOR", "WAREHOUSE_SUPERVISOR", "LOGISTICS_MANAGER", "SUPPLIER"
-];
 
 export default function SettingsPage() {
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [form, setForm] = useState({ name: "", email: "", password: "Admin@123", role: "PROCUREMENT_MANAGER" });
+  const [form, setForm] = useState({ name:"", email:"", password:"Admin@123", role:"PROCUREMENT_MANAGER" });
   const { user: currentUser } = useAuth();
 
   const load = () => {
-    setLoading(true);
     api.get("/users").then(r => setUsers(r.data)).finally(() => setLoading(false));
   };
   useEffect(() => { load(); }, []);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitting(true);
-    try {
-      await api.post("/users", form);
-      setShowForm(false);
-      setForm({ name: "", email: "", password: "Admin@123", role: "PROCUREMENT_MANAGER" });
-      load();
-    } finally { setSubmitting(false); }
+    await api.post("/users", form);
+    setShowForm(false);
+    setForm({ name:"", email:"", password:"Admin@123", role:"PROCUREMENT_MANAGER" });
+    load();
   };
 
   const toggleActive = async (id: string, isActive: boolean) => {
@@ -45,153 +34,84 @@ export default function SettingsPage() {
     load();
   };
 
-  const activeCount = users.filter(u => u.isActive).length;
+  const roles = ["SUPER_ADMIN","DIRECTOR","FINANCE_MANAGER","PROCUREMENT_MANAGER","QC_OFFICER","PRODUCTION_SUPERVISOR","WAREHOUSE_SUPERVISOR","LOGISTICS_MANAGER","SUPPLIER"];
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-      {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+    <div>
+      <div className="flex items-center justify-between mb-4">
         <div>
-          <h2 style={{ fontSize: 22, fontWeight: 700, color: "var(--text-primary)", letterSpacing: "-0.02em" }}>Settings & User Management</h2>
-          <p style={{ fontSize: 14, color: "var(--text-secondary)", marginTop: 4 }}>Kelola akun pengguna dan hak akses sistem</p>
+          <h2 className="text-2xl font-semibold mb-1">Settings & User Management</h2>
+          <p className="text-gray-500 text-sm">Kelola akun pengguna dan hak akses sistem</p>
         </div>
         {currentUser?.role === "SUPER_ADMIN" && (
-          <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}>
+          <button className="btn btn-primary shadow-sm" onClick={() => setShowForm(!showForm)}>
             {showForm ? "✕ Tutup" : "👤 Tambah User"}
           </button>
         )}
       </div>
 
-      {/* Stats */}
-      {!loading && (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20 }}>
-          {[
-            { label: "Total Pengguna", value: users.length, icon: "👥", variant: "dark" },
-            { label: "Pengguna Aktif", value: activeCount, icon: "✅", variant: "mint" },
-            { label: "Nonaktif", value: users.length - activeCount, icon: "⏸️", variant: "pink" },
-          ].map((k, i) => (
-            <div key={i} className="kpi-card" style={{
-              background: ({ dark: "var(--kpi-dark)", mint: "var(--kpi-mint-bg)", pink: "var(--kpi-pink-bg)" } as any)[k.variant],
-              borderColor: k.variant === "dark" ? "transparent" : undefined
-            }}>
-              <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
-                <span style={{ fontSize: 12, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: k.variant === "dark" ? "rgba(255,255,255,0.6)" : "var(--text-secondary)" }}>{k.label}</span>
-                <div style={{ width: 36, height: 36, borderRadius: 8, background: k.variant === "dark" ? "rgba(255,255,255,0.12)" : "rgba(78,205,196,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>{k.icon}</div>
-              </div>
-              <div style={{ fontSize: "2rem", fontWeight: 700, letterSpacing: "-0.04em", color: k.variant === "dark" ? "#fff" : "var(--text-primary)", lineHeight: 1.2 }}>{k.value}</div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Add User Form */}
       {showForm && (
-        <div className="erp-card animate-fade-in">
+        <div className="erp-card mb-4 animate-fade-in">
           <div className="erp-card-header">
             <h3 className="erp-card-title">Tambah Pengguna Baru</h3>
-            <button className="btn btn-ghost btn-sm" onClick={() => setShowForm(false)}>✕</button>
           </div>
           <div className="erp-card-body">
             <form onSubmit={submit}>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
-                <div>
-                  <label className="form-label">Nama Lengkap</label>
-                  <input className="form-input" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="Nama pengguna" required />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div className="form-group mb-0">
+                  <label>Nama Lengkap</label>
+                  <input value={form.name} onChange={e => setForm({...form, name: e.target.value})} placeholder="Nama pengguna" required />
                 </div>
-                <div>
-                  <label className="form-label">Email</label>
-                  <input className="form-input" type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="user@rpms.id" required autoComplete="off" />
+                <div className="form-group mb-0">
+                  <label>Email</label>
+                  <input type="email" value={form.email} onChange={e => setForm({...form, email: e.target.value})} placeholder="user@rpms.id" required />
                 </div>
-                <div>
-                  <label className="form-label">Password</label>
-                  <input className="form-input" type="password" value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} required autoComplete="new-password" />
+                <div className="form-group mb-0">
+                  <label>Password</label>
+                  <input type="password" value={form.password} onChange={e => setForm({...form, password: e.target.value})} required />
                 </div>
-                <div>
-                  <label className="form-label">Role</label>
-                  <select className="form-select" value={form.role} onChange={e => setForm({ ...form, role: e.target.value })}>
-                    {roles.map(r => (
-                      <option key={r} value={r}>{r.replace(/_/g, " ")}</option>
-                    ))}
+                <div className="form-group mb-0">
+                  <label>Role</label>
+                  <select value={form.role} onChange={e => setForm({...form, role: e.target.value})}>
+                    {roles.map(r => <option key={r} value={r}>{r.replace(/_/g," ")}</option>)}
                   </select>
                 </div>
               </div>
-              <div style={{ paddingTop: 16, borderTop: "1px solid var(--border-light)", display: "flex", gap: 8 }}>
-                <button type="submit" className="btn btn-primary" disabled={submitting}>
-                  {submitting ? "⏳ Menyimpan..." : "💾 Simpan Pengguna"}
-                </button>
-                <button type="button" className="btn btn-secondary" onClick={() => setShowForm(false)}>Batal</button>
+              <div className="mt-4 pt-3 border-t border-gray-200">
+                <button type="submit" className="btn btn-primary">💾 Simpan Pengguna</button>
               </div>
             </form>
           </div>
         </div>
       )}
 
-      {/* Users Table */}
       {loading ? (
-        <div style={{ display: "flex", justifyContent: "center", padding: "4rem" }}>
-          <div style={{ width: 36, height: 36, border: "3px solid #EDE9FF", borderTop: "3px solid #7C6FE0", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
-        </div>
+        <div className="flex justify-center py-16"><div style={{width:36,height:36,border:"3px solid #EDE9FF",borderTop:"3px solid #7C6FE0",borderRadius:"50%",animation:"spin 0.8s linear infinite"}} /></div>
       ) : (
-        <div className="erp-card">
-          <div className="erp-card-header">
-            <span className="erp-card-title">Daftar Pengguna</span>
-            <span style={{ fontSize: 13, color: "var(--text-muted)" }}>{users.length} pengguna</span>
-          </div>
-          <div style={{ overflowX: "auto" }}>
+        <div className="erp-card ">
+          <div className="erp-card-body overflow-x-auto">
             <table className="erp-table">
-              <thead>
-                <tr>
-                  <th>Nama</th>
-                  <th>Email</th>
-                  <th>Role</th>
-                  <th>Status</th>
-                  <th>Dibuat</th>
-                  {currentUser?.role === "SUPER_ADMIN" && <th>Aksi</th>}
-                </tr>
-              </thead>
+              <thead><tr><th>Nama</th><th>Email</th><th>Role</th><th>Status</th><th>Dibuat</th>{currentUser?.role === "SUPER_ADMIN" && <th>Aksi</th>}</tr></thead>
               <tbody>
-                {users.map((u: any) => {
-                  const color = roleColors[u.role] || "#9CA3AF";
+                {users.map((u:any) => {
+                  const color = roleColors[u.role] || "#6c757d";
                   return (
                     <tr key={u.id}>
                       <td>
-                        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                          <div style={{
-                            width: 32, height: 32, borderRadius: "50%", flexShrink: 0,
-                            background: color, color: "#fff",
-                            display: "flex", alignItems: "center", justifyContent: "center",
-                            fontWeight: 700, fontSize: 13,
-                          }}>
-                            {u.name.charAt(0).toUpperCase()}
-                          </div>
-                          <div>
-                            <div style={{ fontWeight: 600, fontSize: 14, color: "var(--text-primary)" }}>{u.name}</div>
-                            {u.id === currentUser?.id && (
-                              <span className="badge badge-purple" style={{ fontSize: 10 }}>Anda</span>
-                            )}
-                          </div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 shadow-sm" style={{ background: color, color: "white" }}>{u.name.charAt(0).toUpperCase()}</div>
+                          <span className="font-semibold text-sm text-gray-800">{u.name}</span>
+                          {u.id === currentUser?.id && <span className="badge badge-info text-xs ml-2">Anda</span>}
                         </div>
                       </td>
-                      <td style={{ fontSize: 13, color: "var(--text-secondary)" }}>{u.email}</td>
-                      <td>
-                        <span className="badge" style={{ background: `${color}18`, color, border: `1px solid ${color}44` }}>
-                          {u.role.replace(/_/g, " ")}
-                        </span>
-                      </td>
-                      <td>
-                        <span className={`badge ${u.isActive ? "badge-success" : "badge-neutral"}`}>
-                          {u.isActive ? "Aktif" : "Nonaktif"}
-                        </span>
-                      </td>
-                      <td style={{ fontSize: 13, color: "var(--text-secondary)" }}>{new Date(u.createdAt).toLocaleDateString("id-ID")}</td>
+                      <td className="text-gray-600 text-sm">{u.email}</td>
+                      <td><span className="badge text-xs" style={{ background: `${color}22`, color, border: `1px solid ${color}55` }}>{u.role.replace(/_/g," ")}</span></td>
+                      <td><span className={`badge ${u.isActive ? "badge-success" : "badge-secondary"}`}>{u.isActive ? "Aktif" : "Nonaktif"}</span></td>
+                      <td className="text-sm text-gray-500">{new Date(u.createdAt).toLocaleDateString("id-ID")}</td>
                       {currentUser?.role === "SUPER_ADMIN" && (
                         <td>
                           {u.id !== currentUser.id && (
-                            <button
-                              onClick={() => toggleActive(u.id, u.isActive)}
-                              className={`btn btn-sm ${u.isActive ? "btn-danger" : "btn-secondary"}`}
-                              style={u.isActive ? {} : { color: "var(--color-green)", borderColor: "var(--color-green)", background: "var(--color-green-light)" }}
-                            >
+                            <button onClick={() => toggleActive(u.id, u.isActive)} className={`text-xs font-semibold ${u.isActive ? "text-danger hover:text-red-700" : "text-success hover:text-green-700"}`}>
                               {u.isActive ? "Nonaktifkan" : "Aktifkan"}
                             </button>
                           )}
