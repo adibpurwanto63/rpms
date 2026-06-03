@@ -22,76 +22,84 @@ export default function PurchasePage() {
   };
 
   const statusBadge = (s: string) => ({
-    ACTIVE: "badge-success", INACTIVE: "badge-gray", BLACKLISTED: "badge-danger"
-  }[s] || "badge-gray");
+    ACTIVE: "badge-success", INACTIVE: "badge-secondary", BLACKLISTED: "badge-danger"
+  }[s] || "badge-secondary");
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-4">
         <div>
-          <h2 className="text-2xl font-bold mb-1">Manajemen Supplier</h2>
-          <p className="text-slate-400 text-sm">Database supplier & histori pembelian OCC</p>
+          <h2 className="text-2xl font-semibold mb-1">Manajemen Supplier</h2>
+          <p className="text-gray-500 text-sm">Database supplier & histori pembelian OCC</p>
         </div>
-        <button className="btn-primary" onClick={() => setShowForm(!showForm)}>
+        <button className="btn-primary shadow-sm" onClick={() => setShowForm(!showForm)}>
           {showForm ? "✕ Tutup" : "+ Tambah Supplier"}
         </button>
       </div>
 
       {showForm && (
-        <div className="glass rounded-2xl p-6 mb-6 animate-fade-in">
-          <h3 className="font-bold mb-4">Registrasi Supplier Baru</h3>
-          <form onSubmit={submit}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {[
-                { key: "companyName", label: "Nama Perusahaan", placeholder: "PT Contoh Jaya" },
-                { key: "picName", label: "Nama PIC", placeholder: "Budi Santoso" },
-                { key: "phone", label: "Telepon", placeholder: "021-xxxxxxx" },
-                { key: "email", label: "Email", placeholder: "pic@perusahaan.com" },
-                { key: "taxNumber", label: "NPWP", placeholder: "xx.xxx.xxx.x-xxx.xxx" },
-              ].map(f => (
-                <div key={f.key} className="form-group">
-                  <label>{f.label}</label>
-                  <input value={(form as any)[f.key]} onChange={e => setForm({...form, [f.key]: e.target.value})} placeholder={f.placeholder} />
+        <div className="admin-card primary mb-4 animate-fade-in">
+          <div className="card-header">
+            <h3 className="card-title">Registrasi Supplier Baru</h3>
+          </div>
+          <div className="card-body">
+            <form onSubmit={submit}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {[
+                  { key: "companyName", label: "Nama Perusahaan", placeholder: "PT Contoh Jaya" },
+                  { key: "picName", label: "Nama PIC", placeholder: "Budi Santoso" },
+                  { key: "phone", label: "Telepon", placeholder: "021-xxxxxxx" },
+                  { key: "email", label: "Email", placeholder: "pic@perusahaan.com" },
+                  { key: "taxNumber", label: "NPWP", placeholder: "xx.xxx.xxx.x-xxx.xxx" },
+                ].map(f => (
+                  <div key={f.key} className="form-group mb-0">
+                    <label>{f.label}</label>
+                    <input value={(form as any)[f.key]} onChange={e => setForm({...form, [f.key]: e.target.value})} placeholder={f.placeholder} />
+                  </div>
+                ))}
+                <div className="form-group mb-0 md:col-span-2">
+                  <label>Alamat</label>
+                  <textarea rows={2} value={form.address} onChange={e => setForm({...form, address: e.target.value})} placeholder="Jl. Contoh No. 1, Kota, Provinsi" />
                 </div>
-              ))}
-              <div className="form-group md:col-span-2">
-                <label>Alamat</label>
-                <textarea rows={2} value={form.address} onChange={e => setForm({...form, address: e.target.value})} placeholder="Jl. Contoh No. 1, Kota, Provinsi" />
               </div>
-            </div>
-            <button type="submit" className="btn-primary">💾 Simpan Supplier</button>
-          </form>
+              <div className="mt-4 pt-3 border-t border-gray-200">
+                <button type="submit" className="btn-primary">💾 Simpan Supplier</button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
 
       {loading ? (
-        <div className="flex justify-center py-16"><div className="w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" /></div>
+        <div className="flex justify-center py-16"><div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" /></div>
       ) : (
-        <div className="glass rounded-2xl overflow-hidden">
-          <table>
-            <thead><tr>
-              <th>Nama Perusahaan</th><th>PIC</th><th>Telepon</th><th>Rating</th><th>Status</th>
-            </tr></thead>
-            <tbody>
-              {suppliers.map((s: any) => (
-                <tr key={s.id}>
-                  <td>
-                    <div className="font-semibold">{s.companyName}</div>
-                    <div className="text-xs text-slate-500">{s.email}</div>
-                  </td>
-                  <td>{s.picName}</td>
-                  <td className="text-slate-400">{s.phone}</td>
-                  <td>
-                    <div className="flex items-center gap-1">
-                      <span className="text-yellow-400">★</span>
-                      <span className="font-semibold">{s.rating?.toFixed(1)}</span>
-                    </div>
-                  </td>
-                  <td><span className={`badge ${statusBadge(s.status)}`}>{s.status}</span></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="admin-card">
+          <div className="card-body p-0 overflow-x-auto">
+            <table className="m-0">
+              <thead><tr>
+                <th>Nama Perusahaan</th><th>PIC</th><th>Telepon</th><th>Rating</th><th>Status</th>
+              </tr></thead>
+              <tbody>
+                {suppliers.map((s: any) => (
+                  <tr key={s.id}>
+                    <td>
+                      <div className="font-semibold text-gray-800">{s.companyName}</div>
+                      <div className="text-xs text-gray-500">{s.email}</div>
+                    </td>
+                    <td>{s.picName}</td>
+                    <td className="text-gray-500">{s.phone}</td>
+                    <td>
+                      <div className="flex items-center gap-1">
+                        <span className="text-yellow-500">★</span>
+                        <span className="font-semibold">{s.rating?.toFixed(1)}</span>
+                      </div>
+                    </td>
+                    <td><span className={`badge ${statusBadge(s.status)}`}>{s.status}</span></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>

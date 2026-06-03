@@ -18,12 +18,6 @@ const navItems = [
   { href: "/portal/settings", icon: "⚙️", label: "Settings", module: "settings" },
 ];
 
-const roleBadgeColor: Record<string, string> = {
-  SUPER_ADMIN: "#a855f7", DIRECTOR: "#3b82f6", FINANCE_MANAGER: "#f59e0b",
-  PROCUREMENT_MANAGER: "#10b981", QC_OFFICER: "#f97316", PRODUCTION_SUPERVISOR: "#06b6d4",
-  WAREHOUSE_SUPERVISOR: "#ec4899", LOGISTICS_MANAGER: "#8b5cf6", SUPPLIER: "#ef4444",
-};
-
 const roleLabel: Record<string, string> = {
   SUPER_ADMIN: "Super Admin", DIRECTOR: "Director", FINANCE_MANAGER: "Finance Manager",
   PROCUREMENT_MANAGER: "Procurement Mgr", QC_OFFICER: "QC Officer",
@@ -43,101 +37,99 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
 
   if (loading || !user) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+      <div className="flex items-center justify-center min-h-screen bg-[#f4f6f9]">
+        <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   const accessible = navItems.filter(n => canAccess(user.role, n.module));
-  const color = roleBadgeColor[user.role] || "#10b981";
 
   return (
-    <div className="flex min-h-screen">
-      {/* Sidebar */}
-      <aside className="glass flex flex-col transition-all duration-300 border-r" style={{
-        width: collapsed ? "72px" : "240px", minHeight: "100vh", position: "fixed", top: 0, left: 0, zIndex: 40
+    <div className="flex min-h-screen bg-[#f4f6f9]">
+      {/* Sidebar - AdminLTE Dark */}
+      <aside className="bg-[#343a40] text-white flex flex-col transition-all duration-300 shadow-[0_14px_28px_rgba(0,0,0,.25),_0_10px_10px_rgba(0,0,0,.22)] z-40" style={{
+        width: collapsed ? "73px" : "250px", minHeight: "100vh", position: "fixed", top: 0, left: 0
       }}>
-        {/* Logo */}
-        <div className="flex items-center gap-3 px-4 py-5 border-b" style={{ borderColor: "rgba(148,163,184,0.1)" }}>
-          <div className="w-9 h-9 rounded-xl flex items-center justify-center text-lg flex-shrink-0"
-            style={{ background: "linear-gradient(135deg, #10b981, #0ea5e9)" }}>♻</div>
-          {!collapsed && <div className="font-bold text-sm gradient-text">RPMS Portal</div>}
-        </div>
+        {/* Brand Logo */}
+        <Link href="/portal/dashboard" className="flex items-center gap-3 px-4 h-[57px] border-b border-[#4b545c] hover:text-white transition-colors">
+          <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-lg flex-shrink-0 shadow-sm text-center ml-1">♻</div>
+          {!collapsed && <span className="font-light text-[1.25rem] truncate">RPMS<span className="font-bold">Portal</span></span>}
+        </Link>
 
-        {/* Nav */}
-        <nav className="flex-1 py-4 overflow-y-auto">
-          {accessible.map(item => {
-            const active = pathname.startsWith(item.href);
-            return (
-              <Link key={item.href} href={item.href}
-                className="flex items-center gap-3 px-4 py-2.5 mx-2 rounded-lg mb-0.5 transition-all text-sm"
-                style={{
-                  background: active ? "rgba(16,185,129,0.12)" : "transparent",
-                  color: active ? "#10b981" : "#94a3b8",
-                  borderLeft: active ? "3px solid #10b981" : "3px solid transparent",
-                }}
-                title={collapsed ? item.label : undefined}>
-                <span className="text-base flex-shrink-0">{item.icon}</span>
-                {!collapsed && <span className="font-medium">{item.label}</span>}
-              </Link>
-            );
-          })}
-        </nav>
-
-        {/* User */}
-        <div className="border-t p-3" style={{ borderColor: "rgba(148,163,184,0.1)" }}>
-          {!collapsed ? (
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
-                  style={{ background: color, color: "white" }}>{user.name.charAt(0)}</div>
-                <div className="min-w-0">
-                  <div className="text-xs font-semibold truncate">{user.name}</div>
-                  <div className="text-xs truncate" style={{ color }}>{roleLabel[user.role]}</div>
-                </div>
-              </div>
-              <button onClick={logout} className="w-full text-left text-xs text-slate-500 hover:text-red-400 transition-colors px-2 py-1 rounded">
-                🚪 Keluar
-              </button>
+        {/* User Panel */}
+        <div className="border-b border-[#4b545c] p-4 flex items-center gap-3">
+          <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-sm font-bold flex-shrink-0 shadow-sm text-white">
+            {user.name.charAt(0)}
+          </div>
+          {!collapsed && (
+            <div className="min-w-0">
+              <div className="text-sm text-[#c2c7d0] hover:text-white transition-colors truncate">{user.name}</div>
             </div>
-          ) : (
-            <button onClick={() => {}} title={user.name}
-              className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold mx-auto"
-              style={{ background: color, color: "white" }}>{user.name.charAt(0)}</button>
           )}
         </div>
 
-        {/* Collapse toggle */}
-        <button onClick={() => setCollapsed(!collapsed)}
-          className="absolute -right-3 top-20 w-6 h-6 rounded-full border flex items-center justify-center text-xs"
-          style={{ background: "#0f172a", borderColor: "rgba(148,163,184,0.2)", color: "#94a3b8" }}>
-          {collapsed ? "›" : "‹"}
-        </button>
+        {/* Sidebar Menu */}
+        <nav className="flex-1 py-4 overflow-y-auto px-2">
+          <ul className="space-y-1">
+            {accessible.map(item => {
+              const active = pathname.startsWith(item.href);
+              return (
+                <li key={item.href}>
+                  <Link href={item.href}
+                    className="flex items-center gap-3 px-3 py-2 rounded transition-colors text-[0.9rem]"
+                    style={{
+                      backgroundColor: active ? "#007bff" : "transparent",
+                      color: active ? "#ffffff" : "#c2c7d0",
+                    }}
+                    title={collapsed ? item.label : undefined}>
+                    <span className="text-base flex-shrink-0 text-center w-5">{item.icon}</span>
+                    {!collapsed && <span>{item.label}</span>}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
       </aside>
 
-      {/* Main */}
-      <main className="flex-1 flex flex-col" style={{ marginLeft: collapsed ? "72px" : "240px", transition: "margin 0.3s" }}>
-        {/* Topbar */}
-        <header className="glass sticky top-0 z-30 border-b px-6 py-3 flex items-center justify-between"
-          style={{ borderColor: "rgba(148,163,184,0.1)" }}>
-          <div>
-            <h1 className="font-bold text-sm">
-              {accessible.find(n => pathname.startsWith(n.href))?.icon}{" "}
-              {accessible.find(n => pathname.startsWith(n.href))?.label || "Portal"}
-            </h1>
+      {/* Main Wrapper */}
+      <div className="flex-1 flex flex-col" style={{ marginLeft: collapsed ? "73px" : "250px", transition: "margin 0.3s" }}>
+        
+        {/* Top Navbar */}
+        <header className="bg-white sticky top-0 z-30 h-[57px] flex items-center justify-between px-4 border-b border-gray-200 transition-all">
+          <div className="flex items-center gap-4">
+            <button onClick={() => setCollapsed(!collapsed)} className="text-gray-500 hover:text-gray-700 p-1">
+              {collapsed ? "»" : "«"}
+            </button>
+            <span className="hidden sm:inline text-sm text-gray-500 font-medium">Home</span>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="text-xs text-slate-500">{new Date().toLocaleDateString("id-ID", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</div>
-            <div className="badge" style={{ background: `${color}22`, color, borderColor: `${color}55`, fontSize: "0.7rem" }}>
-              {roleLabel[user.role]}
-            </div>
+          <div className="flex items-center gap-4">
+            <div className="hidden sm:block text-xs text-gray-500">{new Date().toLocaleDateString("id-ID", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</div>
+            <div className="badge badge-info">{roleLabel[user.role]}</div>
+            <button onClick={logout} className="text-sm text-gray-500 hover:text-red-500 px-2 py-1">
+              Logout
+            </button>
           </div>
         </header>
 
-        {/* Page content */}
-        <div className="flex-1 p-6 animate-fade-in">{children}</div>
-      </main>
+        {/* Content Header */}
+        <div className="px-4 py-3 sm:px-6 sm:py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between">
+          <h1 className="text-xl sm:text-2xl font-light text-gray-800 m-0">
+            {accessible.find(n => pathname.startsWith(n.href))?.label || "Portal"}
+          </h1>
+          <ol className="flex text-sm text-gray-500 mt-2 sm:mt-0">
+            <li><Link href="/portal/dashboard" className="text-blue-500 hover:underline">Home</Link></li>
+            <li className="mx-2">/</li>
+            <li className="text-gray-500 active">{accessible.find(n => pathname.startsWith(n.href))?.label}</li>
+          </ol>
+        </div>
+
+        {/* Page Content */}
+        <section className="flex-1 px-4 sm:px-6 pb-6 animate-fade-in">
+          {children}
+        </section>
+      </div>
     </div>
   );
 }
