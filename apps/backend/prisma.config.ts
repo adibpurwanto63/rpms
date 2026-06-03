@@ -14,10 +14,4 @@ export default defineConfig({
   migrations: {
     seed: 'ts-node prisma/seed.ts',
   },
-  migrate: {
-    adapter: async () => {
-      const pool = new pg.Pool({ connectionString });
-      return new PrismaPg(pool);
-    },
-  },
 });

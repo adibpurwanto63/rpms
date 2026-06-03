@@ -2,12 +2,19 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { ExpressAdapter } from '@nestjs/platform-express';
+import express from 'express';
 
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+const server = express();
+
+async function createNestServer(expressInstance: express.Express) {
+  const app = await NestFactory.create(
+    AppModule,
+    new ExpressAdapter(expressInstance),
+  );
 
   app.enableCors({
-    origin: ['http://localhost:3000', 'http://localhost:3001'],
+    origin: true, // allow any origin in Vercel environment
     credentials: true,
   });
 
@@ -23,9 +30,24 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
 
-  const port = process.env.PORT || 3001;
-  await app.listen(port);
-  console.log(`🚀 RPMS Backend running on http://localhost:${port}`);
-  console.log(`📚 Swagger docs: http://localhost:${port}/api/docs`);
+  await app.init();
+  return app;
 }
-bootstrap();
+
+if (!process.env.VERCEL) {
+  createNestServer(server).then(app => {
+    const port = process.env.PORT || 3001;
+    app.listen(port, () => {
+      console.log(`🚀 RPMS Backend running on http://localhost:${port}`);
+      console.log(`📚 Swagger docs: http://localhost:${port}/api/docs`);
+    });
+  });
+}
+
+let cachedApp: any;
+export default async (req: any, res: any) => {
+  if (!cachedApp) {
+    cachedApp = await createNestServer(server);
+  }
+  server(req, res);
+};
