@@ -14,6 +14,7 @@ interface DashData {
   recentTickets: any[];
   recentProduction: any[];
   pembelian: { pendingPO: number; recentPO: any[]; totalPO: number; totalSpend: number };
+  penjualan: { pendingSO: number; recentSO: any[]; totalSO: number; totalRevenue: number };
 }
 
 const fmt = (n: number) => `${(n / 1000).toFixed(2)} Ton`;
@@ -58,6 +59,16 @@ export default function DashboardPage() {
       variant: "dark",
       icon: "🛍️",
       iconBg: "rgba(255,255,255,0.15)",
+    },
+    {
+      label: "Total Penjualan",
+      value: fmtRpShort(data.penjualan?.totalRevenue || 0),
+      sub: `${data.penjualan?.totalSO || 0} SO · ${data.penjualan?.pendingSO || 0} tertunda`,
+      trend: "+8.4%",
+      trendUp: true,
+      variant: "pink",
+      icon: "📈",
+      iconBg: "rgba(255,107,157,0.2)",
     },
     {
       label: "Total Produksi",

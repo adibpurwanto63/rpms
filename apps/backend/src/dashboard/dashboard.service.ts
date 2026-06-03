@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
-import { InvoiceType, InventoryStatus, IncidentStatus, PurchaseOrderStatus } from "@prisma/client";
+import { InvoiceType, InventoryStatus, IncidentStatus, PurchaseOrderStatus, SalesOrderStatus } from "@prisma/client";
 
 @Injectable()
 export class DashboardService {
@@ -16,6 +16,7 @@ export class DashboardService {
       todayPurchase, todayProduction, todayShipment,
       inventory, ar, ap, incidents, recentTickets, recentProduction,
       pendingPO, recentPO, totalPO, totalSpend,
+      pendingSO, recentSO, totalSO, totalRevenue
     ] = await Promise.all([
       this.prisma.weighingTicket.aggregate({ where: { date: { gte: today, lt: tomorrow } }, _count: true, _sum: { netWeight: true } }),
       this.prisma.productionRecord.aggregate({ where: { date: { gte: today, lt: tomorrow } }, _sum: { outputWeight: true, baleCount: true }, _avg: { oee: true } }),
@@ -30,6 +31,10 @@ export class DashboardService {
       this.prisma.purchaseOrder.findMany({ orderBy: { createdAt: "desc" }, take: 5, include: { supplier: { select: { companyName: true } } } }),
       this.prisma.purchaseOrder.count(),
       this.prisma.purchaseOrder.aggregate({ _sum: { totalAmount: true } }),
+      this.prisma.salesOrder.count({ where: { status: { in: [SalesOrderStatus.PENDING, SalesOrderStatus.APPROVED] } } }),
+      this.prisma.salesOrder.findMany({ orderBy: { createdAt: "desc" }, take: 5 }),
+      this.prisma.salesOrder.count(),
+      this.prisma.salesOrder.aggregate({ _sum: { totalAmount: true } }),
     ]);
 
     const revenue = ar._sum.amount || 0;
@@ -52,6 +57,12 @@ export class DashboardService {
         totalPO,
         totalSpend: totalSpend._sum.totalAmount || 0,
       },
+      penjualan: {
+        pendingSO,
+        recentSO,
+        totalSO,
+        totalRevenue: totalRevenue._sum.totalAmount || 0,
+      }
     };
   }
 
