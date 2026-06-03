@@ -24,14 +24,16 @@ export default function DashboardPage() {
   const [data, setData] = useState<DashData | null>(null);
   const [trend, setTrend] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split("T")[0]);
 
   useEffect(() => {
+    setLoading(true);
     Promise.all([
-      api.get("/dashboard/executive"),
+      api.get(`/dashboard/executive?date=${selectedDate}`),
       api.get("/dashboard/kpi-trend?days=7"),
     ]).then(([d, t]) => { setData(d.data); setTrend(t.data); })
       .finally(() => setLoading(false));
-  }, []);
+  }, [selectedDate]);
 
   if (loading) return (
     <div className="flex items-center justify-center h-64">
@@ -131,10 +133,18 @@ export default function DashboardPage() {
           fontSize: 13,
           color: "var(--text-secondary)",
           cursor: "pointer",
+          position: "relative",
+          overflow: "hidden"
         }}>
           <span>📅</span>
-          <span>{new Date().toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}</span>
+          <span style={{ minWidth: 85 }}>{new Date(selectedDate).toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}</span>
           <span style={{ fontSize: 10 }}>▼</span>
+          <input 
+            type="date"
+            value={selectedDate}
+            onChange={(e) => setSelectedDate(e.target.value)}
+            style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", opacity: 0, cursor: "pointer" }}
+          />
         </div>
       </div>
 

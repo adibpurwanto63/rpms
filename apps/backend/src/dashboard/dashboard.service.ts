@@ -6,8 +6,9 @@ import { InvoiceType, InventoryStatus, DeliveryStatus, IncidentStatus } from "@p
 export class DashboardService {
   constructor(private prisma: PrismaService) {}
 
-  async getExecutiveDashboard() {
-    const today = new Date(); today.setHours(0,0,0,0);
+  async getExecutiveDashboard(dateStr?: string) {
+    const today = dateStr ? new Date(dateStr) : new Date();
+    today.setHours(0,0,0,0);
     const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate() + 1);
 
     const [

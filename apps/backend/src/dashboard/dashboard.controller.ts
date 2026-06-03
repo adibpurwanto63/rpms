@@ -11,7 +11,7 @@ export class DashboardController {
   constructor(private svc: DashboardService) {}
 
   @Get("executive")
-  getExecutive() { return this.svc.getExecutiveDashboard(); }
+  getExecutive(@Query("date") date?: string) { return this.svc.getExecutiveDashboard(date); }
 
   @Get("kpi-trend")
   getKpiTrend(@Query("days") days?: string) { return this.svc.getKpiTrend(days ? parseInt(days) : 7); }
