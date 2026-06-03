@@ -42,7 +42,7 @@ export default function QcPage() {
           <h2 className="text-2xl font-semibold mb-1">Quality Control</h2>
           <p className="text-gray-500 text-sm">Inspeksi material & grading OCC</p>
         </div>
-        <button className="btn-primary shadow-sm" onClick={() => setShowForm(!showForm)}>
+        <button className="btn btn-primary shadow-sm" onClick={() => setShowForm(!showForm)}>
           {showForm ? "✕ Tutup" : "🔬 Input Inspeksi"}
         </button>
       </div>
@@ -51,7 +51,7 @@ export default function QcPage() {
       {stats.length > 0 && (
         <div className="grid grid-cols-3 gap-4 mb-4">
           {stats.map((s: any) => (
-            <div key={s.grade} className="paper-card text-center py-4">
+            <div key={s.grade} className="erp-card text-center py-4">
               <div className={`text-3xl font-bold mb-2 ${s.grade === "A" ? "text-success" : s.grade === "B" ? "text-warning" : "text-danger"}`}>{s._count}</div>
               <div className={`badge ${(gradeColor as any)[s.grade]} mx-auto`}>{(gradeLabel as any)[s.grade]}</div>
             </div>
@@ -60,11 +60,11 @@ export default function QcPage() {
       )}
 
       {showForm && (
-        <div className="paper-card mb-4 animate-fade-in">
-          <div className="card-header">
-            <h3 className="card-title">Form Inspeksi QC</h3>
+        <div className="erp-card mb-4 animate-fade-in">
+          <div className="erp-card-header">
+            <h3 className="erp-card-title">Form Inspeksi QC</h3>
           </div>
-          <div className="card-body">
+          <div className="erp-card-body">
             <form onSubmit={submit}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div className="form-group mb-0">
@@ -94,7 +94,7 @@ export default function QcPage() {
                 <textarea rows={3} value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} placeholder="Catatan tambahan pemeriksaan..." />
               </div>
               <div className="mt-4 pt-3 border-t border-gray-200">
-                <button type="submit" className="btn-primary">💾 Simpan Inspeksi</button>
+                <button type="submit" className="btn btn-primary">💾 Simpan Inspeksi</button>
               </div>
             </form>
           </div>
@@ -102,11 +102,11 @@ export default function QcPage() {
       )}
 
       {loading ? (
-        <div className="flex justify-center py-16"><div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" /></div>
+        <div className="flex justify-center py-16"><div style={{width:36,height:36,border:"3px solid #EDE9FF",borderTop:"3px solid #7C6FE0",borderRadius:"50%",animation:"spin 0.8s linear infinite"}} /></div>
       ) : (
-        <div className="paper-card ">
-          <div className="card-body p-0 overflow-x-auto">
-            <table className="m-0">
+        <div className="erp-card ">
+          <div className="erp-card-body overflow-x-auto">
+            <table className="erp-table">
               <thead><tr><th>Tiket</th><th>Supplier</th><th>Grade</th><th>Moisture</th><th>Plastik</th><th>Metal</th><th>Tanggal</th></tr></thead>
               <tbody>
                 {inspections.map((q:any) => (

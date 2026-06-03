@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
 
-const machineStatusColor = { RUNNING: "bg-success", IDLE: "bg-secondary", MAINTENANCE: "bg-warning", BREAKDOWN: "bg-danger" };
+const machineStatusColor = { RUNNING: "badge-success", IDLE: "bg-secondary", MAINTENANCE: "badge-warning", BREAKDOWN: "badge-danger" };
 const machineStatusLabel = { RUNNING: "Berjalan", IDLE: "Standby", MAINTENANCE: "Maintenance", BREAKDOWN: "Rusak" };
 
 export default function ProductionPage() {
@@ -49,7 +49,7 @@ export default function ProductionPage() {
           <h2 className="text-2xl font-semibold mb-1">Monitoring Produksi</h2>
           <p className="text-gray-500 text-sm">Status mesin, OEE, dan catatan produksi</p>
         </div>
-        <button className="btn-primary shadow-sm" onClick={() => setShowForm(!showForm)}>
+        <button className="btn btn-primary shadow-sm" onClick={() => setShowForm(!showForm)}>
           {showForm ? "✕ Tutup" : "📝 Input Produksi"}
         </button>
       </div>
@@ -57,7 +57,7 @@ export default function ProductionPage() {
       {/* Machine status */}
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-4">
         {machines.map((m:any) => (
-          <div key={m.id} className="paper-card px-4 py-3 border-t-0 shadow-sm bg-white">
+          <div key={m.id} className="erp-card px-4 py-3 border-t-0 shadow-sm bg-white">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xl">🏭</span>
               <span className={`badge ${(machineStatusColor as any)[m.status]}`}>{(machineStatusLabel as any)[m.status]}</span>
@@ -72,16 +72,13 @@ export default function ProductionPage() {
       {stats && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
           {[
-            { label: "Input", value: `${((stats._sum?.inputWeight || 0)/1000).toFixed(2)} Ton`, icon: "📥", color: "bg-info" },
-            { label: "Output", value: `${((stats._sum?.outputWeight || 0)/1000).toFixed(2)} Ton`, icon: "📤", color: "bg-success" },
-            { label: "Bale Hari Ini", value: stats._sum?.baleCount || 0, icon: "📦", color: "bg-primary" },
-            { label: "OEE Avg", value: `${(stats._avg?.oee || 0).toFixed(1)}%`, icon: "📊", color: "bg-warning" },
+            { label: "Input", value: `${((stats._sum?.inputWeight || 0)/1000).toFixed(2)} Ton`, icon: "📥", color: "badge-info" },
+            { label: "Output", value: `${((stats._sum?.outputWeight || 0)/1000).toFixed(2)} Ton`, icon: "📤", color: "badge-success" },
+            { label: "Bale Hari Ini", value: stats._sum?.baleCount || 0, icon: "📦", color: "badge-purple" },
+            { label: "OEE Avg", value: `${(stats._avg?.oee || 0).toFixed(1)}%`, icon: "📊", color: "badge-warning" },
           ].map((s,i) => (
-            <div key={i} className={`small-box ${s.color}`}>
-              <div className="inner">
-                <h3>{s.value}</h3>
-                <p>{s.label}</p>
-              </div>
+            <div key={i} className={`erp-card ${s.color}`}>
+              <div style={{padding:"1rem"}}><div style={{fontSize:"1.5rem",fontWeight:700}}>{s.value}</div><div style={{fontSize:13,color:"var(--text-secondary)"}}>{s.label}</div></div>
               <div className="icon">{s.icon}</div>
             </div>
           ))}
@@ -89,11 +86,11 @@ export default function ProductionPage() {
       )}
 
       {showForm && (
-        <div className="paper-card mb-4 animate-fade-in">
-          <div className="card-header">
-            <h3 className="card-title">Input Catatan Produksi</h3>
+        <div className="erp-card mb-4 animate-fade-in">
+          <div className="erp-card-header">
+            <h3 className="erp-card-title">Input Catatan Produksi</h3>
           </div>
-          <div className="card-body">
+          <div className="erp-card-body">
             <form onSubmit={submit}>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
                 <div className="form-group mb-0">
@@ -117,7 +114,7 @@ export default function ProductionPage() {
                 ))}
               </div>
               <div className="mt-4 pt-3 border-t border-gray-200">
-                <button type="submit" className="btn-primary">💾 Simpan Produksi</button>
+                <button type="submit" className="btn btn-primary">💾 Simpan Produksi</button>
               </div>
             </form>
           </div>
@@ -125,11 +122,11 @@ export default function ProductionPage() {
       )}
 
       {loading ? (
-        <div className="flex justify-center py-16"><div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" /></div>
+        <div className="flex justify-center py-16"><div style={{width:36,height:36,border:"3px solid #EDE9FF",borderTop:"3px solid #7C6FE0",borderRadius:"50%",animation:"spin 0.8s linear infinite"}} /></div>
       ) : (
-        <div className="paper-card ">
-          <div className="card-body p-0 overflow-x-auto">
-            <table className="m-0">
+        <div className="erp-card ">
+          <div className="erp-card-body overflow-x-auto">
+            <table className="erp-table">
               <thead><tr><th>Mesin</th><th>Input (kg)</th><th>Output (kg)</th><th>Bale</th><th>Runtime</th><th>Downtime</th><th>OEE</th><th>Tanggal</th></tr></thead>
               <tbody>
                 {records.map((r:any) => (

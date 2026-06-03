@@ -42,7 +42,7 @@ export default function WarehousePage() {
           const colors = { RAW_MATERIAL: "text-info", FINISHED_GOODS: "text-success", REJECTED: "text-danger" };
           const labels = { RAW_MATERIAL: "Bahan Baku", FINISHED_GOODS: "Barang Jadi", REJECTED: "Reject" };
           return (
-            <div key={area} className="paper-card px-4 py-4 text-center">
+            <div key={area} className="erp-card px-4 py-4 text-center">
               <div className="flex items-center justify-center gap-2 mb-2">
                 <span className="text-xl">{(icons as any)[area]}</span>
                 <span className="text-sm font-semibold text-gray-600">{(labels as any)[area]}</span>
@@ -55,7 +55,7 @@ export default function WarehousePage() {
       </div>
 
       {/* Filters */}
-      <div className="paper-card mb-4 flex gap-4 flex-wrap p-3 bg-gray-50">
+      <div className="erp-card mb-4 flex gap-4 flex-wrap p-3 bg-gray-50">
         <select value={filter.area} onChange={e => setFilter({...filter, area: e.target.value})} className="form-control flex-1 min-w-[140px] m-0">
           <option value="">Semua Area</option>
           <option value="RAW_MATERIAL">Bahan Baku</option>
@@ -81,11 +81,11 @@ export default function WarehousePage() {
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-16"><div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" /></div>
+        <div className="flex justify-center py-16"><div style={{width:36,height:36,border:"3px solid #EDE9FF",borderTop:"3px solid #7C6FE0",borderRadius:"50%",animation:"spin 0.8s linear infinite"}} /></div>
       ) : (
-        <div className="paper-card ">
-          <div className="card-body p-0 overflow-x-auto">
-            <table className="m-0">
+        <div className="erp-card ">
+          <div className="erp-card-body overflow-x-auto">
+            <table className="erp-table">
               <thead><tr><th>Bale ID</th><th>Berat (kg)</th><th>Grade</th><th>Area</th><th>Lokasi</th><th>Status</th><th>Tgl Produksi</th></tr></thead>
               <tbody>
                 {inventory.map((item:any) => (

@@ -32,7 +32,7 @@ export default function LogisticsPage() {
           <h2 className="text-2xl font-semibold mb-1">Manajemen Logistik</h2>
           <p className="text-gray-500 text-sm">Armada kendaraan & delivery order</p>
         </div>
-        <button className="btn-primary shadow-sm" onClick={() => setShowForm(!showForm)}>
+        <button className="btn btn-primary shadow-sm" onClick={() => setShowForm(!showForm)}>
           {showForm ? "✕ Tutup" : "🚛 Buat DO Baru"}
         </button>
       </div>
@@ -40,7 +40,7 @@ export default function LogisticsPage() {
       {/* Fleet status */}
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-4">
         {vehicles.map((v:any) => (
-          <div key={v.id} className="paper-card px-4 py-3 border-t-0 shadow-sm bg-white">
+          <div key={v.id} className="erp-card px-4 py-3 border-t-0 shadow-sm bg-white">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xl">🚛</span>
               <span className={`badge ${vehicleStatusColor[v.status]}`}>{vehicleStatusLabel[v.status]}</span>
@@ -52,11 +52,11 @@ export default function LogisticsPage() {
       </div>
 
       {showForm && (
-        <div className="paper-card mb-4 animate-fade-in">
-          <div className="card-header">
-            <h3 className="card-title">Delivery Order Baru</h3>
+        <div className="erp-card mb-4 animate-fade-in">
+          <div className="erp-card-header">
+            <h3 className="erp-card-title">Delivery Order Baru</h3>
           </div>
-          <div className="card-body">
+          <div className="erp-card-body">
             <form onSubmit={submit}>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                 <div className="form-group mb-0">
@@ -76,7 +76,7 @@ export default function LogisticsPage() {
                 </div>
               </div>
               <div className="mt-4 pt-3 border-t border-gray-200">
-                <button type="submit" className="btn-primary">📝 Buat Delivery Order</button>
+                <button type="submit" className="btn btn-primary">📝 Buat Delivery Order</button>
               </div>
             </form>
           </div>
@@ -84,11 +84,11 @@ export default function LogisticsPage() {
       )}
 
       {loading ? (
-        <div className="flex justify-center py-16"><div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" /></div>
+        <div className="flex justify-center py-16"><div style={{width:36,height:36,border:"3px solid #EDE9FF",borderTop:"3px solid #7C6FE0",borderRadius:"50%",animation:"spin 0.8s linear infinite"}} /></div>
       ) : (
-        <div className="paper-card ">
-          <div className="card-body p-0 overflow-x-auto">
-            <table className="m-0">
+        <div className="erp-card ">
+          <div className="erp-card-body overflow-x-auto">
+            <table className="erp-table">
               <thead><tr><th>No. DO</th><th>Kendaraan</th><th>Tujuan</th><th>Berat (kg)</th><th>Status</th><th>Tanggal</th></tr></thead>
               <tbody>
                 {deliveries.map((d:any) => (

@@ -36,7 +36,7 @@ export default function WeighbridgePage() {
           <h2 className="text-2xl font-semibold mb-1">Manajemen Timbangan</h2>
           <p className="text-gray-500 text-sm">Tiket timbang digital & histori transaksi</p>
         </div>
-        <button className="btn-primary shadow-sm" onClick={() => setShowForm(!showForm)}>
+        <button className="btn btn-primary shadow-sm" onClick={() => setShowForm(!showForm)}>
           {showForm ? "✕ Tutup" : "⚖️ Buat Tiket Baru"}
         </button>
       </div>
@@ -45,15 +45,12 @@ export default function WeighbridgePage() {
       {stats && (
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
           {[
-            { label: "Tiket Hari Ini", value: stats._count || 0, icon: "🎫", color: "bg-info" },
-            { label: "Total Netto (kg)", value: (stats._sum?.netWeight || 0).toLocaleString("id-ID"), icon: "⚖️", color: "bg-success" },
-            { label: "Rata-rata Netto", value: stats._count ? ((stats._sum?.netWeight || 0) / stats._count).toFixed(0) + " kg" : "—", icon: "📊", color: "bg-warning" },
+            { label: "Tiket Hari Ini", value: stats._count || 0, icon: "🎫", color: "badge-info" },
+            { label: "Total Netto (kg)", value: (stats._sum?.netWeight || 0).toLocaleString("id-ID"), icon: "⚖️", color: "badge-success" },
+            { label: "Rata-rata Netto", value: stats._count ? ((stats._sum?.netWeight || 0) / stats._count).toFixed(0) + " kg" : "—", icon: "📊", color: "badge-warning" },
           ].map((s, i) => (
-            <div key={i} className={`small-box ${s.color}`}>
-              <div className="inner">
-                <h3>{s.value}</h3>
-                <p>{s.label}</p>
-              </div>
+            <div key={i} className={`erp-card ${s.color}`}>
+              <div style={{padding:"1rem"}}><div style={{fontSize:"1.5rem",fontWeight:700}}>{s.value}</div><div style={{fontSize:13,color:"var(--text-secondary)"}}>{s.label}</div></div>
               <div className="icon">{s.icon}</div>
             </div>
           ))}
@@ -61,11 +58,11 @@ export default function WeighbridgePage() {
       )}
 
       {showForm && (
-        <div className="paper-card mb-4 animate-fade-in">
-          <div className="card-header">
-            <h3 className="card-title">Tiket Timbangan Baru</h3>
+        <div className="erp-card mb-4 animate-fade-in">
+          <div className="erp-card-header">
+            <h3 className="erp-card-title">Tiket Timbangan Baru</h3>
           </div>
-          <div className="card-body">
+          <div className="erp-card-body">
             <form onSubmit={submit}>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div className="form-group mb-0">
@@ -108,7 +105,7 @@ export default function WeighbridgePage() {
                 </div>
               )}
               <div className="mt-4 pt-3 border-t border-gray-200">
-                <button type="submit" className="btn-primary">🎫 Buat Tiket</button>
+                <button type="submit" className="btn btn-primary">🎫 Buat Tiket</button>
               </div>
             </form>
           </div>
@@ -116,11 +113,11 @@ export default function WeighbridgePage() {
       )}
 
       {loading ? (
-        <div className="flex justify-center py-16"><div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" /></div>
+        <div className="flex justify-center py-16"><div style={{width:36,height:36,border:"3px solid #EDE9FF",borderTop:"3px solid #7C6FE0",borderRadius:"50%",animation:"spin 0.8s linear infinite"}} /></div>
       ) : (
-        <div className="paper-card ">
-          <div className="card-body p-0 overflow-x-auto">
-            <table className="m-0">
+        <div className="erp-card ">
+          <div className="erp-card-body overflow-x-auto">
+            <table className="erp-table">
               <thead><tr><th>No. Tiket</th><th>Supplier</th><th>Truk</th><th>Material</th><th>Bruto</th><th>Tare</th><th>Netto</th><th>Tanggal</th></tr></thead>
               <tbody>
                 {tickets.map((t:any) => (

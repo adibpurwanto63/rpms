@@ -45,7 +45,7 @@ export default function BcpPage() {
           <h2 className="text-2xl font-semibold mb-1">Business Continuity Center</h2>
           <p className="text-gray-500 text-sm">Incident management, risk register, & alert system</p>
         </div>
-        <button className="btn-primary shadow-sm" onClick={() => setShowForm(!showForm)}>
+        <button className="btn btn-primary shadow-sm" onClick={() => setShowForm(!showForm)}>
           {showForm ? "✕ Tutup" : "⚠️ Laporkan Insiden"}
         </button>
       </div>
@@ -53,15 +53,15 @@ export default function BcpPage() {
       {/* Alert Summary */}
       {alerts && (
         <div className="grid grid-cols-3 gap-4 mb-4">
-          <div className="paper-card px-4 py-4 text-center border-t-4 border-t-danger">
+          <div className="erp-card px-4 py-4 text-center border-t-4 border-t-danger">
             <div className="text-3xl font-bold text-danger">{alerts.openIncidents}</div>
             <div className="text-xs text-gray-500 mt-1 font-semibold uppercase">Insiden Terbuka</div>
           </div>
-          <div className="paper-card px-4 py-4 text-center border-t-4 border-t-danger bg-red-50">
+          <div className="erp-card px-4 py-4 text-center border-t-4 border-t-danger bg-red-50">
             <div className="text-3xl font-bold text-danger">{alerts.criticalIncidents}</div>
             <div className="text-xs text-gray-500 mt-1 font-semibold uppercase">Insiden Kritis</div>
           </div>
-          <div className="paper-card px-4 py-4 text-center border-t-4 border-t-warning">
+          <div className="erp-card px-4 py-4 text-center border-t-4 border-t-warning">
             <div className="text-3xl font-bold text-warning">{alerts.highRiskItems}</div>
             <div className="text-xs text-gray-500 mt-1 font-semibold uppercase">Risiko Tinggi</div>
           </div>
@@ -69,11 +69,11 @@ export default function BcpPage() {
       )}
 
       {showForm && (
-        <div className="paper-card mb-4 animate-fade-in">
-          <div className="card-header">
-            <h3 className="card-title">Laporan Insiden Baru</h3>
+        <div className="erp-card mb-4 animate-fade-in">
+          <div className="erp-card-header">
+            <h3 className="erp-card-title">Laporan Insiden Baru</h3>
           </div>
-          <div className="card-body">
+          <div className="erp-card-body">
             <form onSubmit={submit}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div className="form-group mb-0">
@@ -98,7 +98,7 @@ export default function BcpPage() {
                 </div>
               </div>
               <div className="mt-4 pt-3 border-t border-gray-200">
-                <button type="submit" className="btn-primary">🚨 Kirim Laporan</button>
+                <button type="submit" className="btn btn-primary">🚨 Kirim Laporan</button>
               </div>
             </form>
           </div>
@@ -107,11 +107,11 @@ export default function BcpPage() {
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
         {/* Incidents */}
-        <div className="paper-card ">
-          <div className="card-header border-b border-gray-200">
-            <h3 className="card-title font-semibold text-gray-800">Daftar Insiden</h3>
+        <div className="erp-card ">
+          <div className="erp-card-header border-b border-gray-200">
+            <h3 className="erp-card-title font-semibold text-gray-800">Daftar Insiden</h3>
           </div>
-          <div className="card-body p-4 bg-gray-50">
+          <div className="erp-card-body p-4 bg-gray-50">
             {loading ? <div className="flex justify-center py-8"><div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" /></div> : (
               <div className="space-y-3">
                 {incidents.map((inc:any) => (
@@ -141,12 +141,12 @@ export default function BcpPage() {
         </div>
 
         {/* Risk Register */}
-        <div className="paper-card ">
-          <div className="card-header border-b border-gray-200">
-            <h3 className="card-title font-semibold text-gray-800">Risk Register</h3>
+        <div className="erp-card ">
+          <div className="erp-card-header border-b border-gray-200">
+            <h3 className="erp-card-title font-semibold text-gray-800">Risk Register</h3>
           </div>
-          <div className="card-body p-0 overflow-x-auto">
-            <table className="m-0">
+          <div className="erp-card-body overflow-x-auto">
+            <table className="erp-table">
               <thead><tr><th>Risiko</th><th>Likelihood</th><th>Impact</th><th>Level</th></tr></thead>
               <tbody>
                 {risks.map((r:any) => {
