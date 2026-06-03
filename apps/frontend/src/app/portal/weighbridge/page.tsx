@@ -8,7 +8,7 @@ export default function WeighbridgePage() {
   const [stats, setStats] = useState<any>(null);
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [form, setForm] = useState({ supplierId:"", truckNumber:"", driverName:"", materialType:"OCC", grossWeight:"", tareWeight:"" });
+  const [form, setForm] = useState({ supplierId: "", truckNumber: "", driverName: "", materialType: "OCC", grossWeight: "", tareWeight: "" });
 
   const load = () => {
     Promise.all([
@@ -24,112 +24,151 @@ export default function WeighbridgePage() {
     e.preventDefault();
     await api.post("/weighbridge", { ...form, grossWeight: parseFloat(form.grossWeight), tareWeight: parseFloat(form.tareWeight) });
     setShowForm(false);
+    setForm({ supplierId: "", truckNumber: "", driverName: "", materialType: "OCC", grossWeight: "", tareWeight: "" });
     load();
   };
 
   const net = form.grossWeight && form.tareWeight ? parseFloat(form.grossWeight) - parseFloat(form.tareWeight) : 0;
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-4">
+    <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+      {/* Page Header */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div>
-          <h2 className="text-2xl font-semibold mb-1">Manajemen Timbangan</h2>
-          <p className="text-gray-500 text-sm">Tiket timbang digital & histori transaksi</p>
+          <h2 style={{ fontSize: 22, fontWeight: 700, color: "var(--text-primary)", letterSpacing: "-0.02em" }}>Manajemen Timbangan</h2>
+          <p style={{ fontSize: 14, color: "var(--text-secondary)", marginTop: 4 }}>Tiket timbang digital, tracking armada, & histori transaksi</p>
         </div>
-        <button className="btn btn-primary shadow-sm" onClick={() => setShowForm(!showForm)}>
-          {showForm ? "✕ Tutup" : "⚖️ Buat Tiket Baru"}
+        <button className="btn btn-primary" onClick={() => setShowForm(true)}>
+          + Buat Tiket Baru
         </button>
       </div>
 
-      {/* Today stats */}
-      {stats && (
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
+      {/* Today stats summary row */}
+      {!loading && stats && (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
           {[
-            { label: "Tiket Hari Ini", value: stats._count || 0, icon: "🎫", color: "badge-info" },
-            { label: "Total Netto (kg)", value: (stats._sum?.netWeight || 0).toLocaleString("id-ID"), icon: "⚖️", color: "badge-success" },
-            { label: "Rata-rata Netto", value: stats._count ? ((stats._sum?.netWeight || 0) / stats._count).toFixed(0) + " kg" : "—", icon: "📊", color: "badge-warning" },
-          ].map((s, i) => (
-            <div key={i} className={`erp-card ${s.color}`}>
-              <div style={{padding:"1rem"}}><div style={{fontSize:"1.5rem",fontWeight:700}}>{s.value}</div><div style={{fontSize:13,color:"var(--text-secondary)"}}>{s.label}</div></div>
-              <div className="icon">{s.icon}</div>
+            { label: "Tiket Hari Ini", value: stats._count || 0, icon: "🎫", variant: "dark" },
+            { label: "Total Netto", value: `${((stats._sum?.netWeight || 0) / 1000).toFixed(2)} Ton`, icon: "⚖️", variant: "mint" },
+            { label: "Rata-Rata Netto", value: stats._count ? `${(((stats._sum?.netWeight || 0) / stats._count) / 1000).toFixed(2)} Ton` : "0 Ton", icon: "📊", variant: "pink" },
+          ].map((k, i) => (
+            <div key={i} className="kpi-card" style={{ background: ({ dark: "var(--kpi-dark)", mint: "var(--kpi-mint-bg)", pink: "var(--kpi-pink-bg)" } as any)[k.variant], borderColor: k.variant === "dark" ? "transparent" : undefined }}>
+              <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+                <span style={{ fontSize: 12, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: k.variant === "dark" ? "rgba(255,255,255,0.6)" : "var(--text-secondary)" }}>{k.label}</span>
+                <div style={{ width: 36, height: 36, borderRadius: 8, background: k.variant === "dark" ? "rgba(255,255,255,0.12)" : k.variant === "mint" ? "rgba(78,205,196,0.15)" : "rgba(255,107,157,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{k.icon}</div>
+              </div>
+              <div style={{ fontSize: "2rem", fontWeight: 700, letterSpacing: "-0.03em", color: k.variant === "dark" ? "#fff" : "var(--text-primary)", lineHeight: 1.2 }}>{k.value}</div>
             </div>
           ))}
         </div>
       )}
 
+      {/* Pop-up Modal Form */}
       {showForm && (
-        <div className="erp-card mb-4 animate-fade-in">
-          <div className="erp-card-header">
-            <h3 className="erp-card-title">Tiket Timbangan Baru</h3>
-          </div>
-          <div className="erp-card-body">
-            <form onSubmit={submit}>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div className="form-group mb-0">
-                  <label>Supplier</label>
-                  <select value={form.supplierId} onChange={e => setForm({...form, supplierId: e.target.value})} required>
-                    <option value="">Pilih Supplier</option>
-                    {suppliers.map((s:any) => <option key={s.id} value={s.id}>{s.companyName}</option>)}
-                  </select>
-                </div>
-                <div className="form-group mb-0">
-                  <label>No. Polisi Truk</label>
-                  <input value={form.truckNumber} onChange={e => setForm({...form, truckNumber: e.target.value})} placeholder="B 1234 XYZ" required />
-                </div>
-                <div className="form-group mb-0">
-                  <label>Nama Pengemudi</label>
-                  <input value={form.driverName} onChange={e => setForm({...form, driverName: e.target.value})} placeholder="Nama supir" required />
-                </div>
-                <div className="form-group mb-0">
-                  <label>Jenis Material</label>
-                  <select value={form.materialType} onChange={e => setForm({...form, materialType: e.target.value})}>
-                    {["OCC","ONP","Mixed Paper","White Ledger"].map(m => <option key={m}>{m}</option>)}
-                  </select>
-                </div>
-                <div className="form-group mb-0">
-                  <label>Berat Bruto (kg)</label>
-                  <input type="number" value={form.grossWeight} onChange={e => setForm({...form, grossWeight: e.target.value})} placeholder="15000" required />
-                </div>
-                <div className="form-group mb-0">
-                  <label>Berat Tare (kg)</label>
-                  <input type="number" value={form.tareWeight} onChange={e => setForm({...form, tareWeight: e.target.value})} placeholder="4500" required />
-                </div>
-              </div>
-              {net > 0 && (
-                <div className="bg-gray-100 rounded p-4 my-4 flex items-center gap-4 border border-gray-200">
-                  <div className="text-2xl">⚖️</div>
+        <div style={{
+          position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
+          background: "rgba(0,0,0,0.5)", zIndex: 9999,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          backdropFilter: "blur(4px)"
+        }}>
+          <div className="erp-card animate-fade-in" style={{ width: "100%", maxWidth: 700, margin: 20, maxHeight: "90vh", overflowY: "auto", border: "none", boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}>
+            <div className="erp-card-header" style={{ position: "sticky", top: 0, background: "#fff", zIndex: 10, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <h3 className="erp-card-title" style={{ fontSize: 20 }}>Buat Tiket Timbangan Baru</h3>
+              <button onClick={() => setShowForm(false)} style={{ background: "transparent", border: "none", fontSize: 20, cursor: "pointer", color: "var(--text-muted)" }}>✕</button>
+            </div>
+            <div className="erp-card-body" style={{ padding: 24 }}>
+              <form onSubmit={submit}>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 20 }}>
+                  <div style={{ gridColumn: "span 2" }}>
+                    <label className="form-label">Supplier Pengirim</label>
+                    <select className="form-input" value={form.supplierId} onChange={e => setForm({ ...form, supplierId: e.target.value })} required>
+                      <option value="">-- Pilih Supplier --</option>
+                      {suppliers.map((s: any) => <option key={s.id} value={s.id}>{s.companyName}</option>)}
+                    </select>
+                  </div>
                   <div>
-                    <div className="text-sm text-gray-500">Berat Netto Kalkulasi</div>
-                    <div className="text-2xl font-bold text-success">{net.toLocaleString("id-ID")} kg</div>
+                    <label className="form-label">Nomor Polisi Kendaraan</label>
+                    <input className="form-input" value={form.truckNumber} onChange={e => setForm({ ...form, truckNumber: e.target.value })} placeholder="Cth: B 1234 XYZ" required />
+                  </div>
+                  <div>
+                    <label className="form-label">Nama Pengemudi</label>
+                    <input className="form-input" value={form.driverName} onChange={e => setForm({ ...form, driverName: e.target.value })} placeholder="Cth: Budi Santoso" required />
+                  </div>
+                  <div style={{ gridColumn: "span 2" }}>
+                    <label className="form-label">Jenis Material</label>
+                    <select className="form-input" value={form.materialType} onChange={e => setForm({ ...form, materialType: e.target.value })}>
+                      {["OCC", "ONP", "Mixed Paper", "White Ledger"].map(m => <option key={m} value={m}>{m}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="form-label">Berat Bruto (kg)</label>
+                    <input className="form-input" type="number" value={form.grossWeight} onChange={e => setForm({ ...form, grossWeight: e.target.value })} placeholder="Cth: 15000" required />
+                  </div>
+                  <div>
+                    <label className="form-label">Berat Tare (kg)</label>
+                    <input className="form-input" type="number" value={form.tareWeight} onChange={e => setForm({ ...form, tareWeight: e.target.value })} placeholder="Cth: 4500" required />
                   </div>
                 </div>
-              )}
-              <div className="mt-4 pt-3 border-t border-gray-200">
-                <button type="submit" className="btn btn-primary">🎫 Buat Tiket</button>
-              </div>
-            </form>
+
+                {net > 0 && (
+                  <div style={{ background: "var(--bg-light)", padding: "16px 20px", borderRadius: 8, display: "flex", alignItems: "center", gap: 16, marginBottom: 24, border: "1px solid var(--border-light)" }}>
+                    <div style={{ fontSize: "2rem" }}>⚖️</div>
+                    <div>
+                      <div style={{ fontSize: 13, color: "var(--text-secondary)", fontWeight: 500 }}>Perkiraan Berat Netto</div>
+                      <div style={{ fontSize: "1.75rem", fontWeight: 700, color: "var(--brand-teal)" }}>{net.toLocaleString("id-ID")} kg</div>
+                    </div>
+                  </div>
+                )}
+
+                <div style={{ paddingTop: 20, borderTop: "1px solid var(--border-light)", display: "flex", gap: 12, justifyContent: "flex-end" }}>
+                  <button type="button" className="btn btn-secondary" onClick={() => setShowForm(false)}>Batal</button>
+                  <button type="submit" className="btn btn-primary" style={{ padding: "0 24px" }}>💾 Simpan Tiket</button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}
 
+      {/* Table */}
       {loading ? (
-        <div className="flex justify-center py-16"><div style={{width:36,height:36,border:"3px solid #EDE9FF",borderTop:"3px solid #7C6FE0",borderRadius:"50%",animation:"spin 0.8s linear infinite"}} /></div>
+        <div style={{ display: "flex", justifyContent: "center", padding: "4rem" }}>
+          <div style={{ width: 36, height: 36, border: "3px solid #EDE9FF", borderTop: "3px solid #7C6FE0", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+        </div>
       ) : (
-        <div className="erp-card ">
-          <div className="erp-card-body overflow-x-auto">
+        <div className="erp-card">
+          <div className="erp-card-header">
+            <span className="erp-card-title">Riwayat Tiket Timbangan</span>
+          </div>
+          <div style={{ overflowX: "auto" }}>
             <table className="erp-table">
-              <thead><tr><th>No. Tiket</th><th>Supplier</th><th>Truk</th><th>Material</th><th>Bruto</th><th>Tare</th><th>Netto</th><th>Tanggal</th></tr></thead>
+              <thead>
+                <tr>
+                  <th>No. Tiket</th>
+                  <th>Supplier</th>
+                  <th>Kendaraan</th>
+                  <th>Material</th>
+                  <th>Bruto</th>
+                  <th>Tare</th>
+                  <th>Netto</th>
+                  <th>Tanggal</th>
+                </tr>
+              </thead>
               <tbody>
-                {tickets.map((t:any) => (
+                {tickets.length === 0 ? (
+                  <tr><td colSpan={8} style={{ textAlign: "center", padding: "3rem", color: "var(--text-muted)" }}>Belum ada tiket timbangan</td></tr>
+                ) : tickets.map((t: any) => (
                   <tr key={t.id}>
-                    <td className="font-mono text-sm text-blue-600">{t.ticketNumber}</td>
-                    <td className="text-sm">{t.supplier?.companyName}</td>
-                    <td className="text-gray-500 text-sm">{t.truckNumber}</td>
-                    <td><span className="badge badge-info">{t.materialType}</span></td>
-                    <td className="text-gray-700">{t.grossWeight?.toLocaleString("id-ID")}</td>
-                    <td className="text-gray-500">{t.tareWeight?.toLocaleString("id-ID")}</td>
-                    <td className="font-bold text-success">{t.netWeight?.toLocaleString("id-ID")}</td>
-                    <td className="text-sm text-gray-500">{new Date(t.date).toLocaleDateString("id-ID")}</td>
+                    <td style={{ fontWeight: 600, color: "var(--brand-purple)" }}>{t.ticketNumber}</td>
+                    <td style={{ fontWeight: 500, color: "var(--text-primary)" }}>{t.supplier?.companyName}</td>
+                    <td>
+                      <div style={{ fontWeight: 600, color: "var(--text-primary)" }}>{t.truckNumber}</div>
+                      <div style={{ fontSize: 12, color: "var(--text-secondary)", marginTop: 2 }}>{t.driverName}</div>
+                    </td>
+                    <td><span className="badge badge-neutral" style={{ background: "#EDE9FF", color: "var(--brand-purple)", border: "none" }}>{t.materialType}</span></td>
+                    <td style={{ color: "var(--text-secondary)" }}>{t.grossWeight?.toLocaleString("id-ID")} kg</td>
+                    <td style={{ color: "var(--text-secondary)" }}>{t.tareWeight?.toLocaleString("id-ID")} kg</td>
+                    <td style={{ fontWeight: 700, color: "var(--brand-teal)" }}>{t.netWeight?.toLocaleString("id-ID")} kg</td>
+                    <td style={{ color: "var(--text-secondary)", fontSize: 13 }}>{new Date(t.date).toLocaleDateString("id-ID")}</td>
                   </tr>
                 ))}
               </tbody>
