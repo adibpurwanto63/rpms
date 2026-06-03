@@ -97,12 +97,12 @@ export default function LoginPage() {
             <div className="form-group">
               <label htmlFor="email">Email</label>
               <input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)}
-                placeholder="nama@rpms.id" required />
+                placeholder="nama@rpms.id" required autoComplete="username" />
             </div>
             <div className="form-group">
               <label htmlFor="password">Password</label>
               <input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)}
-                placeholder="••••••••" required />
+                placeholder="••••••••" required autoComplete="current-password" />
             </div>
             <button type="submit" className="btn-primary w-full justify-center py-3 text-base" disabled={loading}>
               {loading ? (
