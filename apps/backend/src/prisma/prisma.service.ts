@@ -5,8 +5,17 @@ import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
 
+const dbUrl = process.env.DATABASE_URL;
+if (!dbUrl) {
+  console.error("CRITICAL ERROR: DATABASE_URL environment variable is missing!");
+  console.error("Please add DATABASE_URL to your Hugging Face Space Secrets.");
+} else {
+  console.log("PrismaService initializing with DB URL:", dbUrl.substring(0, 30) + "...");
+}
+
+const fallbackDbUrl = "postgresql://neondb_owner:npg_dnWjzf4P8FRw@ep-ancient-wind-apqnezaa-pooler.c-7.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require";
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://rpms_user:rpms_pass@localhost:5433/rpms_db?schema=public',
+  connectionString: dbUrl || fallbackDbUrl,
 });
 
 const adapter = new PrismaPg(pool);
