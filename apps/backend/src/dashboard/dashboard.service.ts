@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
-import { InvoiceType, InventoryStatus, DeliveryStatus, IncidentStatus, PurchaseOrderStatus } from "@prisma/client";
+import { InvoiceType, InventoryStatus, IncidentStatus, PurchaseOrderStatus } from "@prisma/client";
 
 @Injectable()
 export class DashboardService {
@@ -8,13 +8,14 @@ export class DashboardService {
 
   async getExecutiveDashboard(dateStr?: string) {
     const today = dateStr ? new Date(dateStr) : new Date();
-    today.setHours(0,0,0,0);
-    const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate() + 1);
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
 
     const [
       todayPurchase, todayProduction, todayShipment,
       inventory, ar, ap, incidents, recentTickets, recentProduction,
-      pendingPO, recentPO
+      pendingPO, recentPO, totalPO, totalSpend,
     ] = await Promise.all([
       this.prisma.weighingTicket.aggregate({ where: { date: { gte: today, lt: tomorrow } }, _count: true, _sum: { netWeight: true } }),
       this.prisma.productionRecord.aggregate({ where: { date: { gte: today, lt: tomorrow } }, _sum: { outputWeight: true, baleCount: true }, _avg: { oee: true } }),
@@ -27,6 +28,8 @@ export class DashboardService {
       this.prisma.productionRecord.findMany({ orderBy: { date: "desc" }, take: 5, include: { machine: true } }),
       this.prisma.purchaseOrder.count({ where: { status: { in: [PurchaseOrderStatus.PENDING, PurchaseOrderStatus.APPROVED, PurchaseOrderStatus.ORDERED] } } }),
       this.prisma.purchaseOrder.findMany({ orderBy: { createdAt: "desc" }, take: 5, include: { supplier: { select: { companyName: true } } } }),
+      this.prisma.purchaseOrder.count(),
+      this.prisma.purchaseOrder.aggregate({ _sum: { totalAmount: true } }),
     ]);
 
     const revenue = ar._sum.amount || 0;
@@ -43,15 +46,23 @@ export class DashboardService {
       riskStatus: { openIncidents: incidents },
       recentTickets,
       recentProduction,
-      pembelian: { pendingPO, recentPO },
+      pembelian: {
+        pendingPO,
+        recentPO,
+        totalPO,
+        totalSpend: totalSpend._sum.totalAmount || 0,
+      },
     };
   }
 
   async getKpiTrend(days: number = 7) {
     const data = [];
     for (let i = days - 1; i >= 0; i--) {
-      const d = new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate() - i);
-      const nd = new Date(d); nd.setDate(nd.getDate() + 1);
+      const d = new Date();
+      d.setHours(0, 0, 0, 0);
+      d.setDate(d.getDate() - i);
+      const nd = new Date(d);
+      nd.setDate(nd.getDate() + 1);
       const [purchase, production] = await Promise.all([
         this.prisma.weighingTicket.aggregate({ where: { date: { gte: d, lt: nd } }, _sum: { netWeight: true } }),
         this.prisma.productionRecord.aggregate({ where: { date: { gte: d, lt: nd } }, _sum: { outputWeight: true } }),

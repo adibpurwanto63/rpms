@@ -46,15 +46,17 @@ export default function DashboardPage() {
 
   if (!data) return <div style={{ color: "var(--text-secondary)", textAlign: "center", padding: "3rem" }}>Gagal memuat data dashboard</div>;
 
+  const fmtRpShort = (n: number) => n >= 1_000_000 ? `Rp ${(n / 1_000_000).toFixed(1)}M` : `Rp ${n.toLocaleString("id-ID")}`;
+
   const kpis = [
     {
       label: "Total Pembelian",
-      value: fmt(data.todayPurchase.weight),
-      sub: `${data.todayPurchase.count} tiket`,
+      value: fmtRpShort(data.pembelian?.totalSpend || 0),
+      sub: `${data.pembelian?.totalPO || 0} PO · ${data.pembelian?.pendingPO || 0} aktif`,
       trend: "+10.5%",
       trendUp: true,
       variant: "dark",
-      icon: "💰",
+      icon: "🛍️",
       iconBg: "rgba(255,255,255,0.15)",
     },
     {
