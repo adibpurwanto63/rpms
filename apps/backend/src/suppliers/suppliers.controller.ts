@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Param, Body, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Param, Body, Query, UseGuards } from '@nestjs/common';
 import { SuppliersService } from './suppliers.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -39,9 +39,21 @@ export class SuppliersController {
   @Roles(UserRole.SUPER_ADMIN, UserRole.PROCUREMENT_MANAGER)
   update(@Param('id') id: string, @Body() dto: any) { return this.suppliersService.update(id, dto); }
 
+  @Put(':id/status')
+  @Roles(UserRole.SUPER_ADMIN, UserRole.PROCUREMENT_MANAGER)
+  updateStatus(@Param('id') id: string, @Body('status') status: SupplierStatus) {
+    return this.suppliersService.updateStatus(id, status);
+  }
+
   @Put(':id/rating')
   @Roles(UserRole.SUPER_ADMIN, UserRole.PROCUREMENT_MANAGER)
   updateRating(@Param('id') id: string, @Body() dto: { rating: number }) {
     return this.suppliersService.updateRating(id, dto.rating);
+  }
+
+  @Delete(':id')
+  @Roles(UserRole.SUPER_ADMIN, UserRole.PROCUREMENT_MANAGER)
+  delete(@Param('id') id: string) {
+    return this.suppliersService.delete(id);
   }
 }

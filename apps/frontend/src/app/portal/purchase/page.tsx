@@ -46,6 +46,27 @@ export default function PurchasePage() {
     triggerRefresh();
   };
 
+  const updateSupplierStatus = async (id: string, status: string) => {
+    try {
+      await api.put(`/suppliers/${id}/status`, { status });
+      loadSuppliers();
+      triggerRefresh();
+    } catch (e: any) {
+      alert(e.response?.data?.message || "Error updating status");
+    }
+  };
+
+  const deleteSupplier = async (id: string) => {
+    if (!confirm("Hapus supplier ini? (Akan gagal jika masih ada data PO/Timbangan terkait)")) return;
+    try {
+      await api.delete(`/suppliers/${id}`);
+      loadSuppliers();
+      triggerRefresh();
+    } catch (e: any) {
+      alert("Gagal menghapus supplier. Pastikan tidak ada data yang terkait dengan supplier ini.");
+    }
+  };
+
   // Actions Penjualan
   const submitSales = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -189,7 +210,7 @@ export default function PurchasePage() {
             <div style={{ overflowX: "auto" }}>
               <table className="erp-table">
                 <thead>
-                  <tr><th>Nama Perusahaan</th><th>PIC</th><th>Kontak</th><th>Rating</th><th>Status</th></tr>
+                  <tr><th>Nama Perusahaan</th><th>PIC</th><th>Kontak</th><th>Rating</th><th>Status</th><th>Aksi</th></tr>
                 </thead>
                 <tbody>
                   {suppliers.map((s: any) => (
@@ -199,6 +220,16 @@ export default function PurchasePage() {
                       <td style={{ color: "var(--text-secondary)" }}>{s.phone}</td>
                       <td>★ {s.rating?.toFixed(1) || "—"}</td>
                       <td><span className={`badge ${statusBadge(s.status)}`}>{statusLabel(s.status)}</span></td>
+                      <td>
+                        <div style={{ display: "flex", gap: 6 }}>
+                          {s.status === "ACTIVE" ? (
+                            <button onClick={() => updateSupplierStatus(s.id, "INACTIVE")} className="btn btn-secondary" style={{ padding: "4px 8px", fontSize: 12 }}>Nonaktifkan</button>
+                          ) : (
+                            <button onClick={() => updateSupplierStatus(s.id, "ACTIVE")} className="btn btn-primary" style={{ padding: "4px 8px", fontSize: 12 }}>Aktifkan</button>
+                          )}
+                          <button onClick={() => deleteSupplier(s.id)} style={{ padding: "4px 8px", fontSize: 12, border: "1px solid red", color: "red", background: "none", borderRadius: 6, cursor: "pointer" }}>Hapus</button>
+                        </div>
+                      </td>
                     </tr>
                   ))}
                 </tbody>

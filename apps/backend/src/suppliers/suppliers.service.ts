@@ -40,6 +40,19 @@ export class SuppliersService {
     });
   }
 
+  async updateStatus(id: string, status: SupplierStatus) {
+    await this.findOne(id);
+    return this.prisma.supplier.update({ where: { id }, data: { status } });
+  }
+
+  async delete(id: string) {
+    await this.findOne(id);
+    // Note: This will fail if there are foreign keys constraints (like purchase_orders or weighing_tickets).
+    // In a real system, you might want to soft-delete by setting status = 'INACTIVE'
+    // but for the sake of the requirement, here is a hard delete attempt.
+    return this.prisma.supplier.delete({ where: { id } });
+  }
+
   stats() {
     return this.prisma.supplier.groupBy({ by: ['status'], _count: true });
   }
