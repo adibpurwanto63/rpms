@@ -51,7 +51,7 @@ export default function SettingsPage() {
       </div>
 
       {showForm && (
-        <div className="admin-card primary mb-4 animate-fade-in">
+        <div className="paper-card mb-4 animate-fade-in">
           <div className="card-header">
             <h3 className="card-title">Tambah Pengguna Baru</h3>
           </div>
@@ -88,7 +88,7 @@ export default function SettingsPage() {
       {loading ? (
         <div className="flex justify-center py-16"><div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" /></div>
       ) : (
-        <div className="admin-card">
+        <div className="paper-card ">
           <div className="card-body p-0 overflow-x-auto">
             <table className="m-0">
               <thead><tr><th>Nama</th><th>Email</th><th>Role</th><th>Status</th><th>Dibuat</th>{currentUser?.role === "SUPER_ADMIN" && <th>Aksi</th>}</tr></thead>

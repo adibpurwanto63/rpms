@@ -61,7 +61,7 @@ export default function WeighbridgePage() {
       )}
 
       {showForm && (
-        <div className="admin-card primary mb-4 animate-fade-in">
+        <div className="paper-card mb-4 animate-fade-in">
           <div className="card-header">
             <h3 className="card-title">Tiket Timbangan Baru</h3>
           </div>
@@ -118,7 +118,7 @@ export default function WeighbridgePage() {
       {loading ? (
         <div className="flex justify-center py-16"><div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" /></div>
       ) : (
-        <div className="admin-card">
+        <div className="paper-card ">
           <div className="card-body p-0 overflow-x-auto">
             <table className="m-0">
               <thead><tr><th>No. Tiket</th><th>Supplier</th><th>Truk</th><th>Material</th><th>Bruto</th><th>Tare</th><th>Netto</th><th>Tanggal</th></tr></thead>

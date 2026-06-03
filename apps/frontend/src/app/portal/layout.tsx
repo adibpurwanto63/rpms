@@ -37,7 +37,7 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
 
   if (loading || !user) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-[#f4f6f9]">
+      <div className="flex items-center justify-center min-h-screen" style={{ background: "var(--bg-primary)" }}>
         <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -46,44 +46,32 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
   const accessible = navItems.filter(n => canAccess(user.role, n.module));
 
   return (
-    <div className="flex min-h-screen bg-[#f4f6f9]">
-      {/* Sidebar - AdminLTE Dark */}
-      <aside className="bg-[#343a40] text-white flex flex-col transition-all duration-300 shadow-[0_14px_28px_rgba(0,0,0,.25),_0_10px_10px_rgba(0,0,0,.22)] z-40" style={{
+    <div className="flex min-h-screen" style={{ background: "var(--bg-primary)" }}>
+      {/* Sidebar - Paper.id Style (White, clean) */}
+      <aside className="bg-white text-gray-800 flex flex-col transition-all duration-300 z-40 border-r border-gray-200" style={{
         width: collapsed ? "73px" : "250px", minHeight: "100vh", position: "fixed", top: 0, left: 0
       }}>
         {/* Brand Logo */}
-        <Link href="/portal/dashboard" className="flex items-center gap-3 px-4 h-[57px] border-b border-[#4b545c] hover:text-white transition-colors">
-          <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-lg flex-shrink-0 shadow-sm text-center ml-1">♻</div>
-          {!collapsed && <span className="font-light text-[1.25rem] truncate">RPMS<span className="font-bold">Portal</span></span>}
+        <Link href="/portal/dashboard" className="flex items-center gap-3 px-6 h-[72px] border-b border-gray-100 hover:opacity-80 transition-opacity">
+          <div className="w-8 h-8 rounded-lg bg-[#4195D5] flex items-center justify-center text-lg flex-shrink-0 text-white font-bold text-center ml-1">P</div>
+          {!collapsed && <span className="font-semibold text-[1.25rem] text-[#1A1C21] tracking-tight truncate">Paper<span className="text-[#4195D5]">RPMS</span></span>}
         </Link>
 
-        {/* User Panel */}
-        <div className="border-b border-[#4b545c] p-4 flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-sm font-bold flex-shrink-0 shadow-sm text-white">
-            {user.name.charAt(0)}
-          </div>
-          {!collapsed && (
-            <div className="min-w-0">
-              <div className="text-sm text-[#c2c7d0] hover:text-white transition-colors truncate">{user.name}</div>
-            </div>
-          )}
-        </div>
-
         {/* Sidebar Menu */}
-        <nav className="flex-1 py-4 overflow-y-auto px-2">
-          <ul className="space-y-1">
+        <nav className="flex-1 py-6 overflow-y-auto px-4">
+          <ul className="space-y-1.5">
             {accessible.map(item => {
               const active = pathname.startsWith(item.href);
               return (
                 <li key={item.href}>
                   <Link href={item.href}
-                    className="flex items-center gap-3 px-3 py-2 rounded transition-colors text-[0.9rem]"
+                    className="flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors text-sm font-medium"
                     style={{
-                      backgroundColor: active ? "#007bff" : "transparent",
-                      color: active ? "#ffffff" : "#c2c7d0",
+                      backgroundColor: active ? "rgba(65, 149, 213, 0.1)" : "transparent",
+                      color: active ? "#4195D5" : "#5F6B7C",
                     }}
                     title={collapsed ? item.label : undefined}>
-                    <span className="text-base flex-shrink-0 text-center w-5">{item.icon}</span>
+                    <span className="text-lg flex-shrink-0 text-center w-6">{item.icon}</span>
                     {!collapsed && <span>{item.label}</span>}
                   </Link>
                 </li>
@@ -91,42 +79,50 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
             })}
           </ul>
         </nav>
+        
+        {/* User Panel (Bottom) */}
+        <div className="border-t border-gray-100 p-4">
+          <div className="flex items-center gap-3 bg-gray-50 rounded-lg p-2 border border-gray-100">
+            <div className="w-8 h-8 rounded-full bg-[#4195D5] flex items-center justify-center text-sm font-bold flex-shrink-0 text-white">
+              {user.name.charAt(0).toUpperCase()}
+            </div>
+            {!collapsed && (
+              <div className="min-w-0 flex-1">
+                <div className="text-sm font-semibold text-gray-800 truncate">{user.name}</div>
+                <div className="text-xs text-gray-500 truncate">{roleLabel[user.role]}</div>
+              </div>
+            )}
+          </div>
+        </div>
       </aside>
 
       {/* Main Wrapper */}
       <div className="flex-1 flex flex-col" style={{ marginLeft: collapsed ? "73px" : "250px", transition: "margin 0.3s" }}>
         
         {/* Top Navbar */}
-        <header className="bg-white sticky top-0 z-30 h-[57px] flex items-center justify-between px-4 border-b border-gray-200 transition-all">
-          <div className="flex items-center gap-4">
-            <button onClick={() => setCollapsed(!collapsed)} className="text-gray-500 hover:text-gray-700 p-1">
+        <header className="bg-white sticky top-0 z-30 h-[72px] flex items-center justify-between px-6 border-b border-gray-200 transition-all">
+          <div className="flex items-center gap-6">
+            <button onClick={() => setCollapsed(!collapsed)} className="text-gray-400 hover:text-[#4195D5] transition-colors p-1 flex items-center justify-center w-8 h-8 rounded-md bg-gray-50 border border-gray-200">
               {collapsed ? "»" : "«"}
             </button>
-            <span className="hidden sm:inline text-sm text-gray-500 font-medium">Home</span>
+            {/* Breadcrumb replacement for modern look */}
+            <div className="hidden sm:flex items-center text-sm font-medium text-gray-400">
+               <span className="text-[#4195D5]">RPMS</span>
+               <span className="mx-2">/</span>
+               <span className="text-gray-800">{accessible.find(n => pathname.startsWith(n.href))?.label || "Portal"}</span>
+            </div>
           </div>
           <div className="flex items-center gap-4">
-            <div className="hidden sm:block text-xs text-gray-500">{new Date().toLocaleDateString("id-ID", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</div>
-            <div className="badge badge-info">{roleLabel[user.role]}</div>
-            <button onClick={logout} className="text-sm text-gray-500 hover:text-red-500 px-2 py-1">
-              Logout
+            <div className="hidden sm:block text-sm text-gray-500 font-medium">{new Date().toLocaleDateString("id-ID", { weekday: "short", year: "numeric", month: "short", day: "numeric" })}</div>
+            <div className="w-px h-6 bg-gray-200 hidden sm:block"></div>
+            <button onClick={logout} className="text-sm font-semibold text-[#F04438] hover:bg-red-50 px-3 py-1.5 rounded-md transition-colors">
+              Keluar
             </button>
           </div>
         </header>
 
-        {/* Content Header */}
-        <div className="px-4 py-3 sm:px-6 sm:py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between">
-          <h1 className="text-xl sm:text-2xl font-light text-gray-800 m-0">
-            {accessible.find(n => pathname.startsWith(n.href))?.label || "Portal"}
-          </h1>
-          <ol className="flex text-sm text-gray-500 mt-2 sm:mt-0">
-            <li><Link href="/portal/dashboard" className="text-blue-500 hover:underline">Home</Link></li>
-            <li className="mx-2">/</li>
-            <li className="text-gray-500 active">{accessible.find(n => pathname.startsWith(n.href))?.label}</li>
-          </ol>
-        </div>
-
         {/* Page Content */}
-        <section className="flex-1 px-4 sm:px-6 pb-6 animate-fade-in">
+        <section className="flex-1 p-6 sm:p-8 animate-fade-in">
           {children}
         </section>
       </div>

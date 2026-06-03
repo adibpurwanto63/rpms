@@ -40,7 +40,7 @@ export default function LogisticsPage() {
       {/* Fleet status */}
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-4">
         {vehicles.map((v:any) => (
-          <div key={v.id} className="admin-card px-4 py-3 border-t-0 shadow-sm bg-white">
+          <div key={v.id} className="paper-card px-4 py-3 border-t-0 shadow-sm bg-white">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xl">🚛</span>
               <span className={`badge ${vehicleStatusColor[v.status]}`}>{vehicleStatusLabel[v.status]}</span>
@@ -52,7 +52,7 @@ export default function LogisticsPage() {
       </div>
 
       {showForm && (
-        <div className="admin-card primary mb-4 animate-fade-in">
+        <div className="paper-card mb-4 animate-fade-in">
           <div className="card-header">
             <h3 className="card-title">Delivery Order Baru</h3>
           </div>
@@ -86,7 +86,7 @@ export default function LogisticsPage() {
       {loading ? (
         <div className="flex justify-center py-16"><div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" /></div>
       ) : (
-        <div className="admin-card">
+        <div className="paper-card ">
           <div className="card-body p-0 overflow-x-auto">
             <table className="m-0">
               <thead><tr><th>No. DO</th><th>Kendaraan</th><th>Tujuan</th><th>Berat (kg)</th><th>Status</th><th>Tanggal</th></tr></thead>

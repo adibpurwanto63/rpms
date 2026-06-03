@@ -51,7 +51,7 @@ export default function QcPage() {
       {stats.length > 0 && (
         <div className="grid grid-cols-3 gap-4 mb-4">
           {stats.map((s: any) => (
-            <div key={s.grade} className="admin-card text-center py-4">
+            <div key={s.grade} className="paper-card text-center py-4">
               <div className={`text-3xl font-bold mb-2 ${s.grade === "A" ? "text-success" : s.grade === "B" ? "text-warning" : "text-danger"}`}>{s._count}</div>
               <div className={`badge ${(gradeColor as any)[s.grade]} mx-auto`}>{(gradeLabel as any)[s.grade]}</div>
             </div>
@@ -60,7 +60,7 @@ export default function QcPage() {
       )}
 
       {showForm && (
-        <div className="admin-card primary mb-4 animate-fade-in">
+        <div className="paper-card mb-4 animate-fade-in">
           <div className="card-header">
             <h3 className="card-title">Form Inspeksi QC</h3>
           </div>
@@ -104,7 +104,7 @@ export default function QcPage() {
       {loading ? (
         <div className="flex justify-center py-16"><div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" /></div>
       ) : (
-        <div className="admin-card">
+        <div className="paper-card ">
           <div className="card-body p-0 overflow-x-auto">
             <table className="m-0">
               <thead><tr><th>Tiket</th><th>Supplier</th><th>Grade</th><th>Moisture</th><th>Plastik</th><th>Metal</th><th>Tanggal</th></tr></thead>

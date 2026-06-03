@@ -57,7 +57,7 @@ export default function ProductionPage() {
       {/* Machine status */}
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-4">
         {machines.map((m:any) => (
-          <div key={m.id} className="admin-card px-4 py-3 border-t-0 shadow-sm bg-white">
+          <div key={m.id} className="paper-card px-4 py-3 border-t-0 shadow-sm bg-white">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xl">🏭</span>
               <span className={`badge ${(machineStatusColor as any)[m.status]}`}>{(machineStatusLabel as any)[m.status]}</span>
@@ -89,7 +89,7 @@ export default function ProductionPage() {
       )}
 
       {showForm && (
-        <div className="admin-card primary mb-4 animate-fade-in">
+        <div className="paper-card mb-4 animate-fade-in">
           <div className="card-header">
             <h3 className="card-title">Input Catatan Produksi</h3>
           </div>
@@ -127,7 +127,7 @@ export default function ProductionPage() {
       {loading ? (
         <div className="flex justify-center py-16"><div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" /></div>
       ) : (
-        <div className="admin-card">
+        <div className="paper-card ">
           <div className="card-body p-0 overflow-x-auto">
             <table className="m-0">
               <thead><tr><th>Mesin</th><th>Input (kg)</th><th>Output (kg)</th><th>Bale</th><th>Runtime</th><th>Downtime</th><th>OEE</th><th>Tanggal</th></tr></thead>
