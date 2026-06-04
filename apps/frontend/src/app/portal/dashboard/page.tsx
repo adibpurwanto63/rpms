@@ -30,6 +30,7 @@ export default function DashboardPage() {
   const [trend, setTrend] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split("T")[0]);
+  const [chartFilter, setChartFilter] = useState("Semua");
   const { refreshKey } = useRefresh();
 
   useEffect(() => {
@@ -212,14 +213,31 @@ export default function DashboardPage() {
           <div className="erp-card-header">
             <span className="erp-card-title">Tren Pembelian & Penjualan</span>
             <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--text-secondary)" }}>
-                <div style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--color-purple)" }} />
-                Pembelian
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--text-secondary)" }}>
-                <div style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--color-teal)" }} />
-                Penjualan
-              </div>
+              {(chartFilter === "Semua" || chartFilter === "Pembelian") && (
+                <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--text-secondary)" }}>
+                  <div style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--color-purple)" }} />
+                  Pembelian
+                </div>
+              )}
+              {(chartFilter === "Semua" || chartFilter === "Penjualan") && (
+                <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--text-secondary)" }}>
+                  <div style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--color-teal)" }} />
+                  Penjualan
+                </div>
+              )}
+              <select 
+                value={chartFilter}
+                onChange={(e) => setChartFilter(e.target.value)}
+                style={{
+                  padding: "4px 10px", borderRadius: 6, outline: "none",
+                  border: "1px solid var(--border-light)", fontSize: 12,
+                  color: "var(--text-secondary)", cursor: "pointer", background: "transparent"
+                }}
+              >
+                <option value="Semua">Semua</option>
+                <option value="Pembelian">Pembelian Saja</option>
+                <option value="Penjualan">Penjualan Saja</option>
+              </select>
             </div>
           </div>
           <div style={{ padding: "1.25rem 1rem 0.5rem" }}>
@@ -243,8 +261,12 @@ export default function DashboardPage() {
                   labelStyle={{ color: "rgba(255,255,255,0.7)", marginBottom: 4 }}
                   formatter={(v: any) => [`${(v / 1000).toFixed(2)} Ton`]}
                 />
-                <Area type="monotone" dataKey="purchase" name="Pembelian" stroke="#7C6FE0" fill="url(#gPurchase)" strokeWidth={2.5} dot={false} />
-                <Area type="monotone" dataKey="sales" name="Penjualan" stroke="#4ECDC4" fill="url(#gProd)" strokeWidth={2.5} dot={false} />
+                {(chartFilter === "Semua" || chartFilter === "Pembelian") && (
+                  <Area type="monotone" dataKey="purchase" name="Pembelian" stroke="#7C6FE0" fill="url(#gPurchase)" strokeWidth={2.5} dot={false} />
+                )}
+                {(chartFilter === "Semua" || chartFilter === "Penjualan") && (
+                  <Area type="monotone" dataKey="sales" name="Penjualan" stroke="#4ECDC4" fill="url(#gProd)" strokeWidth={2.5} dot={false} />
+                )}
               </AreaChart>
             </ResponsiveContainer>
           </div>
