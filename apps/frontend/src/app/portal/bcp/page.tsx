@@ -52,7 +52,7 @@ export default function BcpPage() {
           <h2 style={{ fontSize: 22, fontWeight: 700, color: "var(--text-primary)", letterSpacing: "-0.02em" }}>Business Continuity Center</h2>
           <p style={{ fontSize: 14, color: "var(--text-secondary)", marginTop: 4 }}>Manajemen Insiden, Mitigasi Risiko, & Sistem Notifikasi BCP</p>
         </div>
-        <button className="btn btn-primary" onClick={() => setShowForm(!showForm)} style={{ background: "var(--brand-pink)", borderColor: "transparent" }}>
+        <button className="btn btn-danger" onClick={() => setShowForm(!showForm)}>
           {showForm ? "✕ Tutup" : "🚨 Laporkan Insiden"}
         </button>
       </div>
@@ -116,7 +116,7 @@ export default function BcpPage() {
                 </div>
                 <div style={{ paddingTop: 20, borderTop: "1px solid var(--border-light)", display: "flex", gap: 12, justifyContent: "flex-end" }}>
                   <button type="button" className="btn btn-secondary" onClick={() => setShowForm(false)}>Batal</button>
-                  <button type="submit" className="btn btn-primary" style={{ padding: "0 24px", background: "var(--brand-pink)", borderColor: "transparent" }}>🚨 Kirim Laporan</button>
+                  <button type="submit" className="btn btn-danger" style={{ padding: "0 24px" }}>🚨 Kirim Laporan</button>
                 </div>
               </form>
             </div>
