@@ -1,7 +1,7 @@
 "use client";
 import { useAuth } from "@/lib/auth-context";
 import { useRouter, usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import { canAccess } from "@/lib/permissions";
 import { RefreshProvider } from "@/lib/refresh-context";
@@ -39,6 +39,18 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
   const router = useRouter();
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setUserMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   useEffect(() => {
     if (!loading && !user) router.push("/login");
@@ -141,52 +153,6 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
               </Link>
             );
           })}
-
-          {/* Footer links */}
-          <div style={{ borderTop: "1px solid var(--border-light)", marginTop: 16, paddingTop: 8, display: collapsed ? "none" : "block" }}>
-            <div style={{ fontSize: 11, fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", padding: "4px 8px 4px" }}>
-              Other
-            </div>
-            {[
-              { icon: "⚙️", label: "Settings", href: "/portal/settings" },
-              { icon: "ℹ️", label: "Help Center", href: "#" },
-            ].map(item => (
-              <Link key={item.href} href={item.href}
-                style={{
-                  display: "flex", alignItems: "center", gap: 10,
-                  padding: "9px 10px", borderRadius: 8, margin: "2px 0",
-                  color: "var(--text-secondary)", fontWeight: 400, fontSize: 14,
-                  textDecoration: "none",
-                }}
-              >
-                <span style={{ fontSize: 16, lineHeight: 1, flexShrink: 0, width: 22, textAlign: "center" }}>{item.icon}</span>
-                <span>{item.label}</span>
-              </Link>
-            ))}
-
-            {/* Dark mode toggle placeholder */}
-            <div style={{
-              display: "flex", alignItems: "center", justifyContent: "space-between",
-              padding: "9px 10px", borderRadius: 8, margin: "2px 0", cursor: "pointer",
-            }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <span style={{ fontSize: 16, width: 22, textAlign: "center" }}>🌙</span>
-                <span style={{ fontSize: 14, color: "var(--text-secondary)" }}>Dark mode</span>
-              </div>
-              <div style={{
-                width: 36, height: 20, borderRadius: 10,
-                background: "#E5E7EB",
-                position: "relative",
-              }}>
-                <div style={{
-                  width: 16, height: 16, borderRadius: "50%",
-                  background: "#fff",
-                  position: "absolute", top: 2, left: 2,
-                  boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
-                }} />
-              </div>
-            </div>
-          </div>
         </nav>
 
         {/* User Panel */}
@@ -284,43 +250,93 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
               }} />
             </div>
 
-            {/* User badge */}
-            <div style={{
-              display: "flex", alignItems: "center", gap: 8,
-              padding: "6px 12px 6px 6px",
-              background: "#F9FAFB",
-              borderRadius: 10,
-              border: "1px solid var(--border-light)",
-              cursor: "pointer",
-            }}>
-              <div style={{
-                width: 28, height: 28, borderRadius: "50%",
-                background: roleColor[user.role] || "#7C6FE0",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                color: "#fff", fontWeight: 700, fontSize: 12,
-              }}>
-                {user.name.charAt(0).toUpperCase()}
+            {/* User badge with dropdown */}
+            <div ref={userMenuRef} style={{ position: "relative" }}>
+              <div 
+                onClick={() => setUserMenuOpen(!userMenuOpen)}
+                style={{
+                  display: "flex", alignItems: "center", gap: 8,
+                  padding: "6px 12px 6px 6px",
+                  background: userMenuOpen ? "#F3F4F6" : "#F9FAFB",
+                  borderRadius: 10,
+                  border: "1px solid var(--border-light)",
+                  cursor: "pointer",
+                  transition: "background 0.2s ease",
+                }}>
+                <div style={{
+                  width: 28, height: 28, borderRadius: "50%",
+                  background: roleColor[user.role] || "#7C6FE0",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  color: "#fff", fontWeight: 700, fontSize: 12,
+                }}>
+                  {user.name.charAt(0).toUpperCase()}
+                </div>
+                <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)" }}>{user.name.split(" ")[0]}</span>
               </div>
-              <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)" }}>{user.name.split(" ")[0]}</span>
-            </div>
 
-            {/* Logout */}
-            <button
-              onClick={logout}
-              style={{
-                padding: "7px 16px",
-                borderRadius: 8,
-                border: "1px solid #FEE2E2",
-                background: "#FFF5F5",
-                color: "var(--color-red)",
-                fontWeight: 600,
-                fontSize: 13,
-                cursor: "pointer",
-                transition: "all 0.15s ease",
-              }}
-            >
-              Keluar
-            </button>
+              {/* Dropdown Menu */}
+              {userMenuOpen && (
+                <div style={{
+                  position: "absolute",
+                  top: "calc(100% + 8px)",
+                  right: 0,
+                  width: 200,
+                  background: "#fff",
+                  borderRadius: 12,
+                  boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
+                  border: "1px solid var(--border-light)",
+                  overflow: "hidden",
+                  zIndex: 100,
+                }}>
+                  <div style={{ padding: "12px 16px", borderBottom: "1px solid var(--border-light)", background: "#F9FAFB" }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary)" }}>{user.name}</div>
+                    <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>{roleLabel[user.role]}</div>
+                  </div>
+                  
+                  <div style={{ padding: 8 }}>
+                    <Link href="/portal/settings" onClick={() => setUserMenuOpen(false)} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", borderRadius: 8, textDecoration: "none", color: "var(--text-secondary)", fontSize: 13, transition: "background 0.2s ease" }} onMouseEnter={e => (e.currentTarget.style.background = "#F3F4F6")} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                      <span>⚙️</span> Settings
+                    </Link>
+                    <Link href="#" onClick={() => setUserMenuOpen(false)} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", borderRadius: 8, textDecoration: "none", color: "var(--text-secondary)", fontSize: 13, transition: "background 0.2s ease" }} onMouseEnter={e => (e.currentTarget.style.background = "#F3F4F6")} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                      <span>ℹ️</span> Help Center
+                    </Link>
+                    
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 12px", borderRadius: 8, cursor: "pointer", transition: "background 0.2s ease" }} onMouseEnter={e => (e.currentTarget.style.background = "#F3F4F6")} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <span>🌙</span>
+                        <span style={{ fontSize: 13, color: "var(--text-secondary)" }}>Dark mode</span>
+                      </div>
+                      <div style={{ width: 32, height: 18, borderRadius: 10, background: "#E5E7EB", position: "relative" }}>
+                        <div style={{ width: 14, height: 14, borderRadius: "50%", background: "#fff", position: "absolute", top: 2, left: 2, boxShadow: "0 1px 3px rgba(0,0,0,0.2)" }} />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div style={{ padding: 8, borderTop: "1px solid var(--border-light)" }}>
+                    <button
+                      onClick={logout}
+                      style={{
+                        width: "100%",
+                        display: "flex", alignItems: "center", gap: 10,
+                        padding: "8px 12px",
+                        borderRadius: 8,
+                        border: "none",
+                        background: "transparent",
+                        color: "var(--color-red)",
+                        fontWeight: 600,
+                        fontSize: 13,
+                        cursor: "pointer",
+                        transition: "background 0.2s ease",
+                      }}
+                      onMouseEnter={e => (e.currentTarget.style.background = "#FFF5F5")}
+                      onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+                    >
+                      <span style={{ transform: "rotate(180deg)" }}>🚪</span> Keluar
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </header>
 
