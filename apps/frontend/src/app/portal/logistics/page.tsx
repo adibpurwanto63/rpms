@@ -167,10 +167,25 @@ export default function LogisticsPage() {
                     <td style={{ fontWeight: 700, color: "var(--text-primary)", fontSize: 15, letterSpacing: "1px" }}>{v.plate}</td>
                     <td style={{ color: "var(--text-secondary)" }}>{vehicleTypeLabel[v.type] || v.type}</td>
                     <td style={{ fontWeight: 500, color: "var(--text-primary)" }}>{v.driverName}</td>
-                    <td><span className={`badge ${vehicleStatusColor[v.status]}`}>{vehicleStatusLabel[v.status]}</span></td>
+                    <td>
+                      <select 
+                        value={v.status} 
+                        onChange={async (e) => {
+                          try {
+                            await api.put(`/logistics/vehicles/${v.id}`, { status: e.target.value });
+                            load();
+                          } catch (e) { console.error(e); }
+                        }}
+                        style={{ padding: "6px 12px", borderRadius: 6, border: "1px solid var(--border-light)", fontSize: 13, fontWeight: 600, color: "var(--text-primary)", background: "var(--bg-secondary)", cursor: "pointer", outline: "none" }}
+                      >
+                        <option value="AVAILABLE">Tersedia</option>
+                        <option value="ON_TRIP">Dalam Perjalanan</option>
+                        <option value="MAINTENANCE">Maintenance</option>
+                      </select>
+                    </td>
                     <td>
                       <button onClick={() => { setVehicleForm(v); setShowVehicleForm(true); }} style={{ padding: "6px 12px", borderRadius: 6, background: "var(--bg-secondary)", color: "var(--text-secondary)", border: "1px solid var(--border-light)", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
-                        Edit ✎
+                        Edit Supir ✎
                       </button>
                     </td>
                   </tr>
