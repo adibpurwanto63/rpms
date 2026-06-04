@@ -7,7 +7,7 @@ export class SearchService {
 
   async globalSearch(q: string) {
     const term = `%${q}%`;
-    const results = [];
+    const results: any[] = [];
 
     // Search Suppliers
     const suppliers = await this.prisma.supplier.findMany({
