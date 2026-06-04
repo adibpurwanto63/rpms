@@ -134,18 +134,18 @@ export default function PembelianPage() {
               className="kpi-card"
               style={{
                 background: variantBg[k.variant],
-                borderColor: k.variant === "dark" ? "transparent" : undefined,
+                borderColor: undefined,
               }}
             >
               <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
-                <span style={{ fontSize: 12, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: k.variant === "dark" ? "rgba(255,255,255,0.6)" : "var(--text-secondary)" }}>
+                <span style={{ fontSize: 12, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--text-secondary)" }}>
                   {k.label}
                 </span>
-                <div style={{ width: 36, height: 36, borderRadius: 8, background: k.variant === "dark" ? "rgba(255,255,255,0.12)" : "rgba(124,111,224,0.12)", display: "flex", alignItems: "center", justifyContent: "center", color: k.variant === "dark" ? "#fff" : "var(--color-primary)" }}>
+                <div style={{ width: 36, height: 36, borderRadius: 8, background: "rgba(124,111,224,0.12)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--color-primary)" }}>
                   {k.Icon && <k.Icon size={18} strokeWidth={2} />}
                 </div>
               </div>
-              <div style={{ fontSize: "1.65rem", fontWeight: 700, letterSpacing: "-0.03em", color: k.variant === "dark" ? "#fff" : "var(--text-primary)", lineHeight: 1.15 }}>
+              <div style={{ fontSize: "1.65rem", fontWeight: 700, letterSpacing: "-0.03em", color: "var(--text-primary)", lineHeight: 1.15 }}>
                 {k.value}
               </div>
             </div>

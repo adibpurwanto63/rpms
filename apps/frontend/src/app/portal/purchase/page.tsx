@@ -211,12 +211,12 @@ export default function PurchasePage() {
                 { label: "Supplier Aktif", value: suppliers.filter(s => s.status === "ACTIVE").length, Icon: CheckCircle2, variant: "mint" },
                 { label: "Diblokir", value: suppliers.filter(s => s.status === "BLACKLISTED").length, Icon: Ban, variant: "pink" },
               ].map((k, i) => (
-                <div key={i} className="kpi-card" style={{ background: ({ dark: "var(--kpi-dark)", mint: "var(--kpi-mint-bg)", pink: "var(--kpi-pink-bg)" } as any)[k.variant], borderColor: k.variant === "dark" ? "transparent" : undefined }}>
+                <div key={i} className="kpi-card" style={{ background: ({ dark: "var(--kpi-dark)", mint: "var(--kpi-mint-bg)", pink: "var(--kpi-pink-bg)" } as any)[k.variant], borderColor: undefined }}>
                   <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
-                    <span style={{ fontSize: 12, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: k.variant === "dark" ? "rgba(255,255,255,0.6)" : "var(--text-secondary)" }}>{k.label}</span>
-                    <div style={{ width: 36, height: 36, borderRadius: 8, background: k.variant === "dark" ? "rgba(255,255,255,0.12)" : k.variant === "mint" ? "rgba(78,205,196,0.15)" : "rgba(255,107,157,0.15)", display: "flex", alignItems: "center", justifyContent: "center", color: k.variant === "dark" ? "#fff" : "var(--color-primary)" }}>{k.Icon && <k.Icon size={18} strokeWidth={2} />}</div>
+                    <span style={{ fontSize: 12, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--text-secondary)" }}>{k.label}</span>
+                    <div style={{ width: 36, height: 36, borderRadius: 8, background: k.variant === "mint" ? "rgba(78,205,196,0.15)" : "rgba(255,107,157,0.15)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--color-primary)" }}>{k.Icon && <k.Icon size={18} strokeWidth={2} />}</div>
                   </div>
-                  <div style={{ fontSize: "2rem", fontWeight: 700, letterSpacing: "-0.03em", color: k.variant === "dark" ? "#fff" : "var(--text-primary)", lineHeight: 1.2 }}>{k.value}</div>
+                  <div style={{ fontSize: "2rem", fontWeight: 700, letterSpacing: "-0.03em", color: "var(--text-primary)", lineHeight: 1.2 }}>{k.value}</div>
                 </div>
               ))}
             </div>

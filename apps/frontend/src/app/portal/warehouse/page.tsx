@@ -172,10 +172,10 @@ export default function WarehousePage() {
               { label: "Menunggu Approval", value: todayStats.pending, sub: "pending Supervisor", color: "#FFF7ED", dark: false },
               { label: "Stok Terreservasi", value: reservedCount, sub: "bale", color: "#EDE9FF", dark: false },
             ].map((kpi, i) => (
-              <div key={i} className="kpi-card" style={{ background: kpi.color, borderColor: kpi.dark ? "transparent" : undefined }}>
-                <div style={{ fontSize: 12, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: kpi.dark ? "rgba(255,255,255,0.6)" : "var(--text-secondary)", marginBottom: 8 }}>{kpi.label}</div>
-                <div style={{ fontSize: "1.8rem", fontWeight: 700, letterSpacing: "-0.03em", color: kpi.dark ? "#fff" : "var(--text-primary)", lineHeight: 1.1 }}>{kpi.value}</div>
-                <div style={{ fontSize: "0.8rem", color: kpi.dark ? "rgba(255,255,255,0.5)" : "var(--text-muted)", marginTop: 4 }}>{kpi.sub}</div>
+              <div key={i} className="kpi-card" style={{ background: kpi.color, borderColor: undefined }}>
+                <div style={{ fontSize: 12, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--text-secondary)", marginBottom: 8 }}>{kpi.label}</div>
+                <div style={{ fontSize: "1.8rem", fontWeight: 700, letterSpacing: "-0.03em", color: "var(--text-primary)", lineHeight: 1.1 }}>{kpi.value}</div>
+                <div style={{ fontSize: "0.8rem", color: "var(--text-muted)", marginTop: 4 }}>{kpi.sub}</div>
               </div>
             ))}
           </div>

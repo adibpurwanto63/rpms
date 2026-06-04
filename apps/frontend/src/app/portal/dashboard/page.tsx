@@ -179,18 +179,18 @@ export default function DashboardPage() {
         {kpis.map((k, i) => (
           <div key={i} className="kpi-card" style={variantStyles[k.variant]}>
             <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
-              <div style={{ fontSize: 12, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: k.variant === "dark" ? "rgba(255,255,255,0.6)" : "var(--text-secondary)" }}>
+              <div style={{ fontSize: 12, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--text-secondary)" }}>
                 {k.label}
               </div>
-              <div style={{ width: 36, height: 36, borderRadius: 8, background: k.iconBg, display: "flex", alignItems: "center", justifyContent: "center", color: k.variant === "dark" ? "#fff" : "var(--color-primary)" }}>
+              <div style={{ width: 36, height: 36, borderRadius: 8, background: k.iconBg, display: "flex", alignItems: "center", justifyContent: "center", color: "var(--color-primary)" }}>
                 {k.Icon && <k.Icon size={18} strokeWidth={2} />}
               </div>
             </div>
-            <div style={{ fontSize: "1.65rem", fontWeight: 700, letterSpacing: "-0.03em", color: k.variant === "dark" ? "#fff" : "var(--text-primary)", lineHeight: 1.15 }}>
+            <div style={{ fontSize: "1.65rem", fontWeight: 700, letterSpacing: "-0.03em", color: "var(--text-primary)", lineHeight: 1.15 }}>
               {k.value}
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <span style={{ display: "flex", alignItems: "center", gap: 2, fontSize: 12, fontWeight: 600, color: k.trendUp ? (k.variant === "dark" ? "#5FE09F" : "var(--color-green)") : "var(--color-red)" }}>
+              <span style={{ display: "flex", alignItems: "center", gap: 2, fontSize: 12, fontWeight: 600, color: k.trendUp ? "var(--color-green)" : "var(--color-red)" }}>
                 {k.trendUp ? <ArrowUp size={12} strokeWidth={3} /> : <ArrowDown size={12} strokeWidth={3} />} {k.trend}
               </span>
               <span style={{ fontSize: 12, color: k.variant === "dark" ? "rgba(255,255,255,0.5)" : "var(--text-muted)" }}>

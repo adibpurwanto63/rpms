@@ -55,10 +55,10 @@
   --shadow-sidebar:       1px 0 0 var(--border-light);
 
   /* ── KPI card backgrounds ────────────────────────────── */
-  --kpi-dark:             #1C2B3A;
-  --kpi-mint-bg:          #F0FBF9;
-  --kpi-pink-bg:          #FFF0F5;
-  --kpi-neutral-bg:       #F7F8FA;
+  --kpi-dark:             #FFFFFF;
+  --kpi-mint-bg:          #FFFFFF;
+  --kpi-pink-bg:          #FFFFFF;
+  --kpi-neutral-bg:       #FFFFFF;
 
   /* ── Layout ─────────────────────────────────────────── */
   --sidebar-width:        220px;
