@@ -31,12 +31,21 @@ export default function DashboardPage() {
   const { refreshKey } = useRefresh();
 
   useEffect(() => {
-    setLoading(true);
-    Promise.all([
-      api.get(`/dashboard/executive?date=${selectedDate}`),
-      api.get("/dashboard/kpi-trend?days=7"),
-    ]).then(([d, t]) => { setData(d.data); setTrend(t.data); })
-      .finally(() => setLoading(false));
+    const load = async () => {
+      setLoading(true);
+      try {
+        const d = await api.get(`/dashboard/executive?date=${selectedDate}`);
+        setData(d.data);
+      } catch (e) { console.error("Error loading dashboard data", e); }
+      
+      try {
+        const t = await api.get("/dashboard/kpi-trend?days=7");
+        setTrend(t.data);
+      } catch (e) { console.error("Error loading trend data", e); }
+      
+      setLoading(false);
+    };
+    load();
   }, [selectedDate, refreshKey]);
 
   if (loading) return (
