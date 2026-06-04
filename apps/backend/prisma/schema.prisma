@@ -120,13 +120,36 @@ model InventoryItem {
   area             InventoryArea     @default(RAW_MATERIAL)
   location         String?
   status           InventoryStatus   @default(IN_STOCK)
+  pendingApproval  Boolean           @default(false) @map("pending_approval")
+  approvedBy       String?           @map("approved_by")
   productionId     String?           @map("production_id")
   productionDate   DateTime?         @map("production_date")
   createdAt        DateTime          @default(now()) @map("created_at")
   updatedAt        DateTime          @updatedAt @map("updated_at")
   productionRecord ProductionRecord? @relation(fields: [productionId], references: [id])
+  movements        StockMovement[]
 
   @@map("inventory_items")
+}
+
+model StockMovement {
+  id          String   @id @default(cuid())
+  inventoryId String   @map("inventory_id")
+  baleId      String   @map("bale_id")
+  movementType String  @map("movement_type")
+  fromStatus  String?  @map("from_status")
+  toStatus    String?  @map("to_status")
+  fromArea    String?  @map("from_area")
+  toArea      String?  @map("to_area")
+  fromLocation String? @map("from_location")
+  toLocation  String?  @map("to_location")
+  weight      Float
+  notes       String?
+  performedBy String?  @map("performed_by")
+  createdAt   DateTime @default(now()) @map("created_at")
+  inventory   InventoryItem @relation(fields: [inventoryId], references: [id])
+
+  @@map("stock_movements")
 }
 
 model Vehicle {
