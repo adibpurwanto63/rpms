@@ -257,6 +257,9 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
               <span style={{ fontSize: 11, color: "var(--text-muted)" }}>Home</span>
               <span style={{ fontSize: 11, color: "var(--text-muted)" }}>/</span>
+              {currentPage?.icon && (
+                <span style={{ fontSize: 14 }}>{currentPage.icon}</span>
+              )}
               <span style={{ fontSize: 12, fontWeight: 600, color: "var(--text-primary)" }}>
                 {currentPage?.label || "Portal"}
               </span>
