@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
 import { useRefresh } from "@/lib/refresh-context";
+import { ArrowDownToLine, ArrowUpFromLine, Package, BarChart2 } from "lucide-react";
 
 const machineStatusColor: any = { RUNNING: "badge-success", IDLE: "badge-neutral", MAINTENANCE: "badge-warning", BREAKDOWN: "badge-danger" };
 const machineStatusLabel: any = { RUNNING: "Berjalan", IDLE: "Standby", MAINTENANCE: "Maintenance", BREAKDOWN: "Rusak" };
@@ -137,15 +138,15 @@ export default function ProductionPage() {
       {!loading && stats && (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
           {[
-            { label: "Input Material", value: `${((stats._sum?.inputWeight || 0) / 1000).toFixed(2)} Ton`, icon: "📥", variant: "neutral" },
-            { label: "Output Produksi", value: `${((stats._sum?.outputWeight || 0) / 1000).toFixed(2)} Ton`, icon: "📤", variant: "mint" },
-            { label: "Bale Selesai", value: stats._sum?.baleCount || 0, icon: "📦", variant: "dark" },
-            { label: "Rata-Rata OEE", value: `${(stats._avg?.oee || 0).toFixed(1)}%`, icon: "📊", variant: "pink" },
+            { label: "Input Material", value: `${((stats._sum?.inputWeight || 0) / 1000).toFixed(2)} Ton`, Icon: ArrowDownToLine, variant: "neutral" },
+            { label: "Output Produksi", value: `${((stats._sum?.outputWeight || 0) / 1000).toFixed(2)} Ton`, Icon: ArrowUpFromLine, variant: "mint" },
+            { label: "Bale Selesai", value: stats._sum?.baleCount || 0, Icon: Package, variant: "dark" },
+            { label: "Rata-Rata OEE", value: `${(stats._avg?.oee || 0).toFixed(1)}%`, Icon: BarChart2, variant: "pink" },
           ].map((k, i) => (
             <div key={i} className="kpi-card" style={{ background: ({ dark: "var(--kpi-dark)", mint: "var(--kpi-mint-bg)", pink: "var(--kpi-pink-bg)", neutral: "var(--kpi-neutral-bg)" } as any)[k.variant], borderColor: k.variant === "dark" ? "transparent" : undefined }}>
               <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
                 <span style={{ fontSize: 12, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: k.variant === "dark" ? "rgba(255,255,255,0.6)" : "var(--text-secondary)" }}>{k.label}</span>
-                <div style={{ width: 36, height: 36, borderRadius: 8, background: k.variant === "dark" ? "rgba(255,255,255,0.12)" : k.variant === "mint" ? "rgba(78,205,196,0.15)" : k.variant === "neutral" ? "#EDE9FF" : "rgba(255,107,157,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{k.icon}</div>
+                <div style={{ width: 36, height: 36, borderRadius: 8, background: k.variant === "dark" ? "rgba(255,255,255,0.12)" : k.variant === "mint" ? "rgba(78,205,196,0.15)" : k.variant === "neutral" ? "#EDE9FF" : "rgba(255,107,157,0.15)", display: "flex", alignItems: "center", justifyContent: "center", color: k.variant === "dark" ? "#fff" : "var(--color-primary)" }}>{k.Icon && <k.Icon size={18} strokeWidth={2} />}</div>
               </div>
               <div style={{ fontSize: "1.75rem", fontWeight: 700, letterSpacing: "-0.03em", color: k.variant === "dark" ? "#fff" : "var(--text-primary)", lineHeight: 1.2 }}>{k.value}</div>
             </div>

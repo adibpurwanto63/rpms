@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import api from "@/lib/api";
 import { useRefresh } from "@/lib/refresh-context";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar, Legend } from "recharts";
+import { ShoppingBag, TrendingUp, Factory, Truck, Package, AlertTriangle, Calendar, ChevronDown, ArrowUp, ArrowDown, DollarSign, Landmark, TrendingDown } from "lucide-react";
 
 interface DashData {
   todayPurchase: { count: number; weight: number };
@@ -66,7 +67,7 @@ export default function DashboardPage() {
       trend: "+10.5%",
       trendUp: true,
       variant: "dark",
-      icon: "🛍️",
+      Icon: ShoppingBag,
       iconBg: "rgba(255,255,255,0.15)",
     },
     {
@@ -76,7 +77,7 @@ export default function DashboardPage() {
       trend: "+8.4%",
       trendUp: true,
       variant: "pink",
-      icon: "📈",
+      Icon: TrendingUp,
       iconBg: "rgba(255,107,157,0.2)",
     },
     {
@@ -86,7 +87,7 @@ export default function DashboardPage() {
       trend: "+10.9%",
       trendUp: true,
       variant: "mint",
-      icon: "🏭",
+      Icon: Factory,
       iconBg: "rgba(78,205,196,0.2)",
     },
     {
@@ -96,7 +97,7 @@ export default function DashboardPage() {
       trend: "+12.5%",
       trendUp: true,
       variant: "pink",
-      icon: "🚛",
+      Icon: Truck,
       iconBg: "rgba(255,107,157,0.2)",
     },
     {
@@ -106,7 +107,7 @@ export default function DashboardPage() {
       trend: "-0.5%",
       trendUp: false,
       variant: "neutral",
-      icon: "📦",
+      Icon: Package,
       iconBg: "#EDE9FF",
     },
   ];
@@ -141,7 +142,7 @@ export default function DashboardPage() {
           fontWeight: 600,
           fontSize: 14,
         }}>
-          <span>🚨</span>
+          <AlertTriangle size={18} strokeWidth={2.5} />
           <span>{data.riskStatus.openIncidents} insiden terbuka — Segera cek BCP Center</span>
         </div>
       )}
@@ -161,9 +162,9 @@ export default function DashboardPage() {
           position: "relative",
           overflow: "hidden"
         }}>
-          <span>📅</span>
+          <Calendar size={14} />
           <span style={{ minWidth: 85 }}>{new Date(selectedDate).toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}</span>
-          <span style={{ fontSize: 10 }}>▼</span>
+          <ChevronDown size={14} />
           <input 
             type="date"
             value={selectedDate}
@@ -181,16 +182,16 @@ export default function DashboardPage() {
               <div style={{ fontSize: 12, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: k.variant === "dark" ? "rgba(255,255,255,0.6)" : "var(--text-secondary)" }}>
                 {k.label}
               </div>
-              <div style={{ width: 36, height: 36, borderRadius: 8, background: k.iconBg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>
-                {k.icon}
+              <div style={{ width: 36, height: 36, borderRadius: 8, background: k.iconBg, display: "flex", alignItems: "center", justifyContent: "center", color: k.variant === "dark" ? "#fff" : "var(--color-primary)" }}>
+                {k.Icon && <k.Icon size={18} strokeWidth={2} />}
               </div>
             </div>
             <div style={{ fontSize: "1.65rem", fontWeight: 700, letterSpacing: "-0.03em", color: k.variant === "dark" ? "#fff" : "var(--text-primary)", lineHeight: 1.15 }}>
               {k.value}
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <span style={{ fontSize: 12, fontWeight: 600, color: k.trendUp ? (k.variant === "dark" ? "#5FE09F" : "var(--color-green)") : "var(--color-red)" }}>
-                {k.trendUp ? "↑" : "↓"} {k.trend}
+              <span style={{ display: "flex", alignItems: "center", gap: 2, fontSize: 12, fontWeight: 600, color: k.trendUp ? (k.variant === "dark" ? "#5FE09F" : "var(--color-green)") : "var(--color-red)" }}>
+                {k.trendUp ? <ArrowUp size={12} strokeWidth={3} /> : <ArrowDown size={12} strokeWidth={3} />} {k.trend}
               </span>
               <span style={{ fontSize: 12, color: k.variant === "dark" ? "rgba(255,255,255,0.5)" : "var(--text-muted)" }}>
                 {k.sub}
@@ -316,10 +317,10 @@ export default function DashboardPage() {
           </div>
           <div className="erp-card-body" style={{ display: "flex", flexDirection: "column", gap: 0 }}>
             {[
-              { label: "Revenue", value: fmtRp(data.finance.revenue), color: "var(--color-purple)", icon: "💰" },
-              { label: "Cash Position", value: fmtRp(data.finance.cashPosition), color: "var(--color-teal)", icon: "🏦" },
-              { label: "Piutang (AR)", value: fmtRp(data.finance.totalAR), color: "var(--color-amber)", icon: "📈" },
-              { label: "Hutang (AP)", value: fmtRp(data.finance.totalAP), color: "var(--color-red)", icon: "📉" },
+              { label: "Revenue", value: fmtRp(data.finance.revenue), color: "var(--color-purple)", Icon: DollarSign },
+              { label: "Cash Position", value: fmtRp(data.finance.cashPosition), color: "var(--color-teal)", Icon: Landmark },
+              { label: "Piutang (AR)", value: fmtRp(data.finance.totalAR), color: "var(--color-amber)", Icon: TrendingUp },
+              { label: "Hutang (AP)", value: fmtRp(data.finance.totalAP), color: "var(--color-red)", Icon: TrendingDown },
             ].map((item, i) => (
               <div key={i} style={{
                 display: "flex", alignItems: "center", justifyContent: "space-between",
@@ -331,8 +332,10 @@ export default function DashboardPage() {
                     width: 36, height: 36, borderRadius: 8,
                     background: `${item.color}15`,
                     display: "flex", alignItems: "center", justifyContent: "center",
-                    fontSize: 16,
-                  }}>{item.icon}</div>
+                    color: item.color,
+                  }}>
+                    <item.Icon size={18} strokeWidth={2} />
+                  </div>
                   <span style={{ fontSize: 14, color: "var(--text-secondary)", fontWeight: 500 }}>{item.label}</span>
                 </div>
                 <span style={{ fontSize: 15, fontWeight: 700, color: item.color }}>{item.value}</span>

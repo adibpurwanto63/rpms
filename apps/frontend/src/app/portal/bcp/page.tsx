@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
 import { useRefresh } from "@/lib/refresh-context";
+import { AlertTriangle, Siren, TrendingUp } from "lucide-react";
 
 const sevColor: any = { LOW: "badge-info", MEDIUM: "badge-warning", HIGH: "badge-pink", CRITICAL: "badge-danger" };
 const statusColor: any = { OPEN: "badge-danger", IN_PROGRESS: "badge-warning", RESOLVED: "badge-success", CLOSED: "badge-neutral" };
@@ -60,14 +61,14 @@ export default function BcpPage() {
       {!loading && alerts && (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
           {[
-            { label: "Insiden Terbuka", value: alerts.openIncidents, icon: "⚠️", variant: "dark" },
-            { label: "Insiden Kritis", value: alerts.criticalIncidents, icon: "🚨", variant: "pink" },
-            { label: "Risiko Tinggi", value: alerts.highRiskItems, icon: "📈", variant: "mint" },
+            { label: "Insiden Terbuka", value: alerts.openIncidents, Icon: AlertTriangle, variant: "dark" },
+            { label: "Insiden Kritis", value: alerts.criticalIncidents, Icon: Siren, variant: "pink" },
+            { label: "Risiko Tinggi", value: alerts.highRiskItems, Icon: TrendingUp, variant: "mint" },
           ].map((k, i) => (
             <div key={i} className="kpi-card" style={{ background: ({ dark: "var(--kpi-dark)", mint: "var(--kpi-mint-bg)", pink: "var(--kpi-pink-bg)" } as any)[k.variant], borderColor: k.variant === "dark" ? "transparent" : undefined }}>
               <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
                 <span style={{ fontSize: 12, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: k.variant === "dark" ? "rgba(255,255,255,0.6)" : "var(--text-secondary)" }}>{k.label}</span>
-                <div style={{ width: 36, height: 36, borderRadius: 8, background: k.variant === "dark" ? "rgba(255,255,255,0.12)" : k.variant === "mint" ? "rgba(78,205,196,0.15)" : "rgba(255,107,157,0.15)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{k.icon}</div>
+                <div style={{ width: 36, height: 36, borderRadius: 8, background: k.variant === "dark" ? "rgba(255,255,255,0.12)" : k.variant === "mint" ? "rgba(78,205,196,0.15)" : "rgba(255,107,157,0.15)", display: "flex", alignItems: "center", justifyContent: "center", color: k.variant === "dark" ? "#fff" : "var(--color-primary)" }}>{k.Icon && <k.Icon size={18} strokeWidth={2} />}</div>
               </div>
               <div style={{ fontSize: "2rem", fontWeight: 700, letterSpacing: "-0.03em", color: k.variant === "dark" ? "#fff" : "var(--text-primary)", lineHeight: 1.2 }}>{k.value}</div>
             </div>

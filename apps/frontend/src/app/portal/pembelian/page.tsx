@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
 import { useRefresh } from "@/lib/refresh-context";
+import { ClipboardList, Hourglass, CheckCircle2, Banknote } from "lucide-react";
 
 const statusColor: any = {
   PENDING: "badge-warning",
@@ -93,10 +94,10 @@ export default function PembelianPage() {
 
   const kpis = dashboard
     ? [
-        { label: "Total PO", value: dashboard.totalOrders, icon: "📋", variant: "dark" },
-        { label: "PO Aktif", value: dashboard.pendingOrders, icon: "⏳", variant: "pink" },
-        { label: "Diterima Hari Ini", value: dashboard.receivedToday, icon: "✅", variant: "mint" },
-        { label: "Total Pengeluaran", value: fmtRp(dashboard.totalSpend), icon: "💸", variant: "neutral" },
+        { label: "Total PO", value: dashboard.totalOrders, Icon: ClipboardList, variant: "dark" },
+        { label: "PO Aktif", value: dashboard.pendingOrders, Icon: Hourglass, variant: "pink" },
+        { label: "Diterima Hari Ini", value: dashboard.receivedToday, Icon: CheckCircle2, variant: "mint" },
+        { label: "Total Pengeluaran", value: fmtRp(dashboard.totalSpend), Icon: Banknote, variant: "neutral" },
       ]
     : [];
 
@@ -140,8 +141,8 @@ export default function PembelianPage() {
                 <span style={{ fontSize: 12, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: k.variant === "dark" ? "rgba(255,255,255,0.6)" : "var(--text-secondary)" }}>
                   {k.label}
                 </span>
-                <div style={{ width: 36, height: 36, borderRadius: 8, background: k.variant === "dark" ? "rgba(255,255,255,0.12)" : "rgba(124,111,224,0.12)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>
-                  {k.icon}
+                <div style={{ width: 36, height: 36, borderRadius: 8, background: k.variant === "dark" ? "rgba(255,255,255,0.12)" : "rgba(124,111,224,0.12)", display: "flex", alignItems: "center", justifyContent: "center", color: k.variant === "dark" ? "#fff" : "var(--color-primary)" }}>
+                  {k.Icon && <k.Icon size={18} strokeWidth={2} />}
                 </div>
               </div>
               <div style={{ fontSize: "1.65rem", fontWeight: 700, letterSpacing: "-0.03em", color: k.variant === "dark" ? "#fff" : "var(--text-primary)", lineHeight: 1.15 }}>
