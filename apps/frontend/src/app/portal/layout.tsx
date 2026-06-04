@@ -203,35 +203,6 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
           })}
         </nav>
 
-        {/* User Panel */}
-        <div style={{
-          borderTop: "1px solid var(--border-light)",
-          padding: "10px 12px",
-          display: "flex",
-          alignItems: "center",
-          gap: 8,
-          flexShrink: 0,
-        }}>
-          <div style={{
-            width: 28, height: 28, borderRadius: "50%", flexShrink: 0,
-            background: roleColor[user.role] || "var(--color-primary)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            color: "#fff", fontWeight: 600, fontSize: 12,
-            overflow: "hidden"
-          }}>
-            {user.avatarUrl ? (
-              <img src={user.avatarUrl} alt="Avatar" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-            ) : (
-              user.name.charAt(0).toUpperCase()
-            )}
-          </div>
-          {!collapsed && (
-            <div style={{ minWidth: 0, flex: 1 }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text-primary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{user.name}</div>
-              <div style={{ fontSize: 10, color: "var(--text-muted)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{roleLabel[user.role]}</div>
-            </div>
-          )}
-        </div>
       </aside>
 
       {/* ── Main Wrapper ── */}
