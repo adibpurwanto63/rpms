@@ -1,7 +1,7 @@
 "use client";
 import { useAuth } from "@/lib/auth-context";
 import { useRouter, usePathname } from "next/navigation";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, Fragment } from "react";
 import Link from "next/link";
 import { canAccess } from "@/lib/permissions";
 import { RefreshProvider } from "@/lib/refresh-context";
@@ -13,16 +13,16 @@ import {
 } from "lucide-react";
 
 const navItems = [
-  { href: "/portal/dashboard",  Icon: LayoutDashboard, label: "Dashboard",  module: "dashboard"  },
-  { href: "/portal/purchase",   Icon: ShoppingCart,    label: "Procurement", module: "purchase"   },
-  { href: "/portal/weighbridge",Icon: Scale,           label: "Timbangan",  module: "weighbridge"},
-  { href: "/portal/pembelian",  Icon: ShoppingBag,     label: "Pembelian",  module: "pembelian"  },
-  { href: "/portal/production", Icon: Factory,         label: "Produksi",   module: "production" },
-  { href: "/portal/warehouse",  Icon: Warehouse,       label: "Gudang",     module: "warehouse"  },
-  { href: "/portal/logistics",  Icon: Truck,           label: "Logistik",   module: "logistics"  },
-  { href: "/portal/finance",    Icon: BarChart2,       label: "Keuangan",   module: "finance"    },
-  { href: "/portal/bcp",        Icon: ShieldCheck,     label: "BCP Center", module: "bcp"        },
-  { href: "/portal/settings",   Icon: Settings,        label: "Settings",   module: "settings"   },
+  { href: "/portal/dashboard",  Icon: LayoutDashboard, label: "Dashboard",  module: "dashboard",   category: "Core" },
+  { href: "/portal/purchase",   Icon: ShoppingCart,    label: "Procurement", module: "purchase",    category: "Supply Chain" },
+  { href: "/portal/weighbridge",Icon: Scale,           label: "Timbangan",  module: "weighbridge", category: "Supply Chain" },
+  { href: "/portal/pembelian",  Icon: ShoppingBag,     label: "Pembelian",  module: "pembelian",   category: "Supply Chain" },
+  { href: "/portal/production", Icon: Factory,         label: "Produksi",   module: "production",  category: "Operations" },
+  { href: "/portal/warehouse",  Icon: Warehouse,       label: "Gudang",     module: "warehouse",   category: "Operations" },
+  { href: "/portal/logistics",  Icon: Truck,           label: "Logistik",   module: "logistics",   category: "Operations" },
+  { href: "/portal/finance",    Icon: BarChart2,       label: "Keuangan",   module: "finance",     category: "Finance & Admin" },
+  { href: "/portal/bcp",        Icon: ShieldCheck,     label: "BCP Center", module: "bcp",         category: "Finance & Admin" },
+  { href: "/portal/settings",   Icon: Settings,        label: "Settings",   module: "settings",    category: "Finance & Admin" },
 ];
 
 const roleLabel: Record<string, string> = {
@@ -152,16 +152,26 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
 
         {/* Navigation */}
         <nav style={{ flex: 1, overflowY: "auto", padding: collapsed ? "8px 6px" : "8px 0" }}>
-          {!collapsed && (
-            <div style={{ fontSize: 10, fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.10em", padding: "10px 14px 4px" }}>
-              Main Menu
-            </div>
-          )}
-          {accessible.map(item => {
+          {accessible.map((item, index) => {
             const active = pathname.startsWith(item.href);
+            const showCategory = index === 0 || item.category !== accessible[index - 1].category;
+
             return (
-              <Link key={item.href} href={item.href}
-                title={collapsed ? item.label : undefined}
+              <Fragment key={item.href}>
+                {showCategory && !collapsed && (
+                  <div style={{ 
+                    fontSize: 10, fontWeight: 600, color: "var(--text-muted)", 
+                    textTransform: "uppercase", letterSpacing: "0.10em", 
+                    padding: index === 0 ? "10px 14px 4px" : "20px 14px 4px",
+                  }}>
+                    {item.category}
+                  </div>
+                )}
+                {showCategory && collapsed && index > 0 && (
+                  <div style={{ height: 1, background: "var(--border-light)", margin: "8px 14px" }} />
+                )}
+                <Link href={item.href}
+                  title={collapsed ? item.label : undefined}
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -175,7 +185,6 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
                   textDecoration: "none",
                   background: active ? "rgba(36,144,239,0.07)" : "transparent",
                   borderLeft: active ? "3px solid var(--color-primary)" : "3px solid transparent",
-                  borderBottom: "1px solid var(--border-light)",
                   transition: "all 0.12s ease",
                   whiteSpace: "nowrap",
                 }}
@@ -188,7 +197,8 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
                   style={{ flexShrink: 0, width: 20 }}
                 />
                 {!collapsed && <span>{item.label}</span>}
-              </Link>
+                </Link>
+              </Fragment>
             );
           })}
         </nav>
