@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { canAccess } from "@/lib/permissions";
 import { RefreshProvider } from "@/lib/refresh-context";
+import GlobalSearch from "@/components/GlobalSearch";
 
 const navItems = [
   { href: "/portal/dashboard", icon: "⊞", label: "Dashboard", module: "dashboard" },
@@ -105,21 +106,7 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
         </div>
 
         {/* Search bar */}
-        {!collapsed && (
-          <div style={{ padding: "16px 16px 8px" }}>
-            <div style={{
-              display: "flex", alignItems: "center", gap: 8,
-              background: "#F3F4F6",
-              borderRadius: 8,
-              padding: "8px 12px",
-              fontSize: 13,
-              color: "var(--text-muted)",
-            }}>
-              <span>🔍</span>
-              <span>Type Here to Search</span>
-            </div>
-          </div>
-        )}
+        {!collapsed && <GlobalSearch />}
 
         {/* Navigation */}
         <nav style={{ flex: 1, overflowY: "auto", padding: "8px 12px" }}>

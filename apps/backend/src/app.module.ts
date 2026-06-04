@@ -15,6 +15,7 @@ import { BcpModule } from './bcp/bcp.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { PembelianModule } from './pembelian/pembelian.module';
 import { PenjualanModule } from './penjualan/penjualan.module';
+import { SearchModule } from './search/search.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { PenjualanModule } from './penjualan/penjualan.module';
     DashboardModule,
     PembelianModule,
     PenjualanModule,
+    SearchModule,
   ],
 })
 export class AppModule {}
