@@ -74,13 +74,7 @@ export default function LoginPage() {
       }}>
         {/* Brand */}
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 40, justifyContent: "center" }}>
-          <div style={{
-            width: 44, height: 44, borderRadius: 12,
-            background: "linear-gradient(135deg, #7C6FE0, #4ECDC4)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            color: "#fff", fontWeight: 800, fontSize: 22,
-            boxShadow: "0 8px 16px rgba(124,111,224,0.3)"
-          }}>R</div>
+          <img src="/logo.png" alt="RPMS Logo" style={{ width: 44, height: 44, objectFit: "contain" }} />
           <span style={{ color: "#0F172A", fontSize: 24, fontWeight: 800, letterSpacing: "-0.02em" }}>
             RPMS<span style={{ color: "#94A3B8", fontWeight: 400 }}>.flow</span>
           </span>

@@ -133,15 +133,7 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
           borderBottom: "1px solid var(--border-light)",
           flexShrink: 0,
         }}>
-          <div style={{
-            width: 28, height: 28,
-            borderRadius: 5,
-            background: "var(--color-primary)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            color: "#fff",
-            fontWeight: 700, fontSize: 13,
-            flexShrink: 0,
-          }}>R</div>
+          <img src="/logo.png" alt="RPMS Logo" style={{ width: 28, height: 28, objectFit: "contain", flexShrink: 0 }} />
           {!collapsed && (
             <span style={{ fontWeight: 700, fontSize: 15, color: "var(--text-primary)", letterSpacing: "-0.01em", whiteSpace: "nowrap" }}>
               RPMS <span style={{ color: "var(--text-muted)", fontWeight: 400, fontSize: 13 }}>ERP</span>
