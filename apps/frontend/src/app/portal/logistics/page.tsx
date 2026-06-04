@@ -12,6 +12,7 @@ export default function LogisticsPage() {
   const [activeTab, setActiveTab] = useState<"DO" | "ARMADA">("DO");
   const [vehicles, setVehicles] = useState<any[]>([]);
   const [deliveries, setDeliveries] = useState<any[]>([]);
+  const [customers, setCustomers] = useState<any[]>([]);
   const [showDoForm, setShowDoForm] = useState(false);
   const [showVehicleForm, setShowVehicleForm] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -23,8 +24,8 @@ export default function LogisticsPage() {
 
   const load = () => {
     setLoading(true);
-    Promise.all([api.get("/logistics/vehicles"), api.get("/logistics/deliveries")])
-      .then(([v, d]) => { setVehicles(v.data); setDeliveries(d.data); }).finally(() => setLoading(false));
+    Promise.all([api.get("/logistics/vehicles"), api.get("/logistics/deliveries"), api.get("/customers")])
+      .then(([v, d, c]) => { setVehicles(v.data); setDeliveries(d.data); setCustomers(c.data); }).finally(() => setLoading(false));
   };
   useEffect(() => { load(); }, []);
 
@@ -199,8 +200,13 @@ export default function LogisticsPage() {
                     </select>
                   </div>
                   <div>
-                    <label className="form-label">Tujuan</label>
-                    <input className="form-input" value={doForm.destination} onChange={e => setDoForm({ ...doForm, destination: e.target.value })} placeholder="Cth: PT Kertas Nusantara - Jakarta" required />
+                    <label className="form-label">Tujuan (Customer)</label>
+                    <select className="form-input" value={doForm.destination} onChange={e => setDoForm({ ...doForm, destination: e.target.value })} required>
+                      <option value="">-- Pilih Customer --</option>
+                      {customers.map((c: any) => (
+                        <option key={c.id} value={`${c.companyName} - ${c.address}`}>{c.companyName}</option>
+                      ))}
+                    </select>
                   </div>
                   <div>
                     <label className="form-label">Berat Muat (kg)</label>
