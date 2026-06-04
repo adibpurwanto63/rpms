@@ -53,12 +53,12 @@ export default function LogisticsPage() {
     load();
   };
 
-  const updateDoStatus = async (id: string, currentStatus: string) => {
-    const sequence = ["SCHEDULED", "LOADING", "IN_TRANSIT", "DELIVERED"];
-    const currentIndex = sequence.indexOf(currentStatus);
-    if (currentIndex < sequence.length - 1) {
-      await api.put(`/logistics/deliveries/${id}/status`, { status: sequence[currentIndex + 1] });
+  const updateDoStatus = async (id: string, newStatus: string) => {
+    try {
+      await api.put(`/logistics/deliveries/${id}/status`, { status: newStatus });
       load();
+    } catch (e) {
+      console.error(e);
     }
   };
 
@@ -106,14 +106,13 @@ export default function LogisticsPage() {
                   <th>Kendaraan & Supir</th>
                   <th>Tujuan</th>
                   <th>Berat Muat</th>
-                  <th>Status</th>
                   <th>Tanggal</th>
-                  <th>Aksi</th>
+                  <th>Status / Aksi</th>
                 </tr>
               </thead>
               <tbody>
                 {deliveries.length === 0 ? (
-                  <tr><td colSpan={7} style={{ textAlign: "center", padding: "3rem", color: "var(--text-muted)" }}>Belum ada DO terdaftar</td></tr>
+                  <tr><td colSpan={6} style={{ textAlign: "center", padding: "3rem", color: "var(--text-muted)" }}>Belum ada DO terdaftar</td></tr>
                 ) : deliveries.map((d: any) => (
                   <tr key={d.id}>
                     <td style={{ fontWeight: 600, color: "var(--brand-purple)" }}>{d.orderNumber}</td>
@@ -123,14 +122,19 @@ export default function LogisticsPage() {
                     </td>
                     <td style={{ color: "var(--text-secondary)" }}>{d.destination}</td>
                     <td style={{ fontWeight: 600, color: "var(--brand-teal)" }}>{d.loadingWeight?.toLocaleString("id-ID")} kg</td>
-                    <td><span className={`badge ${deliveryStatusColor[d.status]}`}>{d.status}</span></td>
                     <td style={{ color: "var(--text-secondary)", fontSize: 13 }}>{new Date(d.createdAt).toLocaleDateString("id-ID")}</td>
                     <td>
-                      {d.status !== "DELIVERED" && d.status !== "CANCELLED" && (
-                        <button onClick={() => updateDoStatus(d.id, d.status)} style={{ padding: "6px 12px", borderRadius: 6, background: "var(--brand-purple)", color: "#fff", border: "none", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
-                          Update Status ➔
-                        </button>
-                      )}
+                      <select 
+                        value={d.status} 
+                        onChange={(e) => updateDoStatus(d.id, e.target.value)}
+                        style={{ padding: "6px 12px", borderRadius: 6, border: "1px solid var(--border-light)", fontSize: 13, fontWeight: 600, color: "var(--text-primary)", background: "var(--bg-secondary)", cursor: "pointer", outline: "none" }}
+                      >
+                        <option value="SCHEDULED">Scheduled</option>
+                        <option value="LOADING">Loading</option>
+                        <option value="IN_TRANSIT">In Transit</option>
+                        <option value="DELIVERED">Delivered</option>
+                        <option value="CANCELLED">Cancelled</option>
+                      </select>
                     </td>
                   </tr>
                 ))}
