@@ -16,17 +16,35 @@ export default function ProductionPage() {
   const [form, setForm] = useState({ machineId: "", inputWeight: "", outputWeight: "", baleCount: "", runtimeMinutes: "", downtimeMinutes: "0" });
   const { triggerRefresh } = useRefresh();
 
-  const load = () => {
-    Promise.all([api.get("/production/machines"), api.get("/production"), api.get("/production/stats/today")])
-      .then(([m, r, s]) => { setMachines(m.data); setRecords(r.data); setStats(s.data); })
-      .finally(() => setLoading(false));
+  const load = async () => {
+    setLoading(true);
+    try {
+      const m = await api.get("/production/machines");
+      setMachines(m.data);
+    } catch (e) { console.error("Error loading machines", e); }
+    
+    try {
+      const r = await api.get("/production");
+      setRecords(r.data);
+    } catch (e) { console.error("Error loading records", e); }
+    
+    try {
+      const s = await api.get("/production/stats/today");
+      setStats(s.data);
+    } catch (e) { console.error("Error loading stats", e); }
+    
+    setLoading(false);
   };
   useEffect(() => { load(); }, []);
 
   const updateMachineStatus = async (id: string, status: string) => {
-    await api.put(`/production/machines/${id}/status`, { status });
-    load();
-    triggerRefresh();
+    try {
+      await api.put(`/production/machines/${id}/status`, { status });
+      load();
+      triggerRefresh();
+    } catch (e: any) {
+      alert("Gagal mengubah status: " + (e.response?.data?.message || e.message));
+    }
   };
 
   const openForm = (r?: any) => {
@@ -58,15 +76,18 @@ export default function ProductionPage() {
       downtimeMinutes: parseInt(form.downtimeMinutes) 
     };
 
-    if (editId) {
-      await api.put(`/production/${editId}`, payload);
-    } else {
-      await api.post("/production", payload);
+    try {
+      if (editId) {
+        await api.put(`/production/${editId}`, payload);
+      } else {
+        await api.post("/production", payload);
+      }
+      setShowForm(false);
+      load();
+      triggerRefresh();
+    } catch (e: any) {
+      alert("Gagal menyimpan data: " + (e.response?.data?.message || e.message));
     }
-
-    setShowForm(false);
-    load();
-    triggerRefresh();
   };
 
   const deleteRecord = async (id: string) => {
