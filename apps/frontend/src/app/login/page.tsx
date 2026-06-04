@@ -76,7 +76,7 @@ export default function LoginPage() {
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 40, justifyContent: "center" }}>
           <img src="/logo.png" alt="RPMS Logo" style={{ width: 44, height: 44, objectFit: "contain" }} />
           <span style={{ color: "#0F172A", fontSize: 24, fontWeight: 800, letterSpacing: "-0.02em" }}>
-            RPMS<span style={{ color: "#94A3B8", fontWeight: 400 }}>.flow</span>
+            Aftech<span style={{ color: "#94A3B8", fontWeight: 400 }}> RPMS</span>
           </span>
         </div>
 

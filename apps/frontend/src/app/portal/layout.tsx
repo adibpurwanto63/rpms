@@ -136,7 +136,7 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
           <img src="/logo.png" alt="RPMS Logo" style={{ width: 28, height: 28, objectFit: "contain", flexShrink: 0 }} />
           {!collapsed && (
             <span style={{ fontWeight: 700, fontSize: 15, color: "var(--text-primary)", letterSpacing: "-0.01em", whiteSpace: "nowrap" }}>
-              RPMS <span style={{ color: "var(--text-muted)", fontWeight: 400, fontSize: 13 }}>ERP</span>
+              Aftech <span style={{ color: "var(--text-muted)", fontWeight: 400, fontSize: 13 }}>RPMS</span>
             </span>
           )}
         </div>
