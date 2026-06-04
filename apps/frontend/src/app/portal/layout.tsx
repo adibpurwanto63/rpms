@@ -121,26 +121,26 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
 
         {/* Brand */}
         <div style={{
-          height: 72,
+          height: 52,
           display: "flex",
           alignItems: "center",
-          gap: 12,
-          padding: collapsed ? "0 16px" : "0 24px",
+          gap: 10,
+          padding: collapsed ? "0 14px" : "0 16px",
           borderBottom: "1px solid var(--border-light)",
           flexShrink: 0,
         }}>
           <div style={{
-            width: 36, height: 36,
-            borderRadius: 10,
-            background: "linear-gradient(135deg, #7C6FE0 0%, #4ECDC4 100%)",
+            width: 28, height: 28,
+            borderRadius: 5,
+            background: "var(--color-primary)",
             display: "flex", alignItems: "center", justifyContent: "center",
             color: "#fff",
-            fontWeight: 800, fontSize: 16,
+            fontWeight: 700, fontSize: 13,
             flexShrink: 0,
           }}>R</div>
           {!collapsed && (
-            <span style={{ fontWeight: 700, fontSize: 18, color: "var(--text-primary)", letterSpacing: "-0.02em", whiteSpace: "nowrap" }}>
-              RPMS<span style={{ color: "var(--color-purple)", fontWeight: 400 }}>.flow</span>
+            <span style={{ fontWeight: 700, fontSize: 15, color: "var(--text-primary)", letterSpacing: "-0.01em", whiteSpace: "nowrap" }}>
+              RPMS <span style={{ color: "var(--text-muted)", fontWeight: 400, fontSize: 13 }}>ERP</span>
             </span>
           )}
         </div>
@@ -149,10 +149,12 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
         {!collapsed && <GlobalSearch />}
 
         {/* Navigation */}
-        <nav style={{ flex: 1, overflowY: "auto", padding: "8px 12px" }}>
-          <div style={{ fontSize: 11, fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", padding: "8px 8px 4px", display: collapsed ? "none" : "block" }}>
-            Menu
-          </div>
+        <nav style={{ flex: 1, overflowY: "auto", padding: collapsed ? "8px 6px" : "8px 0" }}>
+          {!collapsed && (
+            <div style={{ fontSize: 10, fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.10em", padding: "10px 14px 4px" }}>
+              Main Menu
+            </div>
+          )}
           {accessible.map(item => {
             const active = pathname.startsWith(item.href);
             return (
@@ -161,22 +163,23 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
                 style={{
                   display: "flex",
                   alignItems: "center",
-                  gap: 10,
-                  padding: "9px 10px",
-                  borderRadius: 8,
-                  margin: "2px 0",
-                  color: active ? "var(--color-purple)" : "var(--text-secondary)",
+                  gap: 9,
+                  padding: collapsed ? "9px 14px" : "7px 14px",
+                  borderRadius: 0,
+                  margin: "1px 0",
+                  color: active ? "var(--color-primary)" : "var(--text-secondary)",
                   fontWeight: active ? 600 : 400,
-                  fontSize: 14,
+                  fontSize: 13,
                   textDecoration: "none",
-                  background: active ? "var(--color-purple-light)" : "transparent",
-                  transition: "all 0.15s ease",
+                  background: active ? "rgba(36,144,239,0.07)" : "transparent",
+                  borderLeft: active ? "3px solid var(--color-primary)" : "3px solid transparent",
+                  transition: "all 0.12s ease",
                   whiteSpace: "nowrap",
                 }}
-                onMouseEnter={e => { if (!active) (e.currentTarget as HTMLElement).style.background = "#F3F4F6"; (e.currentTarget as HTMLElement).style.color = "var(--text-primary)"; }}
+                onMouseEnter={e => { if (!active) { (e.currentTarget as HTMLElement).style.background = "var(--bg-hover)"; (e.currentTarget as HTMLElement).style.color = "var(--text-primary)"; } }}
                 onMouseLeave={e => { if (!active) { (e.currentTarget as HTMLElement).style.background = "transparent"; (e.currentTarget as HTMLElement).style.color = "var(--text-secondary)"; } }}
               >
-                <span style={{ fontSize: 17, lineHeight: 1, flexShrink: 0, width: 22, textAlign: "center" }}>{item.icon}</span>
+                <span style={{ fontSize: 15, lineHeight: 1, flexShrink: 0, width: 20, textAlign: "center" }}>{item.icon}</span>
                 {!collapsed && <span>{item.label}</span>}
               </Link>
             );
@@ -186,24 +189,24 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
         {/* User Panel */}
         <div style={{
           borderTop: "1px solid var(--border-light)",
-          padding: "14px 14px",
+          padding: "10px 12px",
           display: "flex",
           alignItems: "center",
-          gap: 10,
+          gap: 8,
           flexShrink: 0,
         }}>
           <div style={{
-            width: 36, height: 36, borderRadius: "50%", flexShrink: 0,
-            background: roleColor[user.role] || "#7C6FE0",
+            width: 28, height: 28, borderRadius: "50%", flexShrink: 0,
+            background: roleColor[user.role] || "var(--color-primary)",
             display: "flex", alignItems: "center", justifyContent: "center",
-            color: "#fff", fontWeight: 700, fontSize: 14,
+            color: "#fff", fontWeight: 600, fontSize: 12,
           }}>
             {user.name.charAt(0).toUpperCase()}
           </div>
           {!collapsed && (
             <div style={{ minWidth: 0, flex: 1 }}>
-              <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{user.name}</div>
-              <div style={{ fontSize: 11, color: "var(--text-muted)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{roleLabel[user.role]}</div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text-primary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{user.name}</div>
+              <div style={{ fontSize: 10, color: "var(--text-muted)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{roleLabel[user.role]}</div>
             </div>
           )}
         </div>
@@ -211,38 +214,38 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
 
       {/* ── Main Wrapper ── */}
       <div style={{
-        marginLeft: collapsed ? 72 : 252,
+        marginLeft: collapsed ? 60 : 220,
         flex: 1,
         display: "flex",
         flexDirection: "column",
         minHeight: "100vh",
-        transition: "margin-left 0.3s cubic-bezier(0.4,0,0.2,1)",
+        transition: "margin-left 0.25s ease",
       }}>
 
-        {/* Top Navbar */}
+        {/* Top Navbar — ERPNext style: compact flat bar */}
         <header style={{
           background: "#fff",
-          height: 72,
+          height: 52,
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          padding: "0 32px",
+          padding: "0 20px",
           borderBottom: "1px solid var(--border-light)",
           position: "sticky",
           top: 0,
           zIndex: 40,
         }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             {/* Collapse button */}
             <button
               onClick={() => setCollapsed(!collapsed)}
               style={{
-                width: 36, height: 36, borderRadius: 8,
+                width: 28, height: 28, borderRadius: 4,
                 border: "1px solid var(--border-light)",
                 background: "#fff",
                 display: "flex", alignItems: "center", justifyContent: "center",
                 cursor: "pointer", color: "var(--text-secondary)",
-                fontSize: 16,
+                fontSize: 13,
                 transition: "all 0.15s ease",
               }}
               title="Toggle sidebar"
@@ -250,14 +253,13 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
               ☰
             </button>
 
-            {/* Page title */}
-            <div>
-              <div style={{ fontSize: 18, fontWeight: 700, color: "var(--text-primary)", letterSpacing: "-0.01em" }}>
+            {/* Breadcrumb / Page title */}
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <span style={{ fontSize: 11, color: "var(--text-muted)" }}>Home</span>
+              <span style={{ fontSize: 11, color: "var(--text-muted)" }}>/</span>
+              <span style={{ fontSize: 12, fontWeight: 600, color: "var(--text-primary)" }}>
                 {currentPage?.label || "Portal"}
-              </div>
-              <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 1 }}>
-                {new Date().toLocaleDateString("id-ID", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
-              </div>
+              </span>
             </div>
           </div>
 
@@ -413,7 +415,7 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
         </header>
 
         {/* Page Content */}
-        <main style={{ flex: 1, padding: "28px 32px", animationName: "fadeInUp", animationDuration: "0.4s", animationTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)" }}>
+        <main style={{ flex: 1, padding: "20px 24px", animation: "fadeInUp 0.25s ease both" }}>
           <RefreshProvider>
             {children}
           </RefreshProvider>
