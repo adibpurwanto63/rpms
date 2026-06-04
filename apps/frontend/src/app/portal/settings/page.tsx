@@ -55,7 +55,13 @@ export default function SettingsPage() {
         
         try {
           await api.put(`/users/me/avatar`, { avatarUrl: base64String });
-          alert("Foto profil berhasil diperbarui! Silakan refresh halaman.");
+          const uStr = localStorage.getItem("rpms_user");
+          if (uStr) {
+            const uObj = JSON.parse(uStr);
+            uObj.avatarUrl = base64String;
+            localStorage.setItem("rpms_user", JSON.stringify(uObj));
+          }
+          alert("Foto profil berhasil diperbarui!");
           window.location.reload(); 
         } catch (err) {
           console.error(err);
