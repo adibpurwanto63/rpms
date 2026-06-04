@@ -210,7 +210,7 @@ export default function DashboardPage() {
         {/* Orders Overview Area Chart */}
         <div className="erp-card">
           <div className="erp-card-header">
-            <span className="erp-card-title">Tren Pembelian & Produksi</span>
+            <span className="erp-card-title">Tren Pembelian & Penjualan</span>
             <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--text-secondary)" }}>
                 <div style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--color-purple)" }} />
@@ -218,14 +218,7 @@ export default function DashboardPage() {
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--text-secondary)" }}>
                 <div style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--color-teal)" }} />
-                Produksi
-              </div>
-              <div style={{
-                padding: "4px 10px", borderRadius: 6,
-                border: "1px solid var(--border-light)", fontSize: 12,
-                color: "var(--text-secondary)", cursor: "pointer",
-              }}>
-                2024 ▾
+                Penjualan
               </div>
             </div>
           </div>
@@ -251,7 +244,7 @@ export default function DashboardPage() {
                   formatter={(v: any) => [`${(v / 1000).toFixed(2)} Ton`]}
                 />
                 <Area type="monotone" dataKey="purchase" name="Pembelian" stroke="#7C6FE0" fill="url(#gPurchase)" strokeWidth={2.5} dot={false} />
-                <Area type="monotone" dataKey="production" name="Produksi" stroke="#4ECDC4" fill="url(#gProd)" strokeWidth={2.5} dot={false} />
+                <Area type="monotone" dataKey="sales" name="Penjualan" stroke="#4ECDC4" fill="url(#gProd)" strokeWidth={2.5} dot={false} />
               </AreaChart>
             </ResponsiveContainer>
           </div>

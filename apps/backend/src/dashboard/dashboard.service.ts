@@ -91,14 +91,14 @@ export class DashboardService {
       d.setDate(d.getDate() - i);
       const nd = new Date(d);
       nd.setDate(nd.getDate() + 1);
-      const [purchase, production] = await Promise.all([
+      const [purchase, sales] = await Promise.all([
         this.prisma.weighingTicket.aggregate({ where: { date: { gte: d, lt: nd } }, _sum: { netWeight: true } }),
-        this.prisma.productionRecord.aggregate({ where: { date: { gte: d, lt: nd } }, _sum: { outputWeight: true } }),
+        this.prisma.salesOrder.aggregate({ where: { createdAt: { gte: d, lt: nd } }, _sum: { quantity: true } }),
       ]);
       data.push({
         date: d.toISOString().split("T")[0],
         purchase: purchase._sum.netWeight || 0,
-        production: production._sum.outputWeight || 0,
+        sales: sales._sum.quantity || 0,
       });
     }
     return data;
