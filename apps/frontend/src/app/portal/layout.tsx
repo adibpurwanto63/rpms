@@ -7,18 +7,23 @@ import { canAccess } from "@/lib/permissions";
 import { RefreshProvider } from "@/lib/refresh-context";
 import GlobalSearch from "@/components/GlobalSearch";
 import api from "@/lib/api";
+import {
+  LayoutDashboard, ShoppingCart, Scale, ShoppingBag, Factory,
+  Warehouse, Truck, BarChart2, ShieldCheck, Settings,
+  Bell, ChevronRight, Home, LogOut, User
+} from "lucide-react";
 
 const navItems = [
-  { href: "/portal/dashboard", icon: "⊞", label: "Dashboard", module: "dashboard" },
-  { href: "/portal/purchase", icon: "🛒", label: "Procurement", module: "purchase" },
-  { href: "/portal/weighbridge", icon: "⚖️", label: "Timbangan", module: "weighbridge" },
-  { href: "/portal/pembelian", icon: "🛍️", label: "Pembelian", module: "pembelian" },
-  { href: "/portal/production", icon: "🏭", label: "Produksi", module: "production" },
-  { href: "/portal/warehouse", icon: "📦", label: "Gudang", module: "warehouse" },
-  { href: "/portal/logistics", icon: "🚛", label: "Logistik", module: "logistics" },
-  { href: "/portal/finance", icon: "💹", label: "Keuangan", module: "finance" },
-  { href: "/portal/bcp", icon: "🛡️", label: "BCP Center", module: "bcp" },
-  { href: "/portal/settings", icon: "⚙️", label: "Settings", module: "settings" },
+  { href: "/portal/dashboard",  Icon: LayoutDashboard, label: "Dashboard",  module: "dashboard"  },
+  { href: "/portal/purchase",   Icon: ShoppingCart,    label: "Procurement", module: "purchase"   },
+  { href: "/portal/weighbridge",Icon: Scale,           label: "Timbangan",  module: "weighbridge"},
+  { href: "/portal/pembelian",  Icon: ShoppingBag,     label: "Pembelian",  module: "pembelian"  },
+  { href: "/portal/production", Icon: Factory,         label: "Produksi",   module: "production" },
+  { href: "/portal/warehouse",  Icon: Warehouse,       label: "Gudang",     module: "warehouse"  },
+  { href: "/portal/logistics",  Icon: Truck,           label: "Logistik",   module: "logistics"  },
+  { href: "/portal/finance",    Icon: BarChart2,       label: "Keuangan",   module: "finance"    },
+  { href: "/portal/bcp",        Icon: ShieldCheck,     label: "BCP Center", module: "bcp"        },
+  { href: "/portal/settings",   Icon: Settings,        label: "Settings",   module: "settings"   },
 ];
 
 const roleLabel: Record<string, string> = {
@@ -179,7 +184,11 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
                 onMouseEnter={e => { if (!active) { (e.currentTarget as HTMLElement).style.background = "var(--bg-hover)"; (e.currentTarget as HTMLElement).style.color = "var(--text-primary)"; } }}
                 onMouseLeave={e => { if (!active) { (e.currentTarget as HTMLElement).style.background = "transparent"; (e.currentTarget as HTMLElement).style.color = "var(--text-secondary)"; } }}
               >
-                <span style={{ fontSize: 15, lineHeight: 1, flexShrink: 0, width: 20, textAlign: "center" }}>{item.icon}</span>
+                <item.Icon
+                  size={16}
+                  strokeWidth={active ? 2 : 1.75}
+                  style={{ flexShrink: 0, width: 20 }}
+                />
                 {!collapsed && <span>{item.label}</span>}
               </Link>
             );
@@ -250,15 +259,19 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
               }}
               title="Toggle sidebar"
             >
-              ☰
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round">
+                <line x1="1" y1="4" x2="13" y2="4"/>
+                <line x1="1" y1="8" x2="13" y2="8"/>
+                <line x1="1" y1="12" x2="13" y2="12"/>
+              </svg>
             </button>
 
             {/* Breadcrumb / Page title */}
-            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <span style={{ fontSize: 11, color: "var(--text-muted)" }}>Home</span>
-              <span style={{ fontSize: 11, color: "var(--text-muted)" }}>/</span>
-              {currentPage?.icon && (
-                <span style={{ fontSize: 14 }}>{currentPage.icon}</span>
+            <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+              <Home size={12} color="var(--text-muted)" />
+              <ChevronRight size={11} color="var(--text-muted)" />
+              {currentPage?.Icon && (
+                <currentPage.Icon size={13} color="var(--color-primary)" strokeWidth={2} />
               )}
               <span style={{ fontSize: 12, fontWeight: 600, color: "var(--text-primary)" }}>
                 {currentPage?.label || "Portal"}
@@ -276,10 +289,10 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
                   border: "1px solid var(--border-light)",
                   background: notificationsOpen ? "#F3F4F6" : "#fff",
                   display: "flex", alignItems: "center", justifyContent: "center",
-                  cursor: "pointer", fontSize: 16, position: "relative",
-                  transition: "background 0.2s ease",
+                  cursor: "pointer", position: "relative",
+                  transition: "background 0.15s ease",
                 }}>
-                🔔
+                <Bell size={16} color={notifications.length > 0 ? "var(--color-primary)" : "var(--text-secondary)"} />
                 {notifications.length > 0 && (
                   <div style={{
                     position: "absolute", top: 6, right: 6,
