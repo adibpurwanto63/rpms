@@ -34,6 +34,15 @@ export class LogisticsService {
 
   async updateStatus(id: string, status: DeliveryStatus) {
     return this.prisma.$transaction(async (tx) => {
+      if (status === DeliveryStatus.CANCELLED) {
+        const doOrder = await tx.deliveryOrder.findUnique({ where: { id } });
+        if (doOrder) {
+          await tx.vehicle.update({ where: { id: doOrder.vehicleId }, data: { status: 'AVAILABLE' } });
+          await tx.deliveryOrder.delete({ where: { id } });
+        }
+        return { deleted: true };
+      }
+
       const doOrder = await tx.deliveryOrder.update({
         where: { id },
         data: {
@@ -44,7 +53,7 @@ export class LogisticsService {
 
       if (status === DeliveryStatus.IN_TRANSIT) {
         await tx.vehicle.update({ where: { id: doOrder.vehicleId }, data: { status: 'ON_TRIP' } });
-      } else if (status === DeliveryStatus.DELIVERED || status === DeliveryStatus.CANCELLED) {
+      } else if (status === DeliveryStatus.DELIVERED) {
         await tx.vehicle.update({ where: { id: doOrder.vehicleId }, data: { status: 'AVAILABLE' } });
       }
 
