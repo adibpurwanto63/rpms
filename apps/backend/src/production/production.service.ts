@@ -21,9 +21,30 @@ export class ProductionService {
     const oee = dto.runtimeMinutes > 0
       ? ((dto.runtimeMinutes / (dto.runtimeMinutes + (dto.downtimeMinutes || 0))) * (dto.outputWeight / dto.inputWeight) * 0.95 * 100)
       : 0;
-    return this.prisma.productionRecord.create({
-      data: { ...dto, oee: parseFloat(oee.toFixed(2)) },
-      include: { machine: true },
+    
+    return this.prisma.$transaction(async (tx) => {
+      const record = await tx.productionRecord.create({
+        data: { ...dto, oee: parseFloat(oee.toFixed(2)) },
+        include: { machine: true },
+      });
+
+      if (record.baleCount > 0) {
+        const bales = [];
+        const weightPerBale = record.outputWeight / record.baleCount;
+        for (let i = 1; i <= record.baleCount; i++) {
+          bales.push({
+            baleId: `B-${record.id.substring(0, 6).toUpperCase()}-${i}`,
+            weight: parseFloat(weightPerBale.toFixed(2)),
+            grade: "A" as any,
+            area: "FINISHED_GOODS" as any,
+            status: "IN_STOCK" as any,
+            productionId: record.id,
+            productionDate: record.date,
+          });
+        }
+        await tx.inventoryItem.createMany({ data: bales });
+      }
+      return record;
     });
   }
 
@@ -31,15 +52,40 @@ export class ProductionService {
     const oee = dto.runtimeMinutes > 0
       ? ((dto.runtimeMinutes / (dto.runtimeMinutes + (dto.downtimeMinutes || 0))) * (dto.outputWeight / dto.inputWeight) * 0.95 * 100)
       : 0;
-    return this.prisma.productionRecord.update({
-      where: { id },
-      data: { ...dto, oee: parseFloat(oee.toFixed(2)) },
-      include: { machine: true },
+
+    return this.prisma.$transaction(async (tx) => {
+      const record = await tx.productionRecord.update({
+        where: { id },
+        data: { ...dto, oee: parseFloat(oee.toFixed(2)) },
+        include: { machine: true },
+      });
+
+      await tx.inventoryItem.deleteMany({ where: { productionId: id } });
+      if (record.baleCount > 0) {
+        const bales = [];
+        const weightPerBale = record.outputWeight / record.baleCount;
+        for (let i = 1; i <= record.baleCount; i++) {
+          bales.push({
+            baleId: `B-${record.id.substring(0, 6).toUpperCase()}-${i}`,
+            weight: parseFloat(weightPerBale.toFixed(2)),
+            grade: "A" as any,
+            area: "FINISHED_GOODS" as any,
+            status: "IN_STOCK" as any,
+            productionId: record.id,
+            productionDate: record.date,
+          });
+        }
+        await tx.inventoryItem.createMany({ data: bales });
+      }
+      return record;
     });
   }
 
   async deleteRecord(id: string) {
-    return this.prisma.productionRecord.delete({ where: { id } });
+    return this.prisma.$transaction(async (tx) => {
+      await tx.inventoryItem.deleteMany({ where: { productionId: id } });
+      return tx.productionRecord.delete({ where: { id } });
+    });
   }
 
   todayStats() {
