@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
 import { useRefresh } from "@/lib/refresh-context";
-import { Building2, CheckCircle2, Ban } from "lucide-react";
+import { Building2, CheckCircle2, Ban, Users, Package } from "lucide-react";
 
 const fmtRp = (n: number) =>
   new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(n);
@@ -169,32 +169,35 @@ export default function PurchasePage() {
         <button
           onClick={() => setActiveTab("supplier")}
           style={{
+            display: "flex", alignItems: "center", gap: 6,
             padding: "8px 20px", borderRadius: 8, fontSize: 14, fontWeight: 600, border: "none", cursor: "pointer",
             background: activeTab === "supplier" ? "var(--color-purple)" : "transparent",
             color: activeTab === "supplier" ? "#fff" : "var(--text-secondary)"
           }}
         >
-          🏢 Manajemen Supplier
+          <Building2 size={16} /> Manajemen Supplier
         </button>
         <button
           onClick={() => setActiveTab("customer")}
           style={{
+            display: "flex", alignItems: "center", gap: 6,
             padding: "8px 20px", borderRadius: 8, fontSize: 14, fontWeight: 600, border: "none", cursor: "pointer",
             background: activeTab === "customer" ? "var(--color-purple)" : "transparent",
             color: activeTab === "customer" ? "#fff" : "var(--text-secondary)"
           }}
         >
-          👥 Manajemen Customer
+          <Users size={16} /> Manajemen Customer
         </button>
         <button
           onClick={() => setActiveTab("penjualan")}
           style={{
+            display: "flex", alignItems: "center", gap: 6,
             padding: "8px 20px", borderRadius: 8, fontSize: 14, fontWeight: 600, border: "none", cursor: "pointer",
             background: activeTab === "penjualan" ? "var(--color-purple)" : "transparent",
             color: activeTab === "penjualan" ? "#fff" : "var(--text-secondary)"
           }}
         >
-          📦 Manajemen Penjualan
+          <Package size={16} /> Manajemen Penjualan
         </button>
       </div>
 

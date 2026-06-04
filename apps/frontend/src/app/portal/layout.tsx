@@ -111,7 +111,7 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
       {/* ── Sidebar ── */}
       <aside style={{
         background: "var(--bg-sidebar)",
-        width: collapsed ? "72px" : "252px",
+        width: collapsed ? "60px" : "220px",
         minHeight: "100vh",
         position: "fixed",
         top: 0, left: 0,
