@@ -1,9 +1,10 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
+import { NotificationsService } from "../notifications/notifications.service";
 
 @Injectable()
 export class ProductionService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private notifications: NotificationsService) {}
 
   getMachines() { return this.prisma.machine.findMany(); }
   updateMachineStatus(id: string, status: any) { return this.prisma.machine.update({ where: { id }, data: { status } }); }
@@ -44,6 +45,12 @@ export class ProductionService {
         }
         await tx.inventoryItem.createMany({ data: bales });
       }
+
+      this.notifications.createNotification(
+        "Produksi Baru", 
+        `Mesin ${record.machine?.name || 'Unknown'} memproduksi ${record.baleCount} bale.`
+      );
+
       return record;
     });
   }

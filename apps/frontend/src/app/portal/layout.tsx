@@ -41,16 +41,43 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
   const [collapsed, setCollapsed] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const notificationsRef = useRef<HTMLDivElement>(null);
+  const [notifications, setNotifications] = useState<any[]>([]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
-        setUserMenuOpen(false);
-      }
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) setUserMenuOpen(false);
+      if (notificationsRef.current && !notificationsRef.current.contains(event.target as Node)) setNotificationsOpen(false);
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  const fetchNotifications = async () => {
+    try {
+      const res = await api.get("/notifications");
+      setNotifications(res.data || []);
+    } catch (e) {}
+  };
+
+  useEffect(() => {
+    if (!user) return;
+    fetchNotifications();
+    const interval = setInterval(fetchNotifications, 10000); // poll every 10 seconds
+    return () => clearInterval(interval);
+  }, [user]);
+
+  const handleNotificationsClick = async () => {
+    setNotificationsOpen(!notificationsOpen);
+    if (!notificationsOpen && notifications.length > 0) {
+      // Mark as read when opening
+      try {
+        await api.post("/notifications/mark-read");
+        setNotifications([]);
+      } catch (e) {}
+    }
+  };
 
   useEffect(() => {
     if (!loading && !user) router.push("/login");
@@ -235,19 +262,63 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
 
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             {/* Notification bell */}
-            <div style={{
-              width: 36, height: 36, borderRadius: 8,
-              border: "1px solid var(--border-light)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              cursor: "pointer", fontSize: 16, position: "relative",
-            }}>
-              🔔
-              <div style={{
-                position: "absolute", top: 6, right: 6,
-                width: 8, height: 8, borderRadius: "50%",
-                background: "var(--color-pink)",
-                border: "2px solid #fff",
-              }} />
+            <div ref={notificationsRef} style={{ position: "relative" }}>
+              <div
+                onClick={handleNotificationsClick}
+                style={{
+                  width: 36, height: 36, borderRadius: 8,
+                  border: "1px solid var(--border-light)",
+                  background: notificationsOpen ? "#F3F4F6" : "#fff",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  cursor: "pointer", fontSize: 16, position: "relative",
+                  transition: "background 0.2s ease",
+                }}>
+                🔔
+                {notifications.length > 0 && (
+                  <div style={{
+                    position: "absolute", top: 6, right: 6,
+                    width: 8, height: 8, borderRadius: "50%",
+                    background: "var(--color-pink)",
+                    border: "2px solid #fff",
+                  }} />
+                )}
+              </div>
+
+              {/* Notifications Dropdown */}
+              {notificationsOpen && (
+                <div style={{
+                  position: "absolute",
+                  top: "calc(100% + 8px)",
+                  right: 0,
+                  width: 320,
+                  background: "#fff",
+                  borderRadius: 12,
+                  boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
+                  border: "1px solid var(--border-light)",
+                  overflow: "hidden",
+                  zIndex: 100,
+                }}>
+                  <div style={{ padding: "12px 16px", borderBottom: "1px solid var(--border-light)", background: "#F9FAFB", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text-primary)" }}>Notifikasi</div>
+                    <div style={{ fontSize: 12, color: "var(--text-muted)", cursor: "pointer" }} onClick={() => { api.post("/notifications/mark-read"); setNotifications([]); }}>Tandai semua dibaca</div>
+                  </div>
+                  <div style={{ maxHeight: 300, overflowY: "auto", padding: 8 }}>
+                    {notifications.length === 0 ? (
+                      <div style={{ padding: "20px 10px", textAlign: "center", color: "var(--text-muted)", fontSize: 13 }}>
+                        Belum ada notifikasi baru.
+                      </div>
+                    ) : (
+                      notifications.map(n => (
+                        <div key={n.id} style={{ padding: "10px 12px", borderRadius: 8, borderBottom: "1px solid var(--border-light)", marginBottom: 4, background: n.isRead ? "transparent" : "#F3F4F6" }}>
+                          <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)" }}>{n.title}</div>
+                          <div style={{ fontSize: 12, color: "var(--text-secondary)", marginTop: 2 }}>{n.message}</div>
+                          <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 4 }}>{new Date(n.createdAt).toLocaleString("id-ID")}</div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* User badge with dropdown */}
