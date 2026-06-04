@@ -27,6 +27,21 @@ export class ProductionService {
     });
   }
 
+  async updateRecord(id: string, dto: any) {
+    const oee = dto.runtimeMinutes > 0
+      ? ((dto.runtimeMinutes / (dto.runtimeMinutes + (dto.downtimeMinutes || 0))) * (dto.outputWeight / dto.inputWeight) * 0.95 * 100)
+      : 0;
+    return this.prisma.productionRecord.update({
+      where: { id },
+      data: { ...dto, oee: parseFloat(oee.toFixed(2)) },
+      include: { machine: true },
+    });
+  }
+
+  async deleteRecord(id: string) {
+    return this.prisma.productionRecord.delete({ where: { id } });
+  }
+
   todayStats() {
     const today = new Date(); today.setHours(0,0,0,0);
     const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate() + 1);

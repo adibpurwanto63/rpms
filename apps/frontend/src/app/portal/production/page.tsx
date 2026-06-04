@@ -11,6 +11,7 @@ export default function ProductionPage() {
   const [records, setRecords] = useState<any[]>([]);
   const [stats, setStats] = useState<any>(null);
   const [showForm, setShowForm] = useState(false);
+  const [editId, setEditId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState({ machineId: "", inputWeight: "", outputWeight: "", baleCount: "", runtimeMinutes: "", downtimeMinutes: "0" });
   const { triggerRefresh } = useRefresh();
@@ -22,13 +23,57 @@ export default function ProductionPage() {
   };
   useEffect(() => { load(); }, []);
 
+  const updateMachineStatus = async (id: string, status: string) => {
+    await api.put(`/production/machines/${id}/status`, { status });
+    load();
+    triggerRefresh();
+  };
+
+  const openForm = (r?: any) => {
+    if (r) {
+      setEditId(r.id);
+      setForm({
+        machineId: r.machineId,
+        inputWeight: r.inputWeight.toString(),
+        outputWeight: r.outputWeight.toString(),
+        baleCount: r.baleCount.toString(),
+        runtimeMinutes: r.runtimeMinutes.toString(),
+        downtimeMinutes: r.downtimeMinutes.toString()
+      });
+    } else {
+      setEditId(null);
+      setForm({ machineId: "", inputWeight: "", outputWeight: "", baleCount: "", runtimeMinutes: "", downtimeMinutes: "0" });
+    }
+    setShowForm(true);
+  };
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await api.post("/production", { machineId: form.machineId, inputWeight: parseFloat(form.inputWeight), outputWeight: parseFloat(form.outputWeight), baleCount: parseInt(form.baleCount), runtimeMinutes: parseInt(form.runtimeMinutes), downtimeMinutes: parseInt(form.downtimeMinutes) });
+    const payload = { 
+      machineId: form.machineId, 
+      inputWeight: parseFloat(form.inputWeight), 
+      outputWeight: parseFloat(form.outputWeight), 
+      baleCount: parseInt(form.baleCount), 
+      runtimeMinutes: parseInt(form.runtimeMinutes), 
+      downtimeMinutes: parseInt(form.downtimeMinutes) 
+    };
+
+    if (editId) {
+      await api.put(`/production/${editId}`, payload);
+    } else {
+      await api.post("/production", payload);
+    }
+
     setShowForm(false);
-    setForm({ machineId: "", inputWeight: "", outputWeight: "", baleCount: "", runtimeMinutes: "", downtimeMinutes: "0" });
     load();
-    triggerRefresh(); // Notify dashboard to re-fetch
+    triggerRefresh();
+  };
+
+  const deleteRecord = async (id: string) => {
+    if (!confirm("Hapus data produksi ini?")) return;
+    await api.delete(`/production/${id}`);
+    load();
+    triggerRefresh();
   };
 
   return (
@@ -39,8 +84,8 @@ export default function ProductionPage() {
           <h2 style={{ fontSize: 22, fontWeight: 700, color: "var(--text-primary)", letterSpacing: "-0.02em" }}>Monitoring Produksi</h2>
           <p style={{ fontSize: 14, color: "var(--text-secondary)", marginTop: 4 }}>Status mesin, performa OEE, dan catatan produksi baling</p>
         </div>
-        <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}>
-          {showForm ? "✕ Tutup" : "+ Input Produksi"}
+        <button className="btn btn-primary" onClick={() => openForm()}>
+          + Input Produksi
         </button>
       </div>
 
@@ -50,7 +95,16 @@ export default function ProductionPage() {
           <div key={m.id} className="erp-card" style={{ padding: "16px", background: "var(--bg-card)", display: "flex", flexDirection: "column", gap: 8 }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <span style={{ fontSize: "1.5rem" }}>🏭</span>
-              <span className={`badge ${machineStatusColor[m.status]}`}>{machineStatusLabel[m.status]}</span>
+              <select 
+                className={`badge ${machineStatusColor[m.status]}`}
+                style={{ border: "none", outline: "none", cursor: "pointer", fontWeight: 600 }}
+                value={m.status}
+                onChange={(e) => updateMachineStatus(m.id, e.target.value)}
+              >
+                {Object.keys(machineStatusLabel).map(k => (
+                  <option key={k} value={k}>{machineStatusLabel[k]}</option>
+                ))}
+              </select>
             </div>
             <div style={{ fontWeight: 600, color: "var(--text-primary)", fontSize: "1.1rem", marginTop: 4 }}>{m.name}</div>
             <div style={{ fontSize: 13, color: "var(--text-secondary)" }}>{m.location}</div>
@@ -78,7 +132,7 @@ export default function ProductionPage() {
         </div>
       )}
 
-      {/* Add Record Form Modal */}
+      {/* Add/Edit Record Form Modal */}
       {showForm && (
         <div style={{
           position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
@@ -88,7 +142,7 @@ export default function ProductionPage() {
         }}>
           <div className="erp-card animate-fade-in" style={{ width: "100%", maxWidth: 700, margin: 20, maxHeight: "90vh", overflowY: "auto", border: "none", boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}>
             <div className="erp-card-header" style={{ position: "sticky", top: 0, background: "#fff", zIndex: 10, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <h3 className="erp-card-title" style={{ fontSize: 20 }}>Catat Hasil Produksi</h3>
+              <h3 className="erp-card-title" style={{ fontSize: 20 }}>{editId ? "Edit Catatan Produksi" : "Catat Hasil Produksi"}</h3>
               <button type="button" onClick={() => setShowForm(false)} style={{ background: "transparent", border: "none", fontSize: 20, cursor: "pointer", color: "var(--text-muted)" }}>✕</button>
             </div>
             <div className="erp-card-body" style={{ padding: 24 }}>
@@ -110,7 +164,7 @@ export default function ProductionPage() {
                   ].map(f => (
                     <div key={f.key}>
                       <label className="form-label">{f.label}</label>
-                      <input className="form-input" type="number" value={(form as any)[f.key]} onChange={e => setForm({ ...form, [f.key]: e.target.value })} placeholder={f.placeholder} required />
+                      <input className="form-input" type="number" step="any" value={(form as any)[f.key]} onChange={e => setForm({ ...form, [f.key]: e.target.value })} placeholder={f.placeholder} required />
                     </div>
                   ))}
                 </div>
@@ -146,11 +200,12 @@ export default function ProductionPage() {
                   <th>Downtime</th>
                   <th>OEE</th>
                   <th>Tanggal</th>
+                  <th>Aksi</th>
                 </tr>
               </thead>
               <tbody>
                 {records.length === 0 ? (
-                  <tr><td colSpan={8} style={{ textAlign: "center", padding: "3rem", color: "var(--text-muted)" }}>Belum ada catatan produksi</td></tr>
+                  <tr><td colSpan={9} style={{ textAlign: "center", padding: "3rem", color: "var(--text-muted)" }}>Belum ada catatan produksi</td></tr>
                 ) : records.map((r: any) => (
                   <tr key={r.id}>
                     <td style={{ fontWeight: 600, color: "var(--brand-purple)" }}>{r.machine?.name}</td>
@@ -168,6 +223,12 @@ export default function ProductionPage() {
                       </div>
                     </td>
                     <td style={{ color: "var(--text-secondary)", fontSize: 13 }}>{new Date(r.date).toLocaleDateString("id-ID")}</td>
+                    <td>
+                      <div style={{ display: "flex", gap: 6 }}>
+                        <button onClick={() => openForm(r)} className="btn btn-secondary" style={{ padding: "4px 8px", fontSize: 12 }}>Edit</button>
+                        <button onClick={() => deleteRecord(r.id)} style={{ padding: "4px 8px", fontSize: 12, border: "1px solid red", color: "red", background: "none", borderRadius: 6, cursor: "pointer" }}>Hapus</button>
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>
