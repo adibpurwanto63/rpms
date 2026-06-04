@@ -9,7 +9,7 @@ import api from "@/lib/api";
 import {
   LayoutDashboard, ShoppingCart, Scale, ShoppingBag, Factory,
   Warehouse, Truck, BarChart2, ShieldCheck, Settings,
-  Bell, ChevronRight, Home, LogOut, User
+  Bell, ChevronRight, Home, LogOut, User, HelpCircle, Moon
 } from "lucide-react";
 
 const navItems = [
@@ -373,16 +373,16 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
                   
                   <div style={{ padding: 8 }}>
                     <Link href="/portal/settings" onClick={() => setUserMenuOpen(false)} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", borderRadius: 8, textDecoration: "none", color: "var(--text-secondary)", fontSize: 13, transition: "background 0.2s ease" }} onMouseEnter={e => (e.currentTarget.style.background = "#F3F4F6")} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-                      <span>⚙️</span> Settings
+                      <Settings size={16} /> Settings
                     </Link>
                     <Link href="#" onClick={() => setUserMenuOpen(false)} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", borderRadius: 8, textDecoration: "none", color: "var(--text-secondary)", fontSize: 13, transition: "background 0.2s ease" }} onMouseEnter={e => (e.currentTarget.style.background = "#F3F4F6")} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-                      <span>ℹ️</span> Help Center
+                      <HelpCircle size={16} /> Help Center
                     </Link>
                     
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 12px", borderRadius: 8, cursor: "pointer", transition: "background 0.2s ease" }} onMouseEnter={e => (e.currentTarget.style.background = "#F3F4F6")} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                        <span>🌙</span>
-                        <span style={{ fontSize: 13, color: "var(--text-secondary)" }}>Dark mode</span>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10, color: "var(--text-secondary)" }}>
+                        <Moon size={16} />
+                        <span style={{ fontSize: 13 }}>Dark mode</span>
                       </div>
                       <div style={{ width: 32, height: 18, borderRadius: 10, background: "#E5E7EB", position: "relative" }}>
                         <div style={{ width: 14, height: 14, borderRadius: "50%", background: "#fff", position: "absolute", top: 2, left: 2, boxShadow: "0 1px 3px rgba(0,0,0,0.2)" }} />
@@ -409,7 +409,7 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
                       onMouseEnter={e => (e.currentTarget.style.background = "#FFF5F5")}
                       onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
                     >
-                      <span style={{ transform: "rotate(180deg)" }}>🚪</span> Keluar
+                      <LogOut size={16} /> Keluar
                     </button>
                   </div>
                 </div>
