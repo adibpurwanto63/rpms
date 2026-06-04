@@ -19,7 +19,7 @@ interface DashData {
 }
 
 const fmt = (n: number) => `${(n / 1000).toFixed(2)} Ton`;
-const fmtRp = (n: number) => `Rp ${(n / 1000000).toFixed(1)}M`;
+const fmtRp = (n: number) => new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n || 0);
 const fmtPct = (n: number) => `${(n || 0).toFixed(1)}%`;
 
 const DONUT_COLORS = ["#7C6FE0", "#4ECDC4", "#FF6B9D"];
@@ -57,7 +57,7 @@ export default function DashboardPage() {
 
   if (!data) return <div style={{ color: "var(--text-secondary)", textAlign: "center", padding: "3rem" }}>Gagal memuat data dashboard</div>;
 
-  const fmtRpShort = (n: number) => n >= 1_000_000 ? `Rp ${(n / 1_000_000).toFixed(1)}M` : `Rp ${n.toLocaleString("id-ID")}`;
+  const fmtRpShort = (n: number) => new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n || 0);
 
   const kpis = [
     {
@@ -470,7 +470,7 @@ export default function DashboardPage() {
                     <td style={{ fontFamily: "monospace", fontSize: 13, color: "var(--color-purple)", fontWeight: 600 }}>{po.orderNumber}</td>
                     <td style={{ fontWeight: 500 }}>{po.supplier?.companyName}</td>
                     <td>{po.itemName}</td>
-                    <td style={{ fontWeight: 700 }}>Rp {po.totalAmount?.toLocaleString("id-ID")}</td>
+                    <td style={{ fontWeight: 700 }}>{fmtRp(po.totalAmount)}</td>
                     <td>
                       <span className={`badge ${{ PENDING: "badge-warning", APPROVED: "badge-info", ORDERED: "badge-purple", RECEIVED: "badge-success", CANCELLED: "badge-danger" }[po.status as string] || "badge-neutral"}`}>
                         {{ PENDING: "Menunggu", APPROVED: "Disetujui", ORDERED: "Dipesan", RECEIVED: "Diterima", CANCELLED: "Dibatalkan" }[po.status as string]}

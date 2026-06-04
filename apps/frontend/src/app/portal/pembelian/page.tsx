@@ -24,8 +24,7 @@ const statusNext: any = {
   ORDERED: "RECEIVED",
 };
 
-const fmtRp = (n: number) =>
-  new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(n);
+const fmtRp = (n: number) => new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n || 0);
 
 export default function PembelianPage() {
   const [orders, setOrders] = useState<any[]>([]);

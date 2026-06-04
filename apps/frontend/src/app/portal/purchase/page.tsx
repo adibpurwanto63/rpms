@@ -4,8 +4,7 @@ import api from "@/lib/api";
 import { useRefresh } from "@/lib/refresh-context";
 import { Building2, CheckCircle2, Ban, Users, Package } from "lucide-react";
 
-const fmtRp = (n: number) =>
-  new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(n);
+const fmtRp = (n: number) => new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n || 0);
 
 export default function PurchasePage() {
   const [activeTab, setActiveTab] = useState("supplier"); // 'supplier' | 'penjualan' | 'customer'

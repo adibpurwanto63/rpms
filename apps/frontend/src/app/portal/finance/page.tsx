@@ -36,7 +36,7 @@ export default function FinancePage() {
     triggerRefresh();
   };
 
-  const fmtRp = (n: number) => `Rp ${(n / 1000000).toFixed(1)}M`;
+  const fmtRp = (n: number) => new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n || 0);
 
   const kpis = dashboard ? [
     { label: "Revenue", value: fmtRp(dashboard.revenue), Icon: TrendingUp, variant: "dark", trend: "+12.5%", trendUp: true },
@@ -176,8 +176,8 @@ export default function FinancePage() {
                     <td style={{ fontFamily: "monospace", fontSize: 13, color: "var(--color-purple)", fontWeight: 600 }}>{inv.invoiceNumber}</td>
                     <td><span className={`badge ${inv.type === "ACCOUNTS_PAYABLE" ? "badge-danger" : "badge-success"}`}>{inv.type === "ACCOUNTS_PAYABLE" ? "AP" : "AR"}</span></td>
                     <td style={{ fontWeight: 500 }}>{inv.supplierOrCustomer}</td>
-                    <td style={{ fontWeight: 600 }}>Rp {inv.amount?.toLocaleString("id-ID")}</td>
-                    <td style={{ color: "var(--text-secondary)" }}>Rp {inv.paidAmount?.toLocaleString("id-ID")}</td>
+                    <td style={{ fontWeight: 600 }}>{fmtRp(inv.amount)}</td>
+                    <td style={{ color: "var(--text-secondary)" }}>{fmtRp(inv.paidAmount)}</td>
                     <td><span className={`badge ${paymentStatusBadge[inv.paymentStatus] || "badge-neutral"}`}>{inv.paymentStatus}</span></td>
                     <td style={{ fontSize: 13, color: "var(--text-secondary)" }}>{new Date(inv.dueDate).toLocaleDateString("id-ID")}</td>
                   </tr>
