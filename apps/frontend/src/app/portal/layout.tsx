@@ -217,8 +217,13 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
             background: roleColor[user.role] || "var(--color-primary)",
             display: "flex", alignItems: "center", justifyContent: "center",
             color: "#fff", fontWeight: 600, fontSize: 12,
+            overflow: "hidden"
           }}>
-            {user.name.charAt(0).toUpperCase()}
+            {user.avatarUrl ? (
+              <img src={user.avatarUrl} alt="Avatar" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            ) : (
+              user.name.charAt(0).toUpperCase()
+            )}
           </div>
           {!collapsed && (
             <div style={{ minWidth: 0, flex: 1 }}>
@@ -354,22 +359,26 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
                 onClick={() => setUserMenuOpen(!userMenuOpen)}
                 style={{
                   display: "flex", alignItems: "center", gap: 8,
-                  padding: "6px 12px 6px 6px",
+                  padding: "4px",
                   background: userMenuOpen ? "#F3F4F6" : "#F9FAFB",
-                  borderRadius: 10,
+                  borderRadius: "50%",
                   border: "1px solid var(--border-light)",
                   cursor: "pointer",
                   transition: "background 0.2s ease",
                 }}>
                 <div style={{
-                  width: 28, height: 28, borderRadius: "50%",
+                  width: 32, height: 32, borderRadius: "50%",
                   background: roleColor[user.role] || "#7C6FE0",
                   display: "flex", alignItems: "center", justifyContent: "center",
-                  color: "#fff", fontWeight: 700, fontSize: 12,
+                  color: "#fff", fontWeight: 700, fontSize: 14,
+                  overflow: "hidden"
                 }}>
-                  {user.name.charAt(0).toUpperCase()}
+                  {user.avatarUrl ? (
+                    <img src={user.avatarUrl} alt="Avatar" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  ) : (
+                    user.name.charAt(0).toUpperCase()
+                  )}
                 </div>
-                <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)" }}>{user.name.split(" ")[0]}</span>
               </div>
 
               {/* Dropdown Menu */}

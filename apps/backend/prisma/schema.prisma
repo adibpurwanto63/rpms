@@ -13,6 +13,7 @@ model User {
   passwordHash String             @map("password_hash")
   role         UserRole
   isActive     Boolean            @default(true) @map("is_active")
+  avatarUrl    String?            @db.Text @map("avatar_url")
   supplierId   String?            @map("supplier_id")
   createdAt    DateTime           @default(now()) @map("created_at")
   updatedAt    DateTime           @updatedAt @map("updated_at")

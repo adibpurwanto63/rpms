@@ -1,8 +1,8 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import api from "@/lib/api";
 import { useAuth } from "@/lib/auth-context";
-import { UserPlus, Shield, Mail, Lock, User, CheckCircle, XCircle, Settings, Edit2, Trash2, Power } from "lucide-react";
+import { Plus, UserPlus, Shield, Mail, Lock, User, CheckCircle, XCircle, Settings, Edit2, Trash2, Power, Camera } from "lucide-react";
 
 const roleColors: Record<string, string> = {
   SUPER_ADMIN: "#7C6FE0", DIRECTOR: "#4ECDC4", FINANCE_MANAGER: "#FF6B9D",
@@ -18,11 +18,31 @@ export default function SettingsPage() {
   const [editId, setEditId] = useState<string | null>(null);
   const [form, setForm] = useState({ name:"", email:"", password:"", role:"PROCUREMENT_MANAGER" });
   const { user: currentUser } = useAuth();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const load = () => {
     api.get("/users").then(r => setUsers(r.data)).finally(() => setLoading(false));
   };
   useEffect(() => { load(); }, []);
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !currentUser) return;
+    
+    // Convert to base64
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      const base64String = reader.result as string;
+      try {
+        await api.put(`/users/${currentUser.id}`, { avatarUrl: base64String });
+        alert("Foto profil berhasil diperbarui! Silakan refresh halaman jika foto belum berubah.");
+        window.location.reload(); // Quick way to reload context
+      } catch (err) {
+        alert("Gagal mengunggah foto.");
+      }
+    };
+    reader.readAsDataURL(file);
+  };
 
   const openAddUser = () => {
     setEditId(null);
@@ -77,9 +97,55 @@ export default function SettingsPage() {
         </div>
         {currentUser?.role === "SUPER_ADMIN" && (
           <button className="btn btn-primary" onClick={openAddUser} style={{ display: "flex", alignItems: "center", gap: 8, padding: "0 20px" }}>
-            <UserPlus size={18} /> <span>Tambah Pengguna</span>
+            <Plus size={18} strokeWidth={2.5} /> <span>Tambah Pengguna</span>
           </button>
         )}
+      </div>
+
+      <div className="erp-card" style={{ display: "flex", alignItems: "center", gap: 24, padding: "24px 32px" }}>
+        <div style={{ position: "relative" }}>
+          <div style={{
+            width: 80, height: 80, borderRadius: "50%",
+            background: roleColors[currentUser?.role || ""] || "var(--color-primary)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            color: "#fff", fontWeight: 700, fontSize: 32,
+            overflow: "hidden"
+          }}>
+            {currentUser?.avatarUrl ? (
+              <img src={currentUser.avatarUrl} alt="Avatar" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            ) : (
+              currentUser?.name?.charAt(0).toUpperCase()
+            )}
+          </div>
+          <button 
+            onClick={() => fileInputRef.current?.click()}
+            title="Ubah Foto Profil"
+            style={{
+              position: "absolute", bottom: 0, right: 0,
+              width: 28, height: 28, borderRadius: "50%",
+              background: "#fff", border: "1px solid var(--border-light)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              cursor: "pointer", color: "var(--text-secondary)",
+              boxShadow: "0 2px 5px rgba(0,0,0,0.1)"
+            }}
+          >
+            <Camera size={14} />
+          </button>
+          <input 
+            type="file" 
+            ref={fileInputRef} 
+            onChange={handleAvatarChange} 
+            accept="image/*" 
+            style={{ display: "none" }} 
+          />
+        </div>
+        <div>
+          <h3 style={{ margin: "0 0 4px 0", fontSize: 20, color: "var(--text-primary)" }}>{currentUser?.name}</h3>
+          <p style={{ margin: 0, color: "var(--text-muted)", fontSize: 14 }}>{currentUser?.email}</p>
+          <div style={{ marginTop: 8, display: "inline-block", background: "rgba(124,111,224,0.1)", color: "var(--color-primary)", padding: "4px 10px", borderRadius: 100, fontSize: 12, fontWeight: 600 }}>
+            {currentUser?.role.replace(/_/g, " ")}
+          </div>
+        </div>
       </div>
 
       {showForm && (
@@ -182,9 +248,9 @@ export default function SettingsPage() {
                       </td>
                       <td style={{ color: "var(--text-secondary)", fontSize: 13 }}>{new Date(u.createdAt).toLocaleDateString("id-ID", { day: 'numeric', month: 'short', year: 'numeric' })}</td>
                       {currentUser?.role === "SUPER_ADMIN" && (
-                        <td style={{ textAlign: "right", paddingRight: 24 }}>
+                        <td style={{ textAlign: "center", paddingRight: 24 }}>
                           {u.id !== currentUser.id ? (
-                            <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
+                            <div style={{ display: "flex", justifyContent: "center", gap: 8 }}>
                               <button 
                                 onClick={() => toggleActive(u.id, u.isActive)} 
                                 title={u.isActive ? "Nonaktifkan Akses" : "Aktifkan Akses"}

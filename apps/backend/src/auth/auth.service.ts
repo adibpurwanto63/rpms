@@ -24,6 +24,7 @@ export class AuthService {
         name: user.name,
         email: user.email,
         role: user.role,
+        avatarUrl: user.avatarUrl,
       },
     };
   }
@@ -31,7 +32,7 @@ export class AuthService {
   async getProfile(userId: string) {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
-      select: { id: true, name: true, email: true, role: true, isActive: true, createdAt: true },
+      select: { id: true, name: true, email: true, role: true, isActive: true, avatarUrl: true, createdAt: true },
     });
     return user;
   }
