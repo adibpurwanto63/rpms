@@ -23,6 +23,8 @@ export default function WarehousePage() {
   const [movements, setMovements] = useState<any[]>([]);
   const [summary, setSummary] = useState<any[]>([]);
   const [todayStats, setTodayStats] = useState<any>({ inbound: 0, outbound: 0, pending: 0 });
+  const [scheduledDOs, setScheduledDOs] = useState<any[]>([]);
+  const [selectedDO, setSelectedDO] = useState<string>("");
   const [loading, setLoading] = useState(true);
 
   // ─── Filter states ───────────────────────────────────────────────────────────
@@ -51,13 +53,15 @@ export default function WarehousePage() {
       api.get("/warehouse/stats/today"),
       api.get("/warehouse/fifo"),
       api.get("/warehouse/movements"),
-    ]).then(([inv, pend, sum, stats, fi, mvt]) => {
+      api.get("/logistics/deliveries?status=SCHEDULED"),
+    ]).then(([inv, pend, sum, stats, fi, mvt, dos]) => {
       setInventory(inv.data);
       setPendingItems(pend.data);
       setSummary(sum.data);
       setTodayStats(stats.data);
       setFifo(fi.data);
       setMovements(mvt.data);
+      setScheduledDOs(dos.data);
     }).finally(() => setLoading(false));
   }, [stockFilter]);
 
@@ -99,10 +103,12 @@ export default function WarehousePage() {
   };
 
   const dispatchSelected = async () => {
-    if (selectedIds.length === 0) return alert("Pilih bale untuk dikirim.");
-    if (!confirm(`Proses pengiriman ${selectedIds.length} bale? Status akan menjadi SHIPPED.`)) return;
-    await api.post("/warehouse/dispatch", { ids: selectedIds });
+    if (!selectedDO) return alert("Pilih Delivery Order (DO) tujuan terlebih dahulu.");
+    if (selectedIds.length === 0) return alert("Pilih bale untuk dimuat.");
+    if (!confirm(`Muat ${selectedIds.length} bale ke DO ini?`)) return;
+    await api.post("/warehouse/load-do", { deliveryOrderId: selectedDO, ids: selectedIds });
     setSelectedIds([]);
+    setSelectedDO("");
     load();
   };
 
@@ -118,7 +124,7 @@ export default function WarehousePage() {
     { id: "DASHBOARD", label: "Dashboard", Icon: LayoutDashboard },
     { id: "INBOUND", label: "Penerimaan", Icon: Download, badge: pendingItems.length },
     { id: "STOCK", label: "Stok Bale", Icon: Package },
-    { id: "OUTBOUND", label: "Pengeluaran (FIFO)", Icon: Truck },
+    { id: "OUTBOUND", label: "Pemuatan DO (Loading)", Icon: Truck },
     { id: "MOVEMENTS", label: "Mutasi Stok", Icon: ArrowRightLeft },
   ];
 
@@ -380,11 +386,19 @@ export default function WarehousePage() {
             <span style={{ display: "flex", alignItems: "center", gap: 6, background: "#EDE9FF", borderRadius: 10, padding: "12px 16px", fontSize: 14, color: "var(--brand-purple)", fontWeight: 500 }}>
               <ClipboardList size={18} /> <strong>Metode FIFO:</strong> Bale ditampilkan dari yang paling lama diproduksi. Pilih bale yang akan dikirim, lalu klik "Proses Pengiriman".
             </span>
-            {selectedIds.length > 0 && (
-              <button onClick={dispatchSelected} className="btn btn-primary" style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 16px" }}>
-                <Truck size={16} /> Proses Pengiriman ({selectedIds.length} bale)
-              </button>
-            )}
+            <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+              <select className="form-input" style={{ width: 300, background: "#fff" }} value={selectedDO} onChange={(e) => setSelectedDO(e.target.value)}>
+                <option value="">-- Pilih Delivery Order (DO) --</option>
+                {scheduledDOs.map((d: any) => (
+                  <option key={d.id} value={d.id}>{d.orderNumber} - {d.customer?.companyName || d.destination}</option>
+                ))}
+              </select>
+              {selectedIds.length > 0 && selectedDO && (
+                <button onClick={dispatchSelected} className="btn btn-primary" style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 16px" }}>
+                  <Truck size={16} /> Masukkan ke Truk ({selectedIds.length} bale)
+                </button>
+              )}
+            </div>
           </div>
           <div className="erp-card">
             <div className="erp-card-header">

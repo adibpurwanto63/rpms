@@ -163,7 +163,32 @@ export class WarehouseService {
     return { reserved: ids.length };
   }
 
-  // ─── DISPATCH / FIFO ─────────────────────────────────────────────────────────
+  // ─── DISPATCH / LOAD DO ──────────────────────────────────────────────────────
+  async loadIntoDO(deliveryOrderId: string, ids: string[], performedBy?: string) {
+    const items = await this.prisma.inventoryItem.findMany({ where: { id: { in: ids } } });
+    await this.prisma.inventoryItem.updateMany({ 
+      where: { id: { in: ids } }, 
+      data: { status: InventoryStatus.RESERVED, deliveryOrderId } 
+    });
+    
+    await this.prisma.stockMovement.createMany({
+      data: items.map((item) => ({
+        inventoryId: item.id,
+        baleId: item.baleId,
+        movementType: "LOAD_DO",
+        fromStatus: item.status,
+        toStatus: InventoryStatus.RESERVED,
+        fromArea: item.area,
+        toArea: item.area,
+        weight: item.weight,
+        notes: `Dimuat ke Delivery Order (ID: ${deliveryOrderId})`,
+        performedBy,
+      })),
+    });
+    return { loaded: ids.length, deliveryOrderId };
+  }
+
+  // legacy dispatch (direct to shipped without DO) - left for backwards compatibility
   async dispatchItems(ids: string[], performedBy?: string) {
     const items = await this.prisma.inventoryItem.findMany({ where: { id: { in: ids } } });
     await this.prisma.inventoryItem.updateMany({ where: { id: { in: ids } }, data: { status: InventoryStatus.SHIPPED } });

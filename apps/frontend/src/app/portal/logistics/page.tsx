@@ -17,7 +17,7 @@ export default function LogisticsPage() {
   const [showVehicleForm, setShowVehicleForm] = useState(false);
   const [loading, setLoading] = useState(true);
   
-  const [doForm, setDoForm] = useState({ vehicleId: "", destination: "", loadingWeight: "" });
+  const [doForm, setDoForm] = useState({ vehicleId: "", customerId: "", destination: "", loadingWeight: "" });
   const [vehicleForm, setVehicleForm] = useState({ id: "", plate: "", type: "ENGKEL", driverName: "", status: "AVAILABLE" });
   
   const { triggerRefresh } = useRefresh();
@@ -31,9 +31,11 @@ export default function LogisticsPage() {
 
   const submitDo = async (e: React.FormEvent) => {
     e.preventDefault();
-    await api.post("/logistics/deliveries", { ...doForm, loadingWeight: parseFloat(doForm.loadingWeight) });
+    const customer = customers.find(c => c.id === doForm.customerId);
+    const destination = customer ? `${customer.companyName} - ${customer.address}` : doForm.destination;
+    await api.post("/logistics/deliveries", { ...doForm, destination, loadingWeight: parseFloat(doForm.loadingWeight) });
     setShowDoForm(false);
-    setDoForm({ vehicleId: "", destination: "", loadingWeight: "" });
+    setDoForm({ vehicleId: "", customerId: "", destination: "", loadingWeight: "" });
     load();
     triggerRefresh();
   };
@@ -105,8 +107,9 @@ export default function LogisticsPage() {
                 <tr>
                   <th>No. DO</th>
                   <th>Kendaraan & Supir</th>
-                  <th>Tujuan</th>
-                  <th>Berat Muat</th>
+                  <th>Tujuan (Customer)</th>
+                  <th>Muatan (Bale)</th>
+                  <th>Target Berat</th>
                   <th>Tanggal</th>
                   <th>Status / Aksi</th>
                 </tr>
@@ -121,7 +124,11 @@ export default function LogisticsPage() {
                       <div style={{ fontWeight: 600, color: "var(--text-primary)" }}>{d.vehicle?.plate}</div>
                       <div style={{ fontSize: 13, color: "var(--text-secondary)", marginTop: 2 }}>{d.vehicle?.driverName}</div>
                     </td>
-                    <td style={{ color: "var(--text-secondary)" }}>{d.destination}</td>
+                    <td>
+                      <div style={{ fontWeight: 600, color: "var(--text-primary)" }}>{d.customer?.companyName || "Non-Customer"}</div>
+                      <div style={{ fontSize: 12, color: "var(--text-secondary)", marginTop: 2, maxWidth: 200, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }} title={d.destination}>{d.destination}</div>
+                    </td>
+                    <td><span className="badge badge-info" style={{ fontWeight: 700 }}>{d.items?.length || 0} Bale</span></td>
                     <td style={{ fontWeight: 600, color: "var(--brand-teal)" }}>{d.loadingWeight?.toLocaleString("id-ID")} kg</td>
                     <td style={{ color: "var(--text-secondary)", fontSize: 13 }}>{new Date(d.createdAt).toLocaleDateString("id-ID")}</td>
                     <td>
@@ -216,10 +223,10 @@ export default function LogisticsPage() {
                   </div>
                   <div>
                     <label className="form-label">Tujuan (Customer)</label>
-                    <select className="form-input" value={doForm.destination} onChange={e => setDoForm({ ...doForm, destination: e.target.value })} required>
+                    <select className="form-input" value={doForm.customerId} onChange={e => setDoForm({ ...doForm, customerId: e.target.value })} required>
                       <option value="">-- Pilih Customer --</option>
                       {customers.map((c: any) => (
-                        <option key={c.id} value={`${c.companyName} - ${c.address}`}>{c.companyName}</option>
+                        <option key={c.id} value={c.id}>{c.companyName}</option>
                       ))}
                     </select>
                   </div>

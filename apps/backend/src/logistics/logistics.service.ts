@@ -11,7 +11,7 @@ export class LogisticsService {
   getDeliveries(status?: DeliveryStatus) {
     return this.prisma.deliveryOrder.findMany({
       where: status ? { status } : {},
-      include: { vehicle: true },
+      include: { vehicle: true, customer: true, items: true },
       orderBy: { createdAt: "desc" },
     });
   }
@@ -20,7 +20,7 @@ export class LogisticsService {
     const count = await this.prisma.deliveryOrder.count();
     return this.prisma.deliveryOrder.create({
       data: { ...dto, orderNumber: `DO-${new Date().getFullYear()}-${String(count+1).padStart(4,"0")}` },
-      include: { vehicle: true },
+      include: { vehicle: true, customer: true },
     });
   }
 
@@ -38,6 +38,7 @@ export class LogisticsService {
         const doOrder = await tx.deliveryOrder.findUnique({ where: { id } });
         if (doOrder) {
           await tx.vehicle.update({ where: { id: doOrder.vehicleId }, data: { status: 'AVAILABLE' } });
+          await tx.inventoryItem.updateMany({ where: { deliveryOrderId: id }, data: { status: 'IN_STOCK', deliveryOrderId: null } });
           await tx.deliveryOrder.delete({ where: { id } });
         }
         return { deleted: true };
@@ -53,6 +54,7 @@ export class LogisticsService {
 
       if (status === DeliveryStatus.IN_TRANSIT) {
         await tx.vehicle.update({ where: { id: doOrder.vehicleId }, data: { status: 'ON_TRIP' } });
+        await tx.inventoryItem.updateMany({ where: { deliveryOrderId: id }, data: { status: 'SHIPPED' } });
       } else if (status === DeliveryStatus.DELIVERED) {
         await tx.vehicle.update({ where: { id: doOrder.vehicleId }, data: { status: 'AVAILABLE' } });
       }

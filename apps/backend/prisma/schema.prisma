@@ -124,9 +124,11 @@ model InventoryItem {
   approvedBy       String?           @map("approved_by")
   productionId     String?           @map("production_id")
   productionDate   DateTime?         @map("production_date")
+  deliveryOrderId  String?           @map("delivery_order_id")
   createdAt        DateTime          @default(now()) @map("created_at")
   updatedAt        DateTime          @updatedAt @map("updated_at")
   productionRecord ProductionRecord? @relation(fields: [productionId], references: [id])
+  deliveryOrder    DeliveryOrder?    @relation(fields: [deliveryOrderId], references: [id])
   movements        StockMovement[]
 
   @@map("inventory_items")
@@ -168,6 +170,7 @@ model DeliveryOrder {
   id            String         @id @default(cuid())
   orderNumber   String         @unique @map("order_number")
   vehicleId     String         @map("vehicle_id")
+  customerId    String?        @map("customer_id")
   destination   String
   loadingWeight Float          @map("loading_weight")
   loadingTime   DateTime?      @map("loading_time")
@@ -178,6 +181,8 @@ model DeliveryOrder {
   createdAt     DateTime       @default(now()) @map("created_at")
   updatedAt     DateTime       @updatedAt @map("updated_at")
   vehicle       Vehicle        @relation(fields: [vehicleId], references: [id])
+  customer      Customer?      @relation(fields: [customerId], references: [id])
+  items         InventoryItem[]
 
   @@map("delivery_orders")
 }
@@ -272,6 +277,7 @@ model Customer {
   createdAt       DateTime         @default(now()) @map("created_at")
   updatedAt       DateTime         @updatedAt @map("updated_at")
   salesOrders     SalesOrder[]
+  deliveryOrders  DeliveryOrder[]
 
   @@map("customers")
 }

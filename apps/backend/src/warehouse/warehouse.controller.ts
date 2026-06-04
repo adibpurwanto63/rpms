@@ -79,6 +79,12 @@ export class WarehouseController {
     return this.svc.reserveItems(dto.ids, dto.performedBy);
   }
 
+  @Post("load-do")
+  @Roles(UserRole.SUPER_ADMIN, UserRole.WAREHOUSE_SUPERVISOR, UserRole.LOGISTICS_MANAGER)
+  loadIntoDO(@Body() dto: { deliveryOrderId: string; ids: string[]; performedBy?: string }) {
+    return this.svc.loadIntoDO(dto.deliveryOrderId, dto.ids, dto.performedBy);
+  }
+
   @Post("dispatch")
   @Roles(UserRole.SUPER_ADMIN, UserRole.WAREHOUSE_SUPERVISOR, UserRole.LOGISTICS_MANAGER)
   dispatch(@Body() dto: { ids: string[]; performedBy?: string }) {
