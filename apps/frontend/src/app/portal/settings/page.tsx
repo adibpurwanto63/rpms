@@ -296,7 +296,7 @@ export default function SettingsPage() {
                       {currentUser?.role === "SUPER_ADMIN" && (
                         <td style={{ textAlign: "center", paddingRight: 24 }}>
                           {u.id !== currentUser.id ? (
-                            <div style={{ display: "flex", justifyContent: "center", gap: 8 }}>
+                            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 8 }}>
                               <button 
                                 onClick={() => toggleActive(u.id, u.isActive)} 
                                 title={u.isActive ? "Nonaktifkan Akses" : "Aktifkan Akses"}
