@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
 import { useRefresh } from "@/lib/refresh-context";
-import { ArrowDownToLine, ArrowUpFromLine, Package, BarChart2 } from "lucide-react";
+import { ArrowDownToLine, ArrowUpFromLine, Package, BarChart2, Factory, Save, Trash2, Edit2 } from "lucide-react";
 
 const machineStatusColor: any = { RUNNING: "badge-success", IDLE: "badge-neutral", MAINTENANCE: "badge-warning", BREAKDOWN: "badge-danger" };
 const machineStatusLabel: any = { RUNNING: "Berjalan", IDLE: "Standby", MAINTENANCE: "Maintenance", BREAKDOWN: "Rusak" };
@@ -116,7 +116,7 @@ export default function ProductionPage() {
         {machines.map((m: any) => (
           <div key={m.id} className="erp-card" style={{ padding: "16px", background: "var(--bg-card)", display: "flex", flexDirection: "column", gap: 8 }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <span style={{ fontSize: "1.5rem" }}>🏭</span>
+              <Factory size={24} color="var(--color-primary)" />
               <select 
                 className={`badge ${machineStatusColor[m.status]}`}
                 style={{ border: "none", outline: "none", cursor: "pointer", fontWeight: 600 }}
@@ -192,7 +192,7 @@ export default function ProductionPage() {
                 </div>
                 <div style={{ paddingTop: 20, borderTop: "1px solid var(--border-light)", display: "flex", gap: 12, justifyContent: "flex-end" }}>
                   <button type="button" className="btn btn-secondary" onClick={() => setShowForm(false)}>Batal</button>
-                  <button type="submit" className="btn btn-primary" style={{ padding: "0 24px" }}>💾 Simpan Catatan</button>
+                  <button type="submit" className="btn btn-primary" style={{ padding: "8px 24px", display: "flex", alignItems: "center", gap: 6 }}><Save size={16} /> Simpan Catatan</button>
                 </div>
               </form>
             </div>
@@ -247,8 +247,8 @@ export default function ProductionPage() {
                     <td style={{ color: "var(--text-secondary)", fontSize: 13 }}>{new Date(r.date).toLocaleDateString("id-ID")}</td>
                     <td>
                       <div style={{ display: "flex", gap: 6 }}>
-                        <button onClick={() => openForm(r)} className="btn btn-secondary" style={{ padding: "4px 8px", fontSize: 12 }}>Edit</button>
-                        <button onClick={() => deleteRecord(r.id)} style={{ padding: "4px 8px", fontSize: 12, border: "1px solid red", color: "red", background: "none", borderRadius: 6, cursor: "pointer" }}>Hapus</button>
+                        <button onClick={() => openForm(r)} className="btn btn-secondary" style={{ padding: "4px 8px", fontSize: 12, display: "flex", alignItems: "center", gap: 4 }}><Edit2 size={12} /> Edit</button>
+                        <button onClick={() => deleteRecord(r.id)} style={{ padding: "4px 8px", fontSize: 12, border: "1px solid red", color: "red", background: "none", borderRadius: 6, cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}><Trash2 size={12} /> Hapus</button>
                       </div>
                     </td>
                   </tr>

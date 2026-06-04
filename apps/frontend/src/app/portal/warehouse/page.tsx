@@ -1,15 +1,16 @@
 "use client";
 import { useEffect, useState, useCallback } from "react";
 import api from "@/lib/api";
+import { LayoutDashboard, Download, Package, Truck, ArrowRightLeft, AlertTriangle, Pin, ClipboardList, CheckCircle2 } from "lucide-react";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const gradeColor: any = { A: "badge-success", B: "badge-warning", REJECT: "badge-danger" };
 const statusColor: any = { IN_STOCK: "badge-success", RESERVED: "badge-info", SHIPPED: "badge-neutral", DAMAGED: "badge-danger" };
 const areaLabel: any = { RAW_MATERIAL: "Bahan Baku", FINISHED_GOODS: "Barang Jadi", REJECTED: "Reject" };
 const mvtLabel: any = {
-  INBOUND_PENDING: "📥 Penerimaan (Pending)", INBOUND_APPROVED: "✅ Penerimaan Disetujui",
-  INBOUND_REJECTED: "❌ Penerimaan Ditolak", MOVE: "🔄 Pemindahan", RESERVE: "📌 Reservasi",
-  OUTBOUND: "🚛 Pengiriman (Outbound)",
+  INBOUND_PENDING: "Penerimaan (Pending)", INBOUND_APPROVED: "Penerimaan Disetujui",
+  INBOUND_REJECTED: "Penerimaan Ditolak", MOVE: "Pemindahan", RESERVE: "Reservasi",
+  OUTBOUND: "Pengiriman (Outbound)",
 };
 
 type Tab = "DASHBOARD" | "INBOUND" | "STOCK" | "OUTBOUND" | "MOVEMENTS";
@@ -113,12 +114,12 @@ export default function WarehousePage() {
   const reservedCount = inventory.filter(i => i.status === "RESERVED").length;
 
   // ─── Tab Definitions ─────────────────────────────────────────────────────────
-  const tabs: { id: Tab; label: string; badge?: number }[] = [
-    { id: "DASHBOARD", label: "📊 Dashboard" },
-    { id: "INBOUND", label: "📥 Penerimaan", badge: pendingItems.length },
-    { id: "STOCK", label: "📦 Stok Bale" },
-    { id: "OUTBOUND", label: "🚛 Pengeluaran (FIFO)" },
-    { id: "MOVEMENTS", label: "📋 Mutasi Stok" },
+  const tabs: { id: Tab; label: string; Icon: any; badge?: number }[] = [
+    { id: "DASHBOARD", label: "Dashboard", Icon: LayoutDashboard },
+    { id: "INBOUND", label: "Penerimaan", Icon: Download, badge: pendingItems.length },
+    { id: "STOCK", label: "Stok Bale", Icon: Package },
+    { id: "OUTBOUND", label: "Pengeluaran (FIFO)", Icon: Truck },
+    { id: "MOVEMENTS", label: "Mutasi Stok", Icon: ArrowRightLeft },
   ];
 
   return (
@@ -149,7 +150,7 @@ export default function WarehousePage() {
               transition: "all 0.2s", display: "flex", alignItems: "center", gap: 6,
             }}
           >
-            {tab.label}
+            <tab.Icon size={16} /> {tab.label}
             {tab.badge ? (
               <span style={{ background: "#ef4444", color: "#fff", borderRadius: 999, fontSize: 11, fontWeight: 700, padding: "1px 6px" }}>
                 {tab.badge}
@@ -212,7 +213,9 @@ export default function WarehousePage() {
             <div className="erp-card animate-fade-in">
               <div className="erp-card-header">
                 <span className="erp-card-title">Form Penerimaan Bale Baru</span>
-                <span style={{ fontSize: 12, color: "var(--text-secondary)", marginLeft: 12 }}>⚠️ Memerlukan persetujuan Supervisor</span>
+                <span style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 12, color: "var(--text-secondary)", marginLeft: 12 }}>
+                  <AlertTriangle size={14} /> Memerlukan persetujuan Supervisor
+                </span>
               </div>
               <div className="erp-card-body" style={{ padding: 24 }}>
                 <form onSubmit={submitInbound}>
@@ -248,7 +251,7 @@ export default function WarehousePage() {
                   </div>
                   <div style={{ display: "flex", gap: 12, justifyContent: "flex-end", borderTop: "1px solid var(--border-light)", paddingTop: 16 }}>
                     <button type="button" className="btn btn-secondary" onClick={() => setShowInboundForm(false)}>Batal</button>
-                    <button type="submit" className="btn btn-primary">📥 Kirim untuk Approval</button>
+                    <button type="submit" className="btn btn-primary" style={{ display: "flex", alignItems: "center", gap: 6 }}><Download size={16} /> Kirim untuk Approval</button>
                   </div>
                 </form>
               </div>
@@ -268,7 +271,7 @@ export default function WarehousePage() {
                 </thead>
                 <tbody>
                   {pendingItems.length === 0 ? (
-                    <tr><td colSpan={6} style={{ textAlign: "center", padding: "2rem", color: "var(--text-muted)" }}>✅ Tidak ada penerimaan yang menunggu persetujuan</td></tr>
+                    <tr><td colSpan={6} style={{ textAlign: "center", padding: "2rem", color: "var(--text-muted)" }}>Tidak ada penerimaan yang menunggu persetujuan</td></tr>
                   ) : pendingItems.map((item: any) => (
                     <tr key={item.id}>
                       <td style={{ fontWeight: 600, color: "var(--brand-purple)" }}>{item.baleId}</td>
@@ -328,11 +331,11 @@ export default function WarehousePage() {
                 </select>
                 {selectedIds.length > 0 && (
                   <>
-                    <button onClick={reserveSelected} style={{ padding: "8px 14px", borderRadius: 6, background: "#6366f1", color: "#fff", border: "none", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
-                      📌 Reservasi ({selectedIds.length})
+                    <button onClick={reserveSelected} className="btn btn-secondary" style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 12px", fontSize: 13 }}>
+                      <Pin size={14} /> Reservasi ({selectedIds.length})
                     </button>
-                    <button onClick={() => { setMoveForm({ ...moveForm, id: selectedIds[0] }); setShowMoveModal(true); }} style={{ padding: "8px 14px", borderRadius: 6, background: "var(--brand-teal)", color: "#fff", border: "none", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
-                      🔄 Pindah
+                    <button onClick={() => { setMoveForm({ ...moveForm, id: selectedIds[0] }); setShowMoveModal(true); }} className="btn btn-secondary" style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 12px", fontSize: 13 }}>
+                      <ArrowRightLeft size={14} /> Pindah
                     </button>
                   </>
                 )}
@@ -373,16 +376,16 @@ export default function WarehousePage() {
       {/* ── TAB: OUTBOUND FIFO ────────────────────────────────────────────────── */}
       {activeTab === "OUTBOUND" && (
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ background: "#EDE9FF", borderRadius: 10, padding: "12px 16px", fontSize: 14, color: "var(--brand-purple)", fontWeight: 500 }}>
-            📋 <strong>Metode FIFO:</strong> Bale ditampilkan dari yang paling lama diproduksi. Pilih bale yang akan dikirim, lalu klik "Proses Pengiriman".
-          </div>
-          {selectedIds.length > 0 && (
-            <div style={{ display: "flex", justifyContent: "flex-end" }}>
-              <button onClick={dispatchSelected} style={{ padding: "10px 20px", borderRadius: 8, background: "var(--brand-purple)", color: "#fff", border: "none", fontSize: 14, fontWeight: 700, cursor: "pointer" }}>
-                🚛 Proses Pengiriman ({selectedIds.length} bale)
+          <div className="erp-card-header" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <span style={{ display: "flex", alignItems: "center", gap: 6, background: "#EDE9FF", borderRadius: 10, padding: "12px 16px", fontSize: 14, color: "var(--brand-purple)", fontWeight: 500 }}>
+              <ClipboardList size={18} /> <strong>Metode FIFO:</strong> Bale ditampilkan dari yang paling lama diproduksi. Pilih bale yang akan dikirim, lalu klik "Proses Pengiriman".
+            </span>
+            {selectedIds.length > 0 && (
+              <button onClick={dispatchSelected} className="btn btn-primary" style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 16px" }}>
+                <Truck size={16} /> Proses Pengiriman ({selectedIds.length} bale)
               </button>
-            </div>
-          )}
+            )}
+          </div>
           <div className="erp-card">
             <div className="erp-card-header">
               <span className="erp-card-title">Antrian FIFO — Siap Kirim</span>
@@ -482,7 +485,7 @@ export default function WarehousePage() {
                 </div>
                 <div style={{ display: "flex", gap: 12, justifyContent: "flex-end", marginTop: 24, borderTop: "1px solid var(--border-light)", paddingTop: 16 }}>
                   <button type="button" className="btn btn-secondary" onClick={() => setShowMoveModal(false)}>Batal</button>
-                  <button type="submit" className="btn btn-primary">🔄 Proses Pemindahan</button>
+                  <button type="submit" className="btn btn-primary" style={{ display: "flex", alignItems: "center", gap: 6 }}><ArrowRightLeft size={16} /> Proses Pemindahan</button>
                 </div>
               </form>
             </div>
