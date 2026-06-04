@@ -44,15 +44,20 @@ export default function LoginPage() {
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
-      background: "#F1F5F9",
+      background: "linear-gradient(135deg, #0F172A 0%, #1E293B 100%)",
       fontFamily: "'Inter', -apple-system, sans-serif",
       position: "relative",
       padding: 24,
+      overflow: "hidden"
     }}>
-      {/* Light modern grid background */}
+      {/* Ambient Glow Effects */}
+      <div style={{ position: "absolute", top: "5%", left: "10%", width: 600, height: 600, borderRadius: "50%", background: "radial-gradient(circle, rgba(124,111,224,0.15) 0%, rgba(124,111,224,0) 60%)", pointerEvents: "none" }} />
+      <div style={{ position: "absolute", bottom: "5%", right: "10%", width: 700, height: 700, borderRadius: "50%", background: "radial-gradient(circle, rgba(78,205,196,0.12) 0%, rgba(78,205,196,0) 60%)", pointerEvents: "none" }} />
+
+      {/* Modern dark grid background */}
       <div style={{
         position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
-        backgroundImage: "linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px)",
+        backgroundImage: "linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)",
         backgroundSize: "40px 40px",
         pointerEvents: "none"
       }} />
