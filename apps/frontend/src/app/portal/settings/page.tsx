@@ -29,17 +29,40 @@ export default function SettingsPage() {
     const file = e.target.files?.[0];
     if (!file || !currentUser) return;
     
-    // Convert to base64
+    // Resize image using Canvas to save DB space and bandwidth
     const reader = new FileReader();
-    reader.onloadend = async () => {
-      const base64String = reader.result as string;
-      try {
-        await api.put(`/users/${currentUser.id}`, { avatarUrl: base64String });
-        alert("Foto profil berhasil diperbarui! Silakan refresh halaman jika foto belum berubah.");
-        window.location.reload(); // Quick way to reload context
-      } catch (err) {
-        alert("Gagal mengunggah foto.");
-      }
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = async () => {
+        const canvas = document.createElement("canvas");
+        const MAX_WIDTH = 250;
+        const MAX_HEIGHT = 250;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+        } else {
+          if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        ctx?.drawImage(img, 0, 0, width, height);
+        
+        // Compress to JPEG with 0.8 quality
+        const base64String = canvas.toDataURL("image/jpeg", 0.8);
+        
+        try {
+          await api.put(`/users/me/avatar`, { avatarUrl: base64String });
+          alert("Foto profil berhasil diperbarui! Silakan refresh halaman.");
+          window.location.reload(); 
+        } catch (err) {
+          console.error(err);
+          alert("Gagal mengunggah foto. Pastikan koneksi lancar.");
+        }
+      };
+      img.src = event.target?.result as string;
     };
     reader.readAsDataURL(file);
   };
