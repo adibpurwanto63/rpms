@@ -6,6 +6,7 @@ import Link from "next/link";
 import { canAccess } from "@/lib/permissions";
 import { RefreshProvider } from "@/lib/refresh-context";
 import GlobalSearch from "@/components/GlobalSearch";
+import api from "@/lib/api";
 
 const navItems = [
   { href: "/portal/dashboard", icon: "⊞", label: "Dashboard", module: "dashboard" },
