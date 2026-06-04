@@ -19,6 +19,10 @@ export class BcpService {
     return this.prisma.incident.update({ where: { id }, data: { status: IncidentStatus.RESOLVED, resolvedAt: new Date() } });
   }
 
+  updateIncidentStatus(id: string, status: IncidentStatus) {
+    return this.prisma.incident.update({ where: { id }, data: { status, resolvedAt: status === IncidentStatus.RESOLVED || status === IncidentStatus.CLOSED ? new Date() : null } });
+  }
+
   getRiskRegister() { return this.prisma.riskRegister.findMany({ orderBy: { createdAt: "desc" } }); }
   createRisk(dto: any) { return this.prisma.riskRegister.create({ data: dto }); }
 

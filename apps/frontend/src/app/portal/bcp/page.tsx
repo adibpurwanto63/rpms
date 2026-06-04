@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
 import { useRefresh } from "@/lib/refresh-context";
+import { useAuth } from "@/lib/auth-context";
 import { AlertTriangle, Siren, TrendingUp } from "lucide-react";
 
 const sevColor: any = { LOW: "badge-info", MEDIUM: "badge-warning", HIGH: "badge-pink", CRITICAL: "badge-danger" };
@@ -16,6 +17,7 @@ export default function BcpPage() {
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ type: "DOWNTIME", severity: "MEDIUM", title: "", description: "" });
   const { triggerRefresh } = useRefresh();
+  const { user: currentUser } = useAuth();
 
   const load = () => {
     Promise.all([api.get("/bcp/incidents"), api.get("/bcp/risks"), api.get("/bcp/alerts")])
@@ -33,6 +35,12 @@ export default function BcpPage() {
 
   const resolve = async (id: string) => {
     await api.put(`/bcp/incidents/${id}/resolve`);
+    load();
+    triggerRefresh();
+  };
+
+  const updateStatus = async (id: string, status: string) => {
+    await api.put(`/bcp/incidents/${id}`, { status });
     load();
     triggerRefresh();
   };
@@ -153,8 +161,21 @@ export default function BcpPage() {
                   <p style={{ fontSize: 13, color: "var(--text-secondary)", marginBottom: 12 }}>{inc.description}</p>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: 12, borderTop: "1px solid var(--border-light)" }}>
                     <span style={{ fontSize: 12, color: "var(--text-muted)" }}>Dilaporkan: {new Date(inc.createdAt).toLocaleDateString("id-ID")}</span>
-                    {inc.status === "OPEN" && (
-                      <button onClick={() => resolve(inc.id)} style={{ background: "transparent", border: "none", color: "var(--brand-teal)", fontWeight: 600, fontSize: 13, cursor: "pointer" }}>✓ Tandai Selesai</button>
+                    {(currentUser?.role === "SUPER_ADMIN" || currentUser?.role === "DIRECTOR") ? (
+                      <select 
+                        style={{ fontSize: 12, padding: "2px 6px", borderRadius: 4, border: "1px solid var(--border-light)", background: "var(--bg-light)", color: "var(--text-primary)" }}
+                        value={inc.status} 
+                        onChange={(e) => updateStatus(inc.id, e.target.value)}
+                      >
+                        <option value="OPEN">Open</option>
+                        <option value="IN_PROGRESS">In Progress</option>
+                        <option value="RESOLVED">Resolved</option>
+                        <option value="CLOSED">Closed</option>
+                      </select>
+                    ) : (
+                      inc.status === "OPEN" && (
+                        <button onClick={() => resolve(inc.id)} style={{ background: "transparent", border: "none", color: "var(--brand-teal)", fontWeight: 600, fontSize: 13, cursor: "pointer" }}>✓ Tandai Selesai</button>
+                      )
                     )}
                   </div>
                 </div>

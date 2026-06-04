@@ -15,11 +15,9 @@ export class BcpController {
   constructor(private svc: BcpService) {}
 
   @Get("alerts")
-  @Roles(UserRole.SUPER_ADMIN, UserRole.DIRECTOR)
   alertSummary() { return this.svc.alertSummary(); }
 
   @Get("incidents")
-  @Roles(UserRole.SUPER_ADMIN, UserRole.DIRECTOR)
   getIncidents(@Query("status") status?: IncidentStatus) { return this.svc.getIncidents(status); }
 
   @Post("incidents")
@@ -32,8 +30,13 @@ export class BcpController {
   @Roles(UserRole.SUPER_ADMIN, UserRole.DIRECTOR)
   resolve(@Param("id") id: string) { return this.svc.resolveIncident(id); }
 
-  @Get("risks")
+  @Put("incidents/:id")
   @Roles(UserRole.SUPER_ADMIN, UserRole.DIRECTOR)
+  updateStatus(@Param("id") id: string, @Body("status") status: IncidentStatus) {
+    return this.svc.updateIncidentStatus(id, status);
+  }
+
+  @Get("risks")
   getRisks() { return this.svc.getRiskRegister(); }
 
   @Post("risks")
