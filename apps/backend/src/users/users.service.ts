@@ -43,4 +43,8 @@ export class UsersService {
     const hash = await bcrypt.hash(password, 12);
     return this.prisma.user.update({ where: { id }, data: { passwordHash: hash } });
   }
+
+  async remove(id: string) {
+    return this.prisma.user.delete({ where: { id } });
+  }
 }

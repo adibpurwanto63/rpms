@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
 import { useAuth } from "@/lib/auth-context";
-import { UserPlus, Shield, Mail, Lock, User, CheckCircle, XCircle, Settings } from "lucide-react";
+import { UserPlus, Shield, Mail, Lock, User, CheckCircle, XCircle, Settings, Edit2, Trash2, Power } from "lucide-react";
 
 const roleColors: Record<string, string> = {
   SUPER_ADMIN: "#7C6FE0", DIRECTOR: "#4ECDC4", FINANCE_MANAGER: "#FF6B9D",
@@ -15,7 +15,8 @@ export default function SettingsPage() {
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ name:"", email:"", password:"Admin@123", role:"PROCUREMENT_MANAGER" });
+  const [editId, setEditId] = useState<string | null>(null);
+  const [form, setForm] = useState({ name:"", email:"", password:"", role:"PROCUREMENT_MANAGER" });
   const { user: currentUser } = useAuth();
 
   const load = () => {
@@ -23,17 +24,41 @@ export default function SettingsPage() {
   };
   useEffect(() => { load(); }, []);
 
+  const openAddUser = () => {
+    setEditId(null);
+    setForm({ name:"", email:"", password:"", role:"PROCUREMENT_MANAGER" });
+    setShowForm(true);
+  };
+
+  const openEditUser = (user: any) => {
+    setEditId(user.id);
+    setForm({ name: user.name, email: user.email, password: "", role: user.role });
+    setShowForm(true);
+  };
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await api.post("/users", form);
+    if (editId) {
+      const payload: any = { name: form.name, email: form.email, role: form.role };
+      if (form.password) payload.password = form.password; // only update password if provided
+      await api.put(`/users/${editId}`, payload);
+    } else {
+      await api.post("/users", form);
+    }
     setShowForm(false);
-    setForm({ name:"", email:"", password:"Admin@123", role:"PROCUREMENT_MANAGER" });
     load();
   };
 
   const toggleActive = async (id: string, isActive: boolean) => {
     await api.put(`/users/${id}`, { isActive: !isActive });
     load();
+  };
+
+  const deleteUser = async (id: string) => {
+    if (confirm("Apakah Anda yakin ingin menghapus pengguna ini permanen?")) {
+      await api.delete(`/users/${id}`);
+      load();
+    }
   };
 
   const roles = ["SUPER_ADMIN","DIRECTOR","FINANCE_MANAGER","PROCUREMENT_MANAGER","QC_OFFICER","PRODUCTION_SUPERVISOR","WAREHOUSE_SUPERVISOR","LOGISTICS_MANAGER","SUPPLIER"];
@@ -51,8 +76,8 @@ export default function SettingsPage() {
           </div>
         </div>
         {currentUser?.role === "SUPER_ADMIN" && (
-          <button className="btn btn-primary" onClick={() => setShowForm(!showForm)} style={{ display: "flex", alignItems: "center", gap: 8, padding: "0 20px" }}>
-            {showForm ? "✕ Batal" : <><UserPlus size={18} /> <span>Tambah Pengguna</span></>}
+          <button className="btn btn-primary" onClick={openAddUser} style={{ display: "flex", alignItems: "center", gap: 8, padding: "0 20px" }}>
+            <UserPlus size={18} /> <span>Tambah Pengguna</span>
           </button>
         )}
       </div>
@@ -67,8 +92,8 @@ export default function SettingsPage() {
           <div className="erp-card animate-fade-in" style={{ width: "100%", maxWidth: 600, margin: 20, maxHeight: "90vh", overflowY: "auto", border: "none", boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}>
             <div className="erp-card-header" style={{ position: "sticky", top: 0, background: "#fff", zIndex: 10, display: "flex", justifyContent: "space-between", alignItems: "center", padding: "20px 24px", borderBottom: "1px solid var(--border-light)" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <UserPlus size={20} color="var(--color-primary)" />
-                <h3 className="erp-card-title" style={{ fontSize: 18, margin: 0 }}>Tambah Pengguna Baru</h3>
+                {editId ? <Edit2 size={20} color="var(--color-primary)" /> : <UserPlus size={20} color="var(--color-primary)" />}
+                <h3 className="erp-card-title" style={{ fontSize: 18, margin: 0 }}>{editId ? "Edit Pengguna" : "Tambah Pengguna Baru"}</h3>
               </div>
               <button type="button" onClick={() => setShowForm(false)} style={{ background: "transparent", border: "none", fontSize: 20, cursor: "pointer", color: "var(--text-muted)" }}>✕</button>
             </div>
@@ -84,8 +109,8 @@ export default function SettingsPage() {
                     <input className="form-input" type="email" value={form.email} onChange={e => setForm({...form, email: e.target.value})} placeholder="user@rpms.id" required />
                   </div>
                   <div>
-                    <label className="form-label" style={{ display: "flex", alignItems: "center", gap: 6 }}><Lock size={14} /> Password</label>
-                    <input className="form-input" type="password" value={form.password} onChange={e => setForm({...form, password: e.target.value})} required />
+                    <label className="form-label" style={{ display: "flex", alignItems: "center", gap: 6 }}><Lock size={14} /> Password {editId && <span style={{ fontSize: 11, fontWeight: "normal", color: "var(--text-muted)" }}>(Kosongkan jika tidak ingin diubah)</span>}</label>
+                    <input className="form-input" type="password" value={form.password} onChange={e => setForm({...form, password: e.target.value})} required={!editId} placeholder={editId ? "Kosongkan untuk tetap menggunakan sandi lama" : "Buat kata sandi"} />
                   </div>
                   <div style={{ gridColumn: "span 2" }}>
                     <label className="form-label" style={{ display: "flex", alignItems: "center", gap: 6 }}><Shield size={14} /> Hak Akses (Role)</label>
@@ -159,22 +184,56 @@ export default function SettingsPage() {
                       {currentUser?.role === "SUPER_ADMIN" && (
                         <td style={{ textAlign: "right", paddingRight: 24 }}>
                           {u.id !== currentUser.id ? (
-                            <button 
-                              onClick={() => toggleActive(u.id, u.isActive)} 
-                              style={{ 
-                                background: u.isActive ? "var(--color-red-light)" : "var(--color-green-light)", 
-                                border: "none", 
-                                padding: "6px 12px",
-                                borderRadius: 6,
-                                fontSize: 12, 
-                                fontWeight: 600, 
-                                cursor: "pointer", 
-                                color: u.isActive ? "var(--color-red)" : "var(--color-green)",
-                                transition: "all 0.2s"
-                              }}
-                            >
-                              {u.isActive ? "Nonaktifkan" : "Aktifkan"}
-                            </button>
+                            <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
+                              <button 
+                                onClick={() => toggleActive(u.id, u.isActive)} 
+                                title={u.isActive ? "Nonaktifkan Akses" : "Aktifkan Akses"}
+                                style={{ 
+                                  background: u.isActive ? "var(--color-red-light)" : "var(--color-green-light)", 
+                                  border: "none", 
+                                  width: 32, height: 32,
+                                  display: "flex", alignItems: "center", justifyContent: "center",
+                                  borderRadius: 6,
+                                  cursor: "pointer", 
+                                  color: u.isActive ? "var(--color-red)" : "var(--color-green)",
+                                  transition: "all 0.2s"
+                                }}
+                              >
+                                <Power size={16} />
+                              </button>
+                              <button 
+                                onClick={() => openEditUser(u)}
+                                title="Edit Pengguna"
+                                style={{ 
+                                  background: "var(--bg-secondary)", 
+                                  border: "none", 
+                                  width: 32, height: 32,
+                                  display: "flex", alignItems: "center", justifyContent: "center",
+                                  borderRadius: 6,
+                                  cursor: "pointer", 
+                                  color: "var(--text-secondary)",
+                                  transition: "all 0.2s"
+                                }}
+                              >
+                                <Edit2 size={16} />
+                              </button>
+                              <button 
+                                onClick={() => deleteUser(u.id)}
+                                title="Hapus Pengguna"
+                                style={{ 
+                                  background: "var(--color-red-light)", 
+                                  border: "none", 
+                                  width: 32, height: 32,
+                                  display: "flex", alignItems: "center", justifyContent: "center",
+                                  borderRadius: 6,
+                                  cursor: "pointer", 
+                                  color: "var(--color-red)",
+                                  transition: "all 0.2s"
+                                }}
+                              >
+                                <Trash2 size={16} />
+                              </button>
+                            </div>
                           ) : (
                             <span style={{ fontSize: 12, color: "var(--text-muted)", fontStyle: "italic" }}>-</span>
                           )}
