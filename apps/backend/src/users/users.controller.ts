@@ -5,6 +5,12 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '@prisma/client';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { IsString } from 'class-validator';
+
+export class UpdateAvatarDto {
+  @IsString()
+  avatarUrl: string;
+}
 
 @ApiTags('Users')
 @ApiBearerAuth()
@@ -12,6 +18,11 @@ import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 @Controller('users')
 export class UsersController {
   constructor(private usersService: UsersService) {}
+
+  @Put('me/avatar')
+  updateAvatar(@Request() req: any, @Body() dto: UpdateAvatarDto) {
+    return this.usersService.update(req.user.id, { avatarUrl: dto.avatarUrl });
+  }
 
   @Get()
   @Roles(UserRole.SUPER_ADMIN)
@@ -43,10 +54,5 @@ export class UsersController {
   @Roles(UserRole.SUPER_ADMIN)
   remove(@Param('id') id: string) {
     return this.usersService.remove(id);
-  }
-
-  @Put('me/avatar')
-  updateAvatar(@Request() req: any, @Body() dto: { avatarUrl: string }) {
-    return this.usersService.update(req.user.id, { avatarUrl: dto.avatarUrl });
   }
 }
