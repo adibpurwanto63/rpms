@@ -125,8 +125,25 @@ export default function SettingsPage() {
           </div>
         </div>
         {currentUser?.role === "SUPER_ADMIN" && (
-          <button className="btn btn-primary" onClick={openAddUser} style={{ display: "flex", alignItems: "center", gap: 8, padding: "0 20px" }}>
-            <Plus size={18} strokeWidth={2.5} /> <span>Tambah Pengguna</span>
+          <button 
+            className="btn btn-primary" 
+            onClick={openAddUser} 
+            style={{ 
+              display: "flex", alignItems: "center", gap: 8, padding: "10px 22px", 
+              borderRadius: "100px", fontWeight: 600, fontSize: 14,
+              boxShadow: "0 4px 14px rgba(36, 144, 239, 0.3)",
+              transition: "all 0.2s ease"
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.transform = "translateY(-2px)";
+              e.currentTarget.style.boxShadow = "0 6px 20px rgba(36, 144, 239, 0.4)";
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "0 4px 14px rgba(36, 144, 239, 0.3)";
+            }}
+          >
+            <Plus size={18} strokeWidth={3} /> <span>Tambah Pengguna</span>
           </button>
         )}
       </div>
@@ -242,7 +259,7 @@ export default function SettingsPage() {
                   <th>ROLE</th>
                   <th>STATUS</th>
                   <th>TERDAFTAR</th>
-                  {currentUser?.role === "SUPER_ADMIN" && <th style={{ textAlign: "right", paddingRight: 24 }}>AKSI</th>}
+                  {currentUser?.role === "SUPER_ADMIN" && <th style={{ textAlign: "center", paddingRight: 24 }}>AKSI</th>}
                 </tr>
               </thead>
               <tbody>
