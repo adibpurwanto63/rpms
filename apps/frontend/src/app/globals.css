@@ -145,8 +145,6 @@ body {
 .kpi-card:hover { box-shadow: var(--shadow-card-hover); }
 
 .kpi-card-dark {
-  background: var(--kpi-dark);
-  border-color: transparent;
   border-left-color: var(--color-primary);
 }
 .kpi-card-mint  { border-left-color: var(--color-teal); }
@@ -171,7 +169,6 @@ body {
   letter-spacing: 0.06em;
   color: var(--text-secondary);
 }
-.kpi-card-dark .kpi-label { color: rgba(255,255,255,0.55); }
 
 .kpi-value {
   font-size: 1.5rem;
@@ -180,7 +177,6 @@ body {
   letter-spacing: -0.02em;
   line-height: 1.2;
 }
-.kpi-card-dark .kpi-value { color: #FFFFFF; }
 
 .kpi-trend {
   font-size: 0.6875rem;
@@ -196,7 +192,6 @@ body {
   font-size: 0.6875rem;
   color: var(--text-muted);
 }
-.kpi-card-dark .kpi-trend-label { color: rgba(255,255,255,0.45); }
 
 /* ============================================
    Badges — Compact ERPNext style
@@ -265,11 +260,11 @@ body {
 .btn-ghost:hover { background: var(--bg-hover); color: var(--text-primary); }
 
 .btn-danger {
-  background: var(--color-red-light);
-  color: var(--color-red);
+  background: var(--color-red);
+  color: #fff;
   border-color: transparent;
 }
-.btn-danger:hover { background: var(--color-red); color: #fff; }
+.btn-danger:hover { background: #E03131; color: #fff; }
 
 .btn-sm { padding: 0.3rem 0.625rem; font-size: 0.75rem; }
 
