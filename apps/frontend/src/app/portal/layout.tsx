@@ -5,7 +5,6 @@ import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import { canAccess } from "@/lib/permissions";
 import { RefreshProvider } from "@/lib/refresh-context";
-import GlobalSearch from "@/components/GlobalSearch";
 import api from "@/lib/api";
 import {
   LayoutDashboard, ShoppingCart, Scale, ShoppingBag, Factory,
@@ -150,8 +149,6 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
           )}
         </div>
 
-        {/* Search bar */}
-        {!collapsed && <GlobalSearch />}
 
         {/* Navigation */}
         <nav style={{ flex: 1, overflowY: "auto", padding: collapsed ? "8px 6px" : "8px 0" }}>
@@ -178,6 +175,7 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
                   textDecoration: "none",
                   background: active ? "rgba(36,144,239,0.07)" : "transparent",
                   borderLeft: active ? "3px solid var(--color-primary)" : "3px solid transparent",
+                  borderBottom: "1px solid var(--border-light)",
                   transition: "all 0.12s ease",
                   whiteSpace: "nowrap",
                 }}
