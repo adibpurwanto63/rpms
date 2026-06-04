@@ -16,7 +16,8 @@ export class DashboardService {
       todayPurchase, todayProduction, todayShipment,
       inventory, ar, ap, incidents, recentTickets, recentProduction,
       pendingPO, recentPO, totalPO, totalSpend,
-      pendingSO, recentSO, totalSO, totalRevenue
+      pendingSO, recentSO, totalSO, totalRevenue,
+      deliveryStats
     ] = await Promise.all([
       this.prisma.weighingTicket.aggregate({ where: { date: { gte: today, lt: tomorrow } }, _count: true, _sum: { netWeight: true } }),
       this.prisma.productionRecord.aggregate({ where: { date: { gte: today, lt: tomorrow } }, _sum: { outputWeight: true, baleCount: true }, _avg: { oee: true } }),
@@ -35,12 +36,19 @@ export class DashboardService {
       this.prisma.salesOrder.findMany({ orderBy: { createdAt: "desc" }, take: 5, include: { customer: { select: { companyName: true } } } }),
       this.prisma.salesOrder.count(),
       this.prisma.salesOrder.aggregate({ _sum: { totalAmount: true } }),
+      this.prisma.deliveryOrder.groupBy({ by: ['status'], _count: true }),
     ]);
 
     const revenue = ar._sum.amount || 0;
     const totalAR = revenue - (ar._sum.paidAmount || 0);
     const totalAP = (ap._sum.amount || 0) - (ap._sum.paidAmount || 0);
     const cashPosition = (ar._sum.paidAmount || 0) - (ap._sum.paidAmount || 0);
+
+    const delivered = deliveryStats.find(s => s.status === 'DELIVERED')?._count || 0;
+    const inTransit = deliveryStats.find(s => s.status === 'IN_TRANSIT')?._count || 0;
+    const cancelled = deliveryStats.find(s => s.status === 'CANCELLED')?._count || 0;
+    // Add default values if all zero so chart doesn't break
+    const hasDeliveryData = delivered > 0 || inTransit > 0 || cancelled > 0;
 
     return {
       todayPurchase: { count: todayPurchase._count, weight: todayPurchase._sum.netWeight || 0 },
@@ -62,7 +70,16 @@ export class DashboardService {
         recentSO,
         totalSO,
         totalRevenue: totalRevenue._sum.totalAmount || 0,
-      }
+      },
+      salesAnalytics: hasDeliveryData ? [
+        { name: "Selesai", value: delivered },
+        { name: "Distribusi", value: inTransit },
+        { name: "Dikembalikan", value: cancelled }
+      ] : [
+        { name: "Selesai", value: 1 },
+        { name: "Distribusi", value: 0 },
+        { name: "Dikembalikan", value: 0 }
+      ]
     };
   }
 

@@ -16,6 +16,7 @@ interface DashData {
   recentProduction: any[];
   pembelian: { pendingPO: number; recentPO: any[]; totalPO: number; totalSpend: number };
   penjualan: { pendingSO: number; recentSO: any[]; totalSO: number; totalRevenue: number };
+  salesAnalytics: { name: string; value: number }[];
 }
 
 const fmt = (n: number) => `${(n / 1000).toFixed(2)} Ton`;
@@ -119,11 +120,13 @@ export default function DashboardPage() {
     neutral: { background: "var(--kpi-neutral-bg)" },
   };
 
-  const donutData = [
-    { name: "Selesai", value: 70 },
-    { name: "Distribusi", value: 15 },
-    { name: "Dikembalikan", value: 15 },
+  const donutData = data.salesAnalytics || [
+    { name: "Selesai", value: 1 },
+    { name: "Distribusi", value: 0 },
+    { name: "Dikembalikan", value: 0 },
   ];
+  
+  const totalSales = donutData.reduce((acc, curr) => acc + curr.value, 0);
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
@@ -290,17 +293,15 @@ export default function DashboardPage() {
             </div>
 
             <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 10 }}>
-              {[
-                { label: "Selesai", pct: "70%", color: DONUT_COLORS[0] },
-                { label: "Distribusi", pct: "15%", color: DONUT_COLORS[1] },
-                { label: "Dikembalikan", pct: "15%", color: DONUT_COLORS[2] },
-              ].map((item, i) => (
+              {donutData.map((item, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <div style={{ width: 8, height: 8, borderRadius: "50%", background: item.color, flexShrink: 0 }} />
-                    <span style={{ fontSize: 13, color: "var(--text-secondary)" }}>{item.label}</span>
+                    <div style={{ width: 8, height: 8, borderRadius: "50%", background: DONUT_COLORS[i % DONUT_COLORS.length], flexShrink: 0 }} />
+                    <div style={{ fontSize: 13, color: "var(--text-secondary)" }}>{item.name}</div>
                   </div>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: item.color }}>{item.pct}</span>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: DONUT_COLORS[i % DONUT_COLORS.length] }}>
+                    {totalSales > 0 ? ((item.value / totalSales) * 100).toFixed(0) + "%" : "0%"}
+                  </div>
                 </div>
               ))}
             </div>
