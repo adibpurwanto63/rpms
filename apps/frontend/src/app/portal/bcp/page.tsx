@@ -61,16 +61,18 @@ export default function BcpPage() {
       {!loading && alerts && (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
           {[
-            { label: "Insiden Terbuka", value: alerts.openIncidents, Icon: AlertTriangle, variant: "dark" },
-            { label: "Insiden Kritis", value: alerts.criticalIncidents, Icon: Siren, variant: "pink" },
-            { label: "Risiko Tinggi", value: alerts.highRiskItems, Icon: TrendingUp, variant: "mint" },
+            { label: "Insiden Terbuka", value: alerts.openIncidents, Icon: AlertTriangle, variant: "dark", colorHex: "#7C6FE0" },
+            { label: "Insiden Kritis", value: alerts.criticalIncidents, Icon: Siren, variant: "pink", colorHex: "#FF6B9D" },
+            { label: "Risiko Tinggi", value: alerts.highRiskItems, Icon: TrendingUp, variant: "mint", colorHex: "#4ECDC4" },
           ].map((k, i) => (
-            <div key={i} className="kpi-card" style={{ background: ({ dark: "var(--kpi-dark)", mint: "var(--kpi-mint-bg)", pink: "var(--kpi-pink-bg)" } as any)[k.variant], borderColor: undefined }}>
+            <div key={i} className={`kpi-card kpi-card-${k.variant}`}>
               <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
-                <span style={{ fontSize: 12, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--text-secondary)" }}>{k.label}</span>
-                <div style={{ width: 36, height: 36, borderRadius: 8, background: k.variant === "mint" ? "rgba(78,205,196,0.15)" : "rgba(255,107,157,0.15)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--color-primary)" }}>{k.Icon && <k.Icon size={18} strokeWidth={2} />}</div>
+                <span className="kpi-label">{k.label}</span>
+                <div className="kpi-card-icon" style={{ background: `${k.colorHex}15`, color: k.colorHex }}>
+                  <k.Icon size={18} strokeWidth={2} />
+                </div>
               </div>
-              <div style={{ fontSize: "2rem", fontWeight: 700, letterSpacing: "-0.03em", color: "var(--text-primary)", lineHeight: 1.2 }}>{k.value}</div>
+              <div className="kpi-value">{k.value}</div>
             </div>
           ))}
         </div>

@@ -37,14 +37,15 @@ export default function SettingsPage() {
   const roles = ["SUPER_ADMIN","DIRECTOR","FINANCE_MANAGER","PROCUREMENT_MANAGER","QC_OFFICER","PRODUCTION_SUPERVISOR","WAREHOUSE_SUPERVISOR","LOGISTICS_MANAGER","SUPPLIER"];
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-4">
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div>
-          <h2 className="text-2xl font-semibold mb-1">Settings & User Management</h2>
-          <p className="text-gray-500 text-sm">Kelola akun pengguna dan hak akses sistem</p>
+          <h2 style={{ fontSize: 22, fontWeight: 700, color: "var(--text-primary)", letterSpacing: "-0.02em" }}>Settings & User Management</h2>
+          <p style={{ fontSize: 14, color: "var(--text-secondary)", marginTop: 4 }}>Kelola akun pengguna dan hak akses sistem</p>
         </div>
         {currentUser?.role === "SUPER_ADMIN" && (
-          <button className="btn btn-primary shadow-sm" onClick={() => setShowForm(!showForm)}>
+          <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}>
             {showForm ? "✕ Tutup" : "👤 Tambah User"}
           </button>
         )}
@@ -64,21 +65,21 @@ export default function SettingsPage() {
             </div>
             <div className="erp-card-body" style={{ padding: 24 }}>
               <form onSubmit={submit}>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                  <div className="form-group mb-0">
-                    <label>Nama Lengkap</label>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
+                  <div>
+                    <label className="form-label">Nama Lengkap</label>
                     <input className="form-input" value={form.name} onChange={e => setForm({...form, name: e.target.value})} placeholder="Nama pengguna" required />
                   </div>
-                  <div className="form-group mb-0">
-                    <label>Email</label>
+                  <div>
+                    <label className="form-label">Email</label>
                     <input className="form-input" type="email" value={form.email} onChange={e => setForm({...form, email: e.target.value})} placeholder="user@rpms.id" required />
                   </div>
-                  <div className="form-group mb-0">
-                    <label>Password</label>
+                  <div>
+                    <label className="form-label">Password</label>
                     <input className="form-input" type="password" value={form.password} onChange={e => setForm({...form, password: e.target.value})} required />
                   </div>
-                  <div className="form-group mb-0">
-                    <label>Role</label>
+                  <div>
+                    <label className="form-label">Role</label>
                     <select className="form-input" value={form.role} onChange={e => setForm({...form, role: e.target.value})}>
                       {roles.map(r => <option key={r} value={r}>{r.replace(/_/g," ")}</option>)}
                     </select>
@@ -95,10 +96,15 @@ export default function SettingsPage() {
       )}
 
       {loading ? (
-        <div className="flex justify-center py-16"><div style={{width:36,height:36,border:"3px solid #EDE9FF",borderTop:"3px solid #7C6FE0",borderRadius:"50%",animation:"spin 0.8s linear infinite"}} /></div>
+        <div style={{ display: "flex", justifyContent: "center", padding: "4rem" }}>
+          <div style={{ width: 36, height: 36, border: "3px solid #EDE9FF", borderTop: "3px solid #7C6FE0", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+        </div>
       ) : (
-        <div className="erp-card ">
-          <div className="erp-card-body overflow-x-auto">
+        <div className="erp-card">
+          <div className="erp-card-header">
+            <span className="erp-card-title">Daftar Pengguna Sistem</span>
+          </div>
+          <div style={{ overflowX: "auto" }}>
             <table className="erp-table">
               <thead><tr><th>Nama</th><th>Email</th><th>Role</th><th>Status</th><th>Dibuat</th>{currentUser?.role === "SUPER_ADMIN" && <th>Aksi</th>}</tr></thead>
               <tbody>
@@ -107,20 +113,20 @@ export default function SettingsPage() {
                   return (
                     <tr key={u.id}>
                       <td>
-                        <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 shadow-sm" style={{ background: color, color: "white" }}>{u.name.charAt(0).toUpperCase()}</div>
-                          <span className="font-semibold text-sm text-gray-800">{u.name}</span>
-                          {u.id === currentUser?.id && <span className="badge badge-info text-xs ml-2">Anda</span>}
+                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                          <div style={{ width: 32, height: 32, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, flexShrink: 0, background: color, color: "white" }}>{u.name.charAt(0).toUpperCase()}</div>
+                          <span style={{ fontWeight: 600, color: "var(--text-primary)" }}>{u.name}</span>
+                          {u.id === currentUser?.id && <span className="badge badge-info" style={{ marginLeft: 8 }}>Anda</span>}
                         </div>
                       </td>
-                      <td className="text-gray-600 text-sm">{u.email}</td>
-                      <td><span className="badge text-xs" style={{ background: `${color}22`, color, border: `1px solid ${color}55` }}>{u.role.replace(/_/g," ")}</span></td>
-                      <td><span className={`badge ${u.isActive ? "badge-success" : "badge-secondary"}`}>{u.isActive ? "Aktif" : "Nonaktif"}</span></td>
-                      <td className="text-sm text-gray-500">{new Date(u.createdAt).toLocaleDateString("id-ID")}</td>
+                      <td style={{ color: "var(--text-secondary)" }}>{u.email}</td>
+                      <td><span className="badge" style={{ background: `${color}15`, color, border: `1px solid ${color}40`, letterSpacing: "0.02em" }}>{u.role.replace(/_/g," ")}</span></td>
+                      <td><span className={`badge ${u.isActive ? "badge-success" : "badge-neutral"}`}>{u.isActive ? "Aktif" : "Nonaktif"}</span></td>
+                      <td style={{ color: "var(--text-secondary)", fontSize: 13 }}>{new Date(u.createdAt).toLocaleDateString("id-ID")}</td>
                       {currentUser?.role === "SUPER_ADMIN" && (
                         <td>
                           {u.id !== currentUser.id && (
-                            <button onClick={() => toggleActive(u.id, u.isActive)} className={`text-xs font-semibold ${u.isActive ? "text-danger hover:text-red-700" : "text-success hover:text-green-700"}`}>
+                            <button onClick={() => toggleActive(u.id, u.isActive)} style={{ background: "transparent", border: "none", fontSize: 13, fontWeight: 600, cursor: "pointer", color: u.isActive ? "var(--color-red)" : "var(--color-green)" }}>
                               {u.isActive ? "Nonaktifkan" : "Aktifkan"}
                             </button>
                           )}
