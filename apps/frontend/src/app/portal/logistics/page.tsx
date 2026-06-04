@@ -6,27 +6,60 @@ import { useRefresh } from "@/lib/refresh-context";
 const deliveryStatusColor: any = { SCHEDULED: "badge-neutral", LOADING: "badge-warning", IN_TRANSIT: "badge-warning", DELIVERED: "badge-success", CANCELLED: "badge-danger" };
 const vehicleStatusColor: any = { AVAILABLE: "badge-success", ON_TRIP: "badge-warning", MAINTENANCE: "badge-danger" };
 const vehicleStatusLabel: any = { AVAILABLE: "Tersedia", ON_TRIP: "Dalam Perjalanan", MAINTENANCE: "Maintenance" };
+const vehicleTypeLabel: any = { TRONTON: "Tronton", ENGKEL: "Engkel", VENDOR: "Vendor Eksternal" };
 
 export default function LogisticsPage() {
+  const [activeTab, setActiveTab] = useState<"DO" | "ARMADA">("DO");
   const [vehicles, setVehicles] = useState<any[]>([]);
   const [deliveries, setDeliveries] = useState<any[]>([]);
-  const [showForm, setShowForm] = useState(false);
+  const [showDoForm, setShowDoForm] = useState(false);
+  const [showVehicleForm, setShowVehicleForm] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [form, setForm] = useState({ vehicleId: "", destination: "", loadingWeight: "" });
+  
+  const [doForm, setDoForm] = useState({ vehicleId: "", destination: "", loadingWeight: "" });
+  const [vehicleForm, setVehicleForm] = useState({ id: "", plate: "", type: "ENGKEL", driverName: "", status: "AVAILABLE" });
+  
   const { triggerRefresh } = useRefresh();
 
   const load = () => {
+    setLoading(true);
     Promise.all([api.get("/logistics/vehicles"), api.get("/logistics/deliveries")])
       .then(([v, d]) => { setVehicles(v.data); setDeliveries(d.data); }).finally(() => setLoading(false));
   };
   useEffect(() => { load(); }, []);
 
-  const submit = async (e: React.FormEvent) => {
+  const submitDo = async (e: React.FormEvent) => {
     e.preventDefault();
-    await api.post("/logistics/deliveries", { ...form, loadingWeight: parseFloat(form.loadingWeight) });
-    setShowForm(false);
+    await api.post("/logistics/deliveries", { ...doForm, loadingWeight: parseFloat(doForm.loadingWeight) });
+    setShowDoForm(false);
+    setDoForm({ vehicleId: "", destination: "", loadingWeight: "" });
     load();
     triggerRefresh();
+  };
+
+  const submitVehicle = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (vehicleForm.id) {
+      await api.put(`/logistics/vehicles/${vehicleForm.id}`, {
+        plate: vehicleForm.plate, type: vehicleForm.type, driverName: vehicleForm.driverName, status: vehicleForm.status
+      });
+    } else {
+      await api.post("/logistics/vehicles", {
+        plate: vehicleForm.plate, type: vehicleForm.type, driverName: vehicleForm.driverName, status: vehicleForm.status
+      });
+    }
+    setShowVehicleForm(false);
+    setVehicleForm({ id: "", plate: "", type: "ENGKEL", driverName: "", status: "AVAILABLE" });
+    load();
+  };
+
+  const updateDoStatus = async (id: string, currentStatus: string) => {
+    const sequence = ["SCHEDULED", "LOADING", "IN_TRANSIT", "DELIVERED"];
+    const currentIndex = sequence.indexOf(currentStatus);
+    if (currentIndex < sequence.length - 1) {
+      await api.put(`/logistics/deliveries/${id}/status`, { status: sequence[currentIndex + 1] });
+      load();
+    }
   };
 
   return (
@@ -37,71 +70,30 @@ export default function LogisticsPage() {
           <h2 style={{ fontSize: 22, fontWeight: 700, color: "var(--text-primary)", letterSpacing: "-0.02em" }}>Manajemen Logistik</h2>
           <p style={{ fontSize: 14, color: "var(--text-secondary)", marginTop: 4 }}>Monitoring armada kendaraan dan Delivery Order (DO)</p>
         </div>
-        <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}>
-          {showForm ? "✕ Tutup" : "+ Buat DO Baru"}
-        </button>
-      </div>
-
-      {/* Fleet status */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 16 }}>
-        {vehicles.map((v: any) => (
-          <div key={v.id} className="erp-card" style={{ padding: "16px", background: "var(--bg-card)", display: "flex", flexDirection: "column", gap: 8 }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <span style={{ fontSize: "1.5rem" }}>🚛</span>
-              <span className={`badge ${vehicleStatusColor[v.status]}`}>{vehicleStatusLabel[v.status]}</span>
-            </div>
-            <div style={{ fontWeight: 600, color: "var(--text-primary)", fontSize: "1.1rem", marginTop: 4 }}>{v.plate}</div>
-            <div style={{ fontSize: 13, color: "var(--text-secondary)" }}>{v.type} • {v.driverName}</div>
-          </div>
-        ))}
-      </div>
-
-      {showForm && (
-        <div style={{
-          position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
-          background: "rgba(0,0,0,0.5)", zIndex: 9999,
-          display: "flex", alignItems: "center", justifyContent: "center",
-          backdropFilter: "blur(4px)"
-        }}>
-          <div className="erp-card animate-fade-in" style={{ width: "100%", maxWidth: 700, margin: 20, maxHeight: "90vh", overflowY: "auto", border: "none", boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}>
-            <div className="erp-card-header" style={{ position: "sticky", top: 0, background: "#fff", zIndex: 10, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <h3 className="erp-card-title" style={{ fontSize: 20 }}>Delivery Order Baru</h3>
-              <button type="button" onClick={() => setShowForm(false)} style={{ background: "transparent", border: "none", fontSize: 20, cursor: "pointer", color: "var(--text-muted)" }}>✕</button>
-            </div>
-            <div className="erp-card-body" style={{ padding: 24 }}>
-              <form onSubmit={submit}>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginBottom: 16 }}>
-                  <div>
-                    <label className="form-label">Kendaraan</label>
-                    <select className="form-input" value={form.vehicleId} onChange={e => setForm({ ...form, vehicleId: e.target.value })} required>
-                      <option value="">-- Pilih Kendaraan Tersedia --</option>
-                      {vehicles.filter(v => v.status === "AVAILABLE").map((v: any) => <option key={v.id} value={v.id}>{v.plate} - {v.driverName}</option>)}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="form-label">Tujuan</label>
-                    <input className="form-input" value={form.destination} onChange={e => setForm({ ...form, destination: e.target.value })} placeholder="Cth: PT Kertas Nusantara - Jakarta" required />
-                  </div>
-                  <div>
-                    <label className="form-label">Berat Muat (kg)</label>
-                    <input className="form-input" type="number" value={form.loadingWeight} onChange={e => setForm({ ...form, loadingWeight: e.target.value })} placeholder="10000" required />
-                  </div>
-                </div>
-                <div style={{ paddingTop: 20, borderTop: "1px solid var(--border-light)", display: "flex", gap: 12, justifyContent: "flex-end" }}>
-                  <button type="button" className="btn btn-secondary" onClick={() => setShowForm(false)}>Batal</button>
-                  <button type="submit" className="btn btn-primary" style={{ padding: "0 24px" }}>📝 Simpan Delivery Order</button>
-                </div>
-              </form>
-            </div>
-          </div>
+        <div style={{ display: "flex", gap: 12 }}>
+          {activeTab === "DO" ? (
+            <button className="btn btn-primary" onClick={() => setShowDoForm(true)}>+ Buat DO Baru</button>
+          ) : (
+            <button className="btn btn-primary" onClick={() => { setVehicleForm({ id: "", plate: "", type: "ENGKEL", driverName: "", status: "AVAILABLE" }); setShowVehicleForm(true); }}>+ Tambah Armada</button>
+          )}
         </div>
-      )}
+      </div>
+
+      {/* Tabs */}
+      <div style={{ display: "flex", gap: 32, borderBottom: "1px solid var(--border-light)" }}>
+        <div onClick={() => setActiveTab("DO")} style={{ paddingBottom: 12, cursor: "pointer", fontWeight: 600, color: activeTab === "DO" ? "var(--brand-purple)" : "var(--text-secondary)", borderBottom: activeTab === "DO" ? "2px solid var(--brand-purple)" : "2px solid transparent", transition: "all 0.2s" }}>
+          Delivery Orders
+        </div>
+        <div onClick={() => setActiveTab("ARMADA")} style={{ paddingBottom: 12, cursor: "pointer", fontWeight: 600, color: activeTab === "ARMADA" ? "var(--brand-purple)" : "var(--text-secondary)", borderBottom: activeTab === "ARMADA" ? "2px solid var(--brand-purple)" : "2px solid transparent", transition: "all 0.2s" }}>
+          Armada Kendaraan
+        </div>
+      </div>
 
       {loading ? (
         <div style={{ display: "flex", justifyContent: "center", padding: "4rem" }}>
           <div style={{ width: 36, height: 36, border: "3px solid #EDE9FF", borderTop: "3px solid #7C6FE0", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
         </div>
-      ) : (
+      ) : activeTab === "DO" ? (
         <div className="erp-card">
           <div className="erp-card-header">
             <span className="erp-card-title">Riwayat Delivery Order</span>
@@ -116,11 +108,12 @@ export default function LogisticsPage() {
                   <th>Berat Muat</th>
                   <th>Status</th>
                   <th>Tanggal</th>
+                  <th>Aksi</th>
                 </tr>
               </thead>
               <tbody>
                 {deliveries.length === 0 ? (
-                  <tr><td colSpan={6} style={{ textAlign: "center", padding: "3rem", color: "var(--text-muted)" }}>Belum ada DO terdaftar</td></tr>
+                  <tr><td colSpan={7} style={{ textAlign: "center", padding: "3rem", color: "var(--text-muted)" }}>Belum ada DO terdaftar</td></tr>
                 ) : deliveries.map((d: any) => (
                   <tr key={d.id}>
                     <td style={{ fontWeight: 600, color: "var(--brand-purple)" }}>{d.orderNumber}</td>
@@ -132,10 +125,138 @@ export default function LogisticsPage() {
                     <td style={{ fontWeight: 600, color: "var(--brand-teal)" }}>{d.loadingWeight?.toLocaleString("id-ID")} kg</td>
                     <td><span className={`badge ${deliveryStatusColor[d.status]}`}>{d.status}</span></td>
                     <td style={{ color: "var(--text-secondary)", fontSize: 13 }}>{new Date(d.createdAt).toLocaleDateString("id-ID")}</td>
+                    <td>
+                      {d.status !== "DELIVERED" && d.status !== "CANCELLED" && (
+                        <button onClick={() => updateDoStatus(d.id, d.status)} style={{ padding: "6px 12px", borderRadius: 6, background: "var(--brand-purple)", color: "#fff", border: "none", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
+                          Update Status ➔
+                        </button>
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
+          </div>
+        </div>
+      ) : (
+        <div className="erp-card">
+          <div className="erp-card-header">
+            <span className="erp-card-title">Daftar Armada Kendaraan</span>
+          </div>
+          <div style={{ overflowX: "auto" }}>
+            <table className="erp-table">
+              <thead>
+                <tr>
+                  <th>Plat Nomor</th>
+                  <th>Tipe</th>
+                  <th>Nama Supir</th>
+                  <th>Status</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                {vehicles.length === 0 ? (
+                  <tr><td colSpan={5} style={{ textAlign: "center", padding: "3rem", color: "var(--text-muted)" }}>Belum ada armada terdaftar</td></tr>
+                ) : vehicles.map((v: any) => (
+                  <tr key={v.id}>
+                    <td style={{ fontWeight: 700, color: "var(--text-primary)", fontSize: 15, letterSpacing: "1px" }}>{v.plate}</td>
+                    <td style={{ color: "var(--text-secondary)" }}>{vehicleTypeLabel[v.type] || v.type}</td>
+                    <td style={{ fontWeight: 500, color: "var(--text-primary)" }}>{v.driverName}</td>
+                    <td><span className={`badge ${vehicleStatusColor[v.status]}`}>{vehicleStatusLabel[v.status]}</span></td>
+                    <td>
+                      <button onClick={() => { setVehicleForm(v); setShowVehicleForm(true); }} style={{ padding: "6px 12px", borderRadius: 6, background: "var(--bg-secondary)", color: "var(--text-secondary)", border: "1px solid var(--border-light)", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
+                        Edit ✎
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Form Modal DO */}
+      {showDoForm && (
+        <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.5)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", backdropFilter: "blur(4px)" }}>
+          <div className="erp-card animate-fade-in" style={{ width: "100%", maxWidth: 700, margin: 20, maxHeight: "90vh", overflowY: "auto", border: "none", boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}>
+            <div className="erp-card-header" style={{ position: "sticky", top: 0, background: "#fff", zIndex: 10, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <h3 className="erp-card-title" style={{ fontSize: 20 }}>Delivery Order Baru</h3>
+              <button type="button" onClick={() => setShowDoForm(false)} style={{ background: "transparent", border: "none", fontSize: 20, cursor: "pointer", color: "var(--text-muted)" }}>✕</button>
+            </div>
+            <div className="erp-card-body" style={{ padding: 24 }}>
+              <form onSubmit={submitDo}>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginBottom: 16 }}>
+                  <div>
+                    <label className="form-label">Kendaraan</label>
+                    <select className="form-input" value={doForm.vehicleId} onChange={e => setDoForm({ ...doForm, vehicleId: e.target.value })} required>
+                      <option value="">-- Pilih Kendaraan Tersedia --</option>
+                      {vehicles.filter(v => v.status === "AVAILABLE").map((v: any) => <option key={v.id} value={v.id}>{v.plate} - {v.driverName}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="form-label">Tujuan</label>
+                    <input className="form-input" value={doForm.destination} onChange={e => setDoForm({ ...doForm, destination: e.target.value })} placeholder="Cth: PT Kertas Nusantara - Jakarta" required />
+                  </div>
+                  <div>
+                    <label className="form-label">Berat Muat (kg)</label>
+                    <input className="form-input" type="number" value={doForm.loadingWeight} onChange={e => setDoForm({ ...doForm, loadingWeight: e.target.value })} placeholder="10000" required />
+                  </div>
+                </div>
+                <div style={{ paddingTop: 20, borderTop: "1px solid var(--border-light)", display: "flex", gap: 12, justifyContent: "flex-end" }}>
+                  <button type="button" className="btn btn-secondary" onClick={() => setShowDoForm(false)}>Batal</button>
+                  <button type="submit" className="btn btn-primary" style={{ padding: "0 24px" }}>📝 Simpan Delivery Order</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Form Modal Vehicle */}
+      {showVehicleForm && (
+        <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.5)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", backdropFilter: "blur(4px)" }}>
+          <div className="erp-card animate-fade-in" style={{ width: "100%", maxWidth: 500, margin: 20, maxHeight: "90vh", overflowY: "auto", border: "none", boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}>
+            <div className="erp-card-header" style={{ position: "sticky", top: 0, background: "#fff", zIndex: 10, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <h3 className="erp-card-title" style={{ fontSize: 20 }}>{vehicleForm.id ? "Edit Armada" : "Tambah Armada Baru"}</h3>
+              <button type="button" onClick={() => setShowVehicleForm(false)} style={{ background: "transparent", border: "none", fontSize: 20, cursor: "pointer", color: "var(--text-muted)" }}>✕</button>
+            </div>
+            <div className="erp-card-body" style={{ padding: 24 }}>
+              <form onSubmit={submitVehicle}>
+                <div style={{ display: "flex", flexDirection: "column", gap: 16, marginBottom: 24 }}>
+                  <div>
+                    <label className="form-label">Plat Nomor</label>
+                    <input className="form-input" value={vehicleForm.plate} onChange={e => setVehicleForm({ ...vehicleForm, plate: e.target.value })} placeholder="B 1234 CD" required />
+                  </div>
+                  <div>
+                    <label className="form-label">Tipe Kendaraan</label>
+                    <select className="form-input" value={vehicleForm.type} onChange={e => setVehicleForm({ ...vehicleForm, type: e.target.value })} required>
+                      <option value="ENGKEL">Engkel</option>
+                      <option value="TRONTON">Tronton</option>
+                      <option value="VENDOR">Vendor Eksternal</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="form-label">Nama Supir</label>
+                    <input className="form-input" value={vehicleForm.driverName} onChange={e => setVehicleForm({ ...vehicleForm, driverName: e.target.value })} placeholder="Nama Supir" required />
+                  </div>
+                  {vehicleForm.id && (
+                    <div>
+                      <label className="form-label">Status</label>
+                      <select className="form-input" value={vehicleForm.status} onChange={e => setVehicleForm({ ...vehicleForm, status: e.target.value })} required>
+                        <option value="AVAILABLE">Tersedia</option>
+                        <option value="ON_TRIP">Dalam Perjalanan (Jangan diubah manual jika sedang DO)</option>
+                        <option value="MAINTENANCE">Maintenance</option>
+                      </select>
+                    </div>
+                  )}
+                </div>
+                <div style={{ paddingTop: 20, borderTop: "1px solid var(--border-light)", display: "flex", gap: 12, justifyContent: "flex-end" }}>
+                  <button type="button" className="btn btn-secondary" onClick={() => setShowVehicleForm(false)}>Batal</button>
+                  <button type="submit" className="btn btn-primary" style={{ padding: "0 24px" }}>💾 Simpan Armada</button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}

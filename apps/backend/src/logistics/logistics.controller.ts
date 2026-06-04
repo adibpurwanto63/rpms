@@ -17,6 +17,14 @@ export class LogisticsController {
   @Roles(UserRole.SUPER_ADMIN, UserRole.LOGISTICS_MANAGER, UserRole.DIRECTOR)
   getVehicles() { return this.svc.getVehicles(); }
 
+  @Post("vehicles")
+  @Roles(UserRole.SUPER_ADMIN, UserRole.LOGISTICS_MANAGER)
+  createVehicle(@Body() dto: any) { return this.svc.createVehicle(dto); }
+
+  @Put("vehicles/:id")
+  @Roles(UserRole.SUPER_ADMIN, UserRole.LOGISTICS_MANAGER)
+  updateVehicle(@Param("id") id: string, @Body() dto: any) { return this.svc.updateVehicle(id, dto); }
+
   @Get("deliveries")
   @Roles(UserRole.SUPER_ADMIN, UserRole.LOGISTICS_MANAGER, UserRole.DIRECTOR, UserRole.WAREHOUSE_SUPERVISOR)
   getDeliveries(@Query("status") status?: DeliveryStatus) { return this.svc.getDeliveries(status); }

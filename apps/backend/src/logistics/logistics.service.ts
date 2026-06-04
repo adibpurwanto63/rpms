@@ -24,8 +24,32 @@ export class LogisticsService {
     });
   }
 
-  updateStatus(id: string, status: DeliveryStatus) {
-    return this.prisma.deliveryOrder.update({ where: { id }, data: { status, ...(status === DeliveryStatus.DELIVERED ? { arrivalTime: new Date() } : {}) } });
+  async createVehicle(dto: any) {
+    return this.prisma.vehicle.create({ data: dto });
+  }
+
+  async updateVehicle(id: string, dto: any) {
+    return this.prisma.vehicle.update({ where: { id }, data: dto });
+  }
+
+  async updateStatus(id: string, status: DeliveryStatus) {
+    return this.prisma.$transaction(async (tx) => {
+      const doOrder = await tx.deliveryOrder.update({
+        where: { id },
+        data: {
+          status,
+          ...(status === DeliveryStatus.DELIVERED ? { arrivalTime: new Date() } : {})
+        }
+      });
+
+      if (status === DeliveryStatus.IN_TRANSIT) {
+        await tx.vehicle.update({ where: { id: doOrder.vehicleId }, data: { status: 'ON_TRIP' } });
+      } else if (status === DeliveryStatus.DELIVERED || status === DeliveryStatus.CANCELLED) {
+        await tx.vehicle.update({ where: { id: doOrder.vehicleId }, data: { status: 'AVAILABLE' } });
+      }
+
+      return doOrder;
+    });
   }
 
   todayStats() {
