@@ -1,6 +1,7 @@
 import * as dotenv from 'dotenv';
 dotenv.config();
-import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
+import { Injectable, OnModuleInit, OnModuleDestroy, Logger } from '@nestjs/common';
+import { execSync } from 'child_process';
 import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
@@ -22,12 +23,30 @@ const adapter = new PrismaPg(pool);
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
+  private readonly logger = new Logger(PrismaService.name);
+
   constructor() {
     super({ adapter } as any);
   }
 
   async onModuleInit() {
     await this.$connect();
+    await this.runMigrations();
+  }
+
+  private async runMigrations() {
+    try {
+      const effectiveUrl = dbUrl || fallbackDbUrl;
+      this.logger.log('Running pending database migrations...');
+      execSync('npx prisma migrate deploy', {
+        cwd: process.cwd(),
+        env: { ...process.env, DATABASE_URL: effectiveUrl },
+        stdio: 'inherit',
+      });
+      this.logger.log('Database migrations applied successfully.');
+    } catch (e: any) {
+      this.logger.warn('Migration check skipped (may already be up to date): ' + (e.message?.substring(0, 200) || ''));
+    }
   }
 
   async onModuleDestroy() {

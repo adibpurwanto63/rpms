@@ -29,5 +29,5 @@ RUN npm run build
 EXPOSE 7860
 ENV PORT=7860
 
-# Apply pending migrations (write env from container secrets first) then start
-CMD ["sh", "-c", "if [ -n \"$DATABASE_URL\" ]; then printf 'DATABASE_URL=\"%s\"\\nJWT_SECRET=\"%s\"\\nJWT_EXPIRES_IN=\"%s\"\\nPORT=7860\\n' \"$DATABASE_URL\" \"$JWT_SECRET\" \"$JWT_EXPIRES_IN\" > .env && npx prisma migrate deploy && echo 'Migrations applied successfully' || echo 'Migration failed, starting anyway'; fi; npm run start:prod"]
+# Start application (migrations run programmatically inside NestJS startup)
+CMD ["npm", "run", "start:prod"]

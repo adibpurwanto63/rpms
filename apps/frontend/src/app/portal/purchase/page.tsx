@@ -52,11 +52,15 @@ export default function PurchasePage() {
   // Actions Supplier
   const submitSupplier = async (e: React.FormEvent) => {
     e.preventDefault();
-    await api.post("/suppliers", supplierForm);
-    setShowSupplierForm(false);
-    setSupplierForm({ companyName: "", picName: "", phone: "", email: "", address: "", taxNumber: "" });
-    loadSuppliers();
-    triggerRefresh();
+    try {
+      await api.post("/suppliers", supplierForm);
+      setShowSupplierForm(false);
+      setSupplierForm({ companyName: "", picName: "", phone: "", email: "", address: "", taxNumber: "" });
+      loadSuppliers();
+      triggerRefresh();
+    } catch (e: any) {
+      alert("Gagal menyimpan supplier: " + (e.response?.data?.message || e.message));
+    }
   };
 
   const updateSupplierStatus = async (id: string, status: string) => {
@@ -83,11 +87,15 @@ export default function PurchasePage() {
   // Actions Customer
   const submitCustomer = async (e: React.FormEvent) => {
     e.preventDefault();
-    await api.post("/customers", customerForm);
-    setShowCustomerForm(false);
-    setCustomerForm({ companyName: "", picName: "", phone: "", email: "", address: "", taxNumber: "" });
-    loadCustomers();
-    triggerRefresh();
+    try {
+      await api.post("/customers", customerForm);
+      setShowCustomerForm(false);
+      setCustomerForm({ companyName: "", picName: "", phone: "", email: "", address: "", taxNumber: "" });
+      loadCustomers();
+      triggerRefresh();
+    } catch (e: any) {
+      alert("Gagal menyimpan customer: " + (e.response?.data?.message || e.message));
+    }
   };
 
   const updateCustomerStatus = async (id: string, status: string) => {
@@ -114,15 +122,19 @@ export default function PurchasePage() {
   // Actions Penjualan
   const submitSales = async (e: React.FormEvent) => {
     e.preventDefault();
-    await api.post("/penjualan", {
-      ...salesForm,
-      quantity: parseFloat(salesForm.quantity),
-      unitPrice: parseFloat(salesForm.unitPrice),
-    });
-    setShowSalesForm(false);
-    setSalesForm({ customerId: "", itemName: "Kardus Bekas (OCC)", quantity: "", unit: "ton", unitPrice: "", notes: "" });
-    loadSales();
-    triggerRefresh();
+    try {
+      await api.post("/penjualan", {
+        ...salesForm,
+        quantity: parseFloat(salesForm.quantity),
+        unitPrice: parseFloat(salesForm.unitPrice),
+      });
+      setShowSalesForm(false);
+      setSalesForm({ customerId: "", itemName: "Kardus Bekas (OCC)", quantity: "", unit: "ton", unitPrice: "", notes: "" });
+      loadSales();
+      triggerRefresh();
+    } catch (e: any) {
+      alert("Gagal membuat sales order: " + (e.response?.data?.message || e.message));
+    }
   };
 
   const updateSalesStatus = async (id: string, status: string) => {
@@ -164,7 +176,7 @@ export default function PurchasePage() {
       </div>
 
       {/* Tabs */}
-      <div style={{ display: "flex", gap: 8, borderBottom: "1px solid var(--border-light)", paddingBottom: 16 }}>
+      <div style={{ display: "flex", gap: 8, borderBottom: "1px solid var(--border-light)", paddingBottom: 16, flexWrap: "wrap" }}>
         <button
           onClick={() => setActiveTab("supplier")}
           style={{
@@ -204,7 +216,7 @@ export default function PurchasePage() {
       {activeTab === "supplier" && (
         <>
           {!loadingSuppliers && suppliers.length > 0 && (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
+            <div className="rg-3">
               {[
                 { label: "Total Supplier", value: suppliers.length, Icon: Building2, variant: "dark" },
                 { label: "Supplier Aktif", value: suppliers.filter(s => s.status === "ACTIVE").length, Icon: CheckCircle2, variant: "mint" },
@@ -230,7 +242,7 @@ export default function PurchasePage() {
                 </div>
                 <div className="erp-card-body" style={{ padding: 24 }}>
                   <form onSubmit={submitSupplier}>
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
+                    <div className="modal-form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
                       {[
                         { key: "companyName", label: "Nama Perusahaan", placeholder: "PT Contoh Jaya" },
                         { key: "picName", label: "Nama PIC", placeholder: "Budi Santoso" },
@@ -306,7 +318,7 @@ export default function PurchasePage() {
                 </div>
                 <div className="erp-card-body" style={{ padding: 24 }}>
                   <form onSubmit={submitCustomer}>
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
+                    <div className="modal-form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
                       {[
                         { key: "companyName", label: "Nama Perusahaan (Customer)", placeholder: "PT Contoh Pembeli" },
                         { key: "picName", label: "Nama PIC", placeholder: "Budi Santoso" },
@@ -383,7 +395,7 @@ export default function PurchasePage() {
                 </div>
                 <div className="erp-card-body" style={{ padding: 24 }}>
                   <form onSubmit={submitSales}>
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
+                    <div className="modal-form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
                       <div className="form-group" style={{ gridColumn: "span 2", marginBottom: 0 }}>
                         <label className="form-label">Nama Pembeli (Customer)</label>
                         <select className="form-input" value={salesForm.customerId} onChange={e => setSalesForm({ ...salesForm, customerId: e.target.value })} required>

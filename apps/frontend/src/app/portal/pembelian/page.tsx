@@ -63,15 +63,19 @@ export default function PembelianPage() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await api.post("/pembelian", {
-      ...form,
-      quantity: parseFloat(form.quantity),
-      unitPrice: parseFloat(form.unitPrice),
-    });
-    setShowForm(false);
-    setForm({ supplierId: "", itemName: "Kardus (OCC)", quantity: "", unit: "kg", unitPrice: "", notes: "", deliveryDate: "" });
-    load();
-    triggerRefresh();
+    try {
+      await api.post("/pembelian", {
+        ...form,
+        quantity: parseFloat(form.quantity),
+        unitPrice: parseFloat(form.unitPrice),
+      });
+      setShowForm(false);
+      setForm({ supplierId: "", itemName: "Kardus (OCC)", quantity: "", unit: "kg", unitPrice: "", notes: "", deliveryDate: "" });
+      load();
+      triggerRefresh();
+    } catch (e: any) {
+      alert("Gagal membuat PO: " + (e.response?.data?.message || e.message));
+    }
   };
 
   const updateStatus = async (id: string, status: string) => {
@@ -110,7 +114,7 @@ export default function PembelianPage() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+      <div className="page-header-responsive" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div>
           <h2 style={{ fontSize: 22, fontWeight: 700, color: "var(--text-primary)", letterSpacing: "-0.02em" }}>
             Pembelian Kardus
@@ -126,7 +130,7 @@ export default function PembelianPage() {
 
       {/* KPI Cards */}
       {dashboard && (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 20 }}>
+        <div className="rg-4">
           {kpis.map((k, i) => (
             <div
               key={i}
@@ -153,7 +157,7 @@ export default function PembelianPage() {
       )}
 
       {/* Filter Tabs */}
-      <div style={{ display: "flex", gap: 4, background: "#F3F4F6", borderRadius: 10, padding: 4, alignSelf: "flex-start" }}>
+      <div style={{ display: "flex", gap: 4, background: "var(--bg-secondary)", borderRadius: 10, padding: 4, alignSelf: "flex-start", flexWrap: "wrap" }}>
         {[
           { key: "all", label: "Semua" },
           { key: "PENDING", label: "Menunggu" },
@@ -192,7 +196,7 @@ export default function PembelianPage() {
             </div>
             <div className="erp-card-body" style={{ padding: 24 }}>
               <form onSubmit={submit}>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
+                <div className="modal-form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
                   <div className="form-group" style={{ gridColumn: "span 2", marginBottom: 0 }}>
                     <label className="form-label">Supplier</label>
                     <select className="form-input" value={form.supplierId} onChange={(e) => setForm({ ...form, supplierId: e.target.value })} required>
