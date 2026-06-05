@@ -29,5 +29,5 @@ RUN npm run build
 EXPOSE 7860
 ENV PORT=7860
 
-# Apply pending migrations then start
-CMD ["sh", "-c", "npx prisma migrate deploy && npm run start:prod"]
+# Apply pending migrations (if DATABASE_URL is set) then start
+CMD ["sh", "-c", "if [ -n \"$DATABASE_URL\" ]; then npx prisma migrate deploy || echo 'Migration skipped or failed, starting anyway'; fi; npm run start:prod"]
