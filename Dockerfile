@@ -29,5 +29,5 @@ RUN npm run build
 EXPOSE 7860
 ENV PORT=7860
 
-# Start the application
-CMD ["npm", "run", "start:prod"]
+# Apply pending migrations then start
+CMD ["sh", "-c", "npx prisma migrate deploy && npm run start:prod"]

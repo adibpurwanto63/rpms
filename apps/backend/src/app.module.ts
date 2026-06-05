@@ -17,6 +17,7 @@ import { PembelianModule } from './pembelian/pembelian.module';
 import { PenjualanModule } from './penjualan/penjualan.module';
 import { SearchModule } from './search/search.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { MaterialsModule } from './materials/materials.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { NotificationsModule } from './notifications/notifications.module';
     PenjualanModule,
     SearchModule,
     NotificationsModule,
+    MaterialsModule,
   ],
 })
 export class AppModule {}

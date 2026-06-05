@@ -40,6 +40,7 @@ model Supplier {
   users           User[]
   weighingTickets WeighingTicket[]
   purchaseOrders  PurchaseOrder[]
+  materials       Material[]
 
   @@map("suppliers")
 }
@@ -94,9 +95,27 @@ model Machine {
   @@map("machines")
 }
 
+model Material {
+  id                String            @id @default(cuid())
+  name              String
+  category          String?
+  stock             Float             @default(0)
+  unit              String            @default("kg")
+  lowStockThreshold Float             @default(0) @map("low_stock_threshold")
+  supplierId        String?           @map("supplier_id")
+  notes             String?
+  createdAt         DateTime          @default(now()) @map("created_at")
+  updatedAt         DateTime          @updatedAt @map("updated_at")
+  supplier          Supplier?         @relation(fields: [supplierId], references: [id])
+  productions       ProductionRecord[]
+
+  @@map("materials")
+}
+
 model ProductionRecord {
   id              String          @id @default(cuid())
   machineId       String          @map("machine_id")
+  materialId      String?         @map("material_id")
   inputWeight     Float           @map("input_weight")
   outputWeight    Float           @map("output_weight")
   baleCount       Int             @map("bale_count")
@@ -108,6 +127,7 @@ model ProductionRecord {
   createdAt       DateTime        @default(now()) @map("created_at")
   bales           InventoryItem[]
   machine         Machine         @relation(fields: [machineId], references: [id])
+  material        Material?       @relation(fields: [materialId], references: [id])
   operator        User?           @relation(fields: [operatorId], references: [id])
 
   @@map("production_records")

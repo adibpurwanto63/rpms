@@ -9,7 +9,7 @@ import api from "@/lib/api";
 import {
   LayoutDashboard, ShoppingCart, Scale, ShoppingBag, Factory,
   Warehouse, Truck, BarChart2, ShieldCheck, Settings,
-  Bell, ChevronRight, Home, LogOut, User, HelpCircle, Moon
+  Bell, ChevronRight, Home, LogOut, User, HelpCircle, Moon, Package
 } from "lucide-react";
 
 const navItems = [
@@ -17,6 +17,7 @@ const navItems = [
   { href: "/portal/purchase",   Icon: ShoppingCart,    label: "Procurement", module: "purchase",    category: "Supply Chain" },
   { href: "/portal/weighbridge",Icon: Scale,           label: "Timbangan",  module: "weighbridge", category: "Supply Chain" },
   { href: "/portal/pembelian",  Icon: ShoppingBag,     label: "Pembelian",  module: "pembelian",   category: "Supply Chain" },
+  { href: "/portal/material",   Icon: Package,         label: "Material",   module: "material",    category: "Supply Chain" },
   { href: "/portal/production", Icon: Factory,         label: "Produksi",   module: "production",  category: "Operations" },
   { href: "/portal/warehouse",  Icon: Warehouse,       label: "Gudang",     module: "warehouse",   category: "Operations" },
   { href: "/portal/logistics",  Icon: Truck,           label: "Logistik",   module: "logistics",   category: "Operations" },
@@ -44,11 +45,34 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
   const router = useRouter();
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const notificationsRef = useRef<HTMLDivElement>(null);
   const [notifications, setNotifications] = useState<any[]>([]);
+  const [theme, setTheme] = useState<"light" | "dark">("light");
+
+  useEffect(() => {
+    const saved = localStorage.getItem("rpms_theme") as "light" | "dark" | null;
+    if (saved) setTheme(saved);
+    else if (window.matchMedia("(prefers-color-scheme: dark)").matches) setTheme("dark");
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("rpms_theme", theme);
+  }, [theme]);
+
+  useEffect(() => {
+    if (mobileOpen) {
+      document.documentElement.classList.add("mobile-sidebar-open");
+    } else {
+      document.documentElement.classList.remove("mobile-sidebar-open");
+    }
+  }, [mobileOpen]);
+
+  const toggleTheme = () => setTheme(t => t === "light" ? "dark" : "light");
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -108,8 +132,16 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
   return (
     <div className="flex min-h-screen" style={{ background: "var(--bg-app)" }}>
 
+      {/* ── Mobile Sidebar Overlay ── */}
+      <div
+        className={`sidebar-overlay ${mobileOpen ? "open" : ""}`}
+        onClick={() => setMobileOpen(false)}
+        style={{ display: mobileOpen ? "block" : "none" }}
+      />
+
       {/* ── Sidebar ── */}
-      <aside style={{
+      <aside className={mobileOpen ? "sidebar-responsive open" : "sidebar-responsive"}
+      style={{
         background: "var(--bg-sidebar)",
         width: collapsed ? "60px" : "220px",
         minHeight: "100vh",
@@ -164,6 +196,7 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
                 )}
                 <Link href={item.href}
                   title={collapsed ? item.label : undefined}
+                  onClick={() => setMobileOpen(false)}
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -198,7 +231,7 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
       </aside>
 
       {/* ── Main Wrapper ── */}
-      <div style={{
+      <div className="main-content-responsive" style={{
         marginLeft: collapsed ? 60 : 220,
         flex: 1,
         display: "flex",
@@ -209,7 +242,7 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
 
         {/* Top Navbar — ERPNext style: compact flat bar */}
         <header style={{
-          background: "#fff",
+          background: "var(--bg-card)",
           height: 52,
           display: "flex",
           alignItems: "center",
@@ -221,13 +254,36 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
           zIndex: 40,
         }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            {/* Collapse button */}
+            {/* Mobile hamburger button */}
             <button
+              className="mobile-only"
+              onClick={() => setMobileOpen(!mobileOpen)}
+              style={{
+                width: 28, height: 28, borderRadius: 4,
+                border: "1px solid var(--border-light)",
+                background: "transparent",
+                display: "none", alignItems: "center", justifyContent: "center",
+                cursor: "pointer", color: "var(--text-secondary)",
+                fontSize: 13,
+                transition: "all 0.15s ease",
+              }}
+              title="Toggle menu"
+            >
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round">
+                <line x1="1" y1="4" x2="13" y2="4"/>
+                <line x1="1" y1="8" x2="13" y2="8"/>
+                <line x1="1" y1="12" x2="13" y2="12"/>
+              </svg>
+            </button>
+
+            {/* Collapse button (desktop only) */}
+            <button
+              className="desktop-only"
               onClick={() => setCollapsed(!collapsed)}
               style={{
                 width: 28, height: 28, borderRadius: 4,
                 border: "1px solid var(--border-light)",
-                background: "#fff",
+                background: "transparent",
                 display: "flex", alignItems: "center", justifyContent: "center",
                 cursor: "pointer", color: "var(--text-secondary)",
                 fontSize: 13,
@@ -260,14 +316,14 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
             <div ref={notificationsRef} style={{ position: "relative" }}>
               <div
                 onClick={handleNotificationsClick}
-                style={{
-                  width: 36, height: 36, borderRadius: 8,
-                  border: "1px solid var(--border-light)",
-                  background: notificationsOpen ? "#F3F4F6" : "#fff",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  cursor: "pointer", position: "relative",
-                  transition: "background 0.15s ease",
-                }}>
+                  style={{
+                    width: 36, height: 36, borderRadius: 8,
+                    border: "1px solid var(--border-light)",
+                    background: notificationsOpen ? "var(--bg-hover)" : "transparent",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    cursor: "pointer", position: "relative",
+                    transition: "background 0.15s ease",
+                  }}>
                 <Bell size={16} color={notifications.length > 0 ? "var(--color-primary)" : "var(--text-secondary)"} />
                 {notifications.length > 0 && (
                   <div style={{
@@ -286,14 +342,14 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
                   top: "calc(100% + 8px)",
                   right: 0,
                   width: 320,
-                  background: "#fff",
+                  background: "var(--bg-card)",
                   borderRadius: 12,
-                  boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
+                  boxShadow: "var(--shadow-dropdown)",
                   border: "1px solid var(--border-light)",
                   overflow: "hidden",
                   zIndex: 100,
                 }}>
-                  <div style={{ padding: "12px 16px", borderBottom: "1px solid var(--border-light)", background: "#F9FAFB", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <div style={{ padding: "12px 16px", borderBottom: "1px solid var(--border-light)", background: "var(--bg-secondary)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text-primary)" }}>Notifikasi</div>
                     <div style={{ fontSize: 12, color: "var(--text-muted)", cursor: "pointer" }} onClick={() => { api.post("/notifications/mark-read"); setNotifications([]); }}>Tandai semua dibaca</div>
                   </div>
@@ -323,7 +379,7 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
                 style={{
                   display: "flex", alignItems: "center", gap: 8,
                   padding: "4px",
-                  background: userMenuOpen ? "#F3F4F6" : "#F9FAFB",
+                  background: userMenuOpen ? "var(--bg-hover)" : "transparent",
                   borderRadius: "50%",
                   border: "1px solid var(--border-light)",
                   cursor: "pointer",
@@ -351,14 +407,14 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
                   top: "calc(100% + 8px)",
                   right: 0,
                   width: 200,
-                  background: "#fff",
+                  background: "var(--bg-card)",
                   borderRadius: 12,
-                  boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
+                  boxShadow: "var(--shadow-dropdown)",
                   border: "1px solid var(--border-light)",
                   overflow: "hidden",
                   zIndex: 100,
                 }}>
-                  <div style={{ padding: "12px 16px", borderBottom: "1px solid var(--border-light)", background: "#F9FAFB" }}>
+                  <div style={{ padding: "12px 16px", borderBottom: "1px solid var(--border-light)", background: "var(--bg-secondary)" }}>
                     <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary)" }}>{user.name}</div>
                     <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>{roleLabel[user.role]}</div>
                   </div>
@@ -371,13 +427,13 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
                       <HelpCircle size={16} /> Help Center
                     </Link>
                     
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 12px", borderRadius: 8, cursor: "pointer", transition: "background 0.2s ease" }} onMouseEnter={e => (e.currentTarget.style.background = "#F3F4F6")} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                    <div onClick={toggleTheme} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 12px", borderRadius: 8, cursor: "pointer", transition: "background 0.2s ease" }} onMouseEnter={e => (e.currentTarget.style.background = "var(--bg-hover)")} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
                       <div style={{ display: "flex", alignItems: "center", gap: 10, color: "var(--text-secondary)" }}>
                         <Moon size={16} />
                         <span style={{ fontSize: 13 }}>Dark mode</span>
                       </div>
-                      <div style={{ width: 32, height: 18, borderRadius: 10, background: "#E5E7EB", position: "relative" }}>
-                        <div style={{ width: 14, height: 14, borderRadius: "50%", background: "#fff", position: "absolute", top: 2, left: 2, boxShadow: "0 1px 3px rgba(0,0,0,0.2)" }} />
+                      <div style={{ width: 32, height: 18, borderRadius: 10, background: theme === "dark" ? "var(--color-primary)" : "var(--border-medium)", position: "relative", transition: "background 0.2s" }}>
+                        <div style={{ width: 14, height: 14, borderRadius: "50%", background: "#fff", position: "absolute", top: 2, left: theme === "dark" ? 16 : 2, boxShadow: "0 1px 3px rgba(0,0,0,0.2)", transition: "left 0.2s" }} />
                       </div>
                     </div>
                   </div>
@@ -411,7 +467,7 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
         </header>
 
         {/* Page Content */}
-        <main style={{ flex: 1, padding: "20px 24px", animation: "fadeInUp 0.25s ease both" }}>
+        <main className="page-content-responsive" style={{ flex: 1, padding: "20px 24px", animation: "fadeInUp 0.25s ease both" }}>
           <RefreshProvider>
             {children}
           </RefreshProvider>

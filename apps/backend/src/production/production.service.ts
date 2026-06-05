@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, BadRequestException } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { NotificationsService } from "../notifications/notifications.service";
 
@@ -25,7 +25,7 @@ export class ProductionService {
   getRecords(machineId?: string) {
     return this.prisma.productionRecord.findMany({
       where: machineId ? { machineId } : {},
-      include: { machine: true },
+      include: { machine: true, material: true },
       orderBy: { date: "desc" },
       take: 100,
     });
@@ -37,9 +37,21 @@ export class ProductionService {
       : 0;
     
     return this.prisma.$transaction(async (tx) => {
+      if (dto.materialId) {
+        const mat = await tx.material.findUnique({ where: { id: dto.materialId } });
+        if (!mat) throw new BadRequestException("Material tidak ditemukan");
+        if (mat.stock < dto.inputWeight) {
+          throw new BadRequestException(`Stok material "${mat.name}" tidak cukup. Stok: ${mat.stock} ${mat.unit}, butuh: ${dto.inputWeight}`);
+        }
+        await tx.material.update({
+          where: { id: dto.materialId },
+          data: { stock: { decrement: dto.inputWeight } },
+        });
+      }
+
       const record = await tx.productionRecord.create({
         data: { ...dto, oee: parseFloat(oee.toFixed(2)) },
-        include: { machine: true },
+        include: { machine: true, material: true },
       });
 
       if (record.baleCount > 0) {
@@ -74,10 +86,37 @@ export class ProductionService {
       : 0;
 
     return this.prisma.$transaction(async (tx) => {
+      const old = await tx.productionRecord.findUnique({ where: { id } });
+
+      if (dto.materialId) {
+        const mat = await tx.material.findUnique({ where: { id: dto.materialId } });
+        if (!mat) throw new BadRequestException("Material tidak ditemukan");
+        const newNeed = dto.inputWeight;
+        const oldFromThis = old?.materialId === dto.materialId ? (old?.inputWeight || 0) : 0;
+        const delta = newNeed - oldFromThis;
+        if (delta > 0 && mat.stock < delta) {
+          throw new BadRequestException(`Stok material "${mat.name}" tidak cukup. Stok: ${mat.stock} ${mat.unit}, butuh tambahan: ${delta}`);
+        }
+        if (delta !== 0) {
+          await tx.material.update({
+            where: { id: dto.materialId },
+            data: { stock: { decrement: delta } },
+          });
+        }
+      } else if (old?.materialId) {
+        const mat = await tx.material.findUnique({ where: { id: old.materialId } });
+        if (mat) {
+          await tx.material.update({
+            where: { id: old.materialId },
+            data: { stock: { increment: old.inputWeight } },
+          });
+        }
+      }
+
       const record = await tx.productionRecord.update({
         where: { id },
         data: { ...dto, oee: parseFloat(oee.toFixed(2)) },
-        include: { machine: true },
+        include: { machine: true, material: true },
       });
 
       await tx.inventoryItem.deleteMany({ where: { productionId: id } });
@@ -103,6 +142,13 @@ export class ProductionService {
 
   async deleteRecord(id: string) {
     return this.prisma.$transaction(async (tx) => {
+      const rec = await tx.productionRecord.findUnique({ where: { id } });
+      if (rec?.materialId) {
+        await tx.material.update({
+          where: { id: rec.materialId },
+          data: { stock: { increment: rec.inputWeight } },
+        });
+      }
       await tx.inventoryItem.deleteMany({ where: { productionId: id } });
       return tx.productionRecord.delete({ where: { id } });
     });
