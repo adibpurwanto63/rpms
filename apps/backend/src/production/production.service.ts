@@ -7,6 +7,9 @@ export class ProductionService {
   constructor(private prisma: PrismaService, private notifications: NotificationsService) {}
 
   getMachines() { return this.prisma.machine.findMany(); }
+  createMachine(dto: { name: string; type: any; location?: string }) { return this.prisma.machine.create({ data: dto as any }); }
+  updateMachine(id: string, dto: { name?: string; type?: any; location?: string; status?: any }) { return this.prisma.machine.update({ where: { id }, data: dto }); }
+  deleteMachine(id: string) { return this.prisma.machine.delete({ where: { id } }); }
   updateMachineStatus(id: string, status: any) { return this.prisma.machine.update({ where: { id }, data: { status } }); }
 
   getRecords(machineId?: string) {

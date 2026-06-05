@@ -17,9 +17,21 @@ export class ProductionController {
   @Roles(UserRole.SUPER_ADMIN, UserRole.PRODUCTION_SUPERVISOR, UserRole.DIRECTOR, UserRole.WAREHOUSE_SUPERVISOR)
   getMachines() { return this.svc.getMachines(); }
 
+  @Post("machines")
+  @Roles(UserRole.SUPER_ADMIN, UserRole.PRODUCTION_SUPERVISOR)
+  createMachine(@Body() dto: { name: string; type: string; location?: string }) { return this.svc.createMachine(dto); }
+
+  @Put("machines/:id")
+  @Roles(UserRole.SUPER_ADMIN, UserRole.PRODUCTION_SUPERVISOR)
+  updateMachine(@Param("id") id: string, @Body() dto: { name?: string; type?: string; location?: string }) { return this.svc.updateMachine(id, dto); }
+
+  @Delete("machines/:id")
+  @Roles(UserRole.SUPER_ADMIN, UserRole.PRODUCTION_SUPERVISOR)
+  deleteMachine(@Param("id") id: string) { return this.svc.deleteMachine(id); }
+
   @Put("machines/:id/status")
   @Roles(UserRole.SUPER_ADMIN, UserRole.PRODUCTION_SUPERVISOR)
-  updateMachine(@Param("id") id: string, @Body() dto: { status: any }) { return this.svc.updateMachineStatus(id, dto.status); }
+  updateMachineStatus(@Param("id") id: string, @Body() dto: { status: any }) { return this.svc.updateMachineStatus(id, dto.status); }
 
   @Get()
   @Roles(UserRole.SUPER_ADMIN, UserRole.PRODUCTION_SUPERVISOR, UserRole.DIRECTOR, UserRole.WAREHOUSE_SUPERVISOR)
