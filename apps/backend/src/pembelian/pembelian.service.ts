@@ -59,12 +59,61 @@ export class PembelianService {
   async updateStatus(id: string, status: PurchaseOrderStatus) {
     const po = await this.prisma.purchaseOrder.findUnique({ where: { id } });
     if (!po) throw new NotFoundException("Purchase order not found");
-    const receivedAt = status === PurchaseOrderStatus.RECEIVED ? new Date() : undefined;
-    return this.prisma.purchaseOrder.update({
-      where: { id },
-      data: { status, ...(receivedAt ? { receivedAt } : {}) },
-      include: { supplier: { select: { companyName: true } } },
+    const wasReceived = po.status === PurchaseOrderStatus.RECEIVED;
+    const isReceived = status === PurchaseOrderStatus.RECEIVED;
+    const receivedAt = isReceived ? new Date() : undefined;
+
+    return this.prisma.$transaction(async (tx) => {
+      const updated = await tx.purchaseOrder.update({
+        where: { id },
+        data: { status, ...(receivedAt ? { receivedAt } : {}) },
+        include: { supplier: { select: { companyName: true } } },
+      });
+
+      if (isReceived && !wasReceived) {
+        const existing = await tx.material.findFirst({ where: { name: po.itemName } });
+        if (existing) {
+          await tx.material.update({
+            where: { id: existing.id },
+            data: {
+              stock: { increment: po.quantity },
+              unit: po.unit || existing.unit,
+              supplierId: po.supplierId || existing.supplierId,
+            },
+          });
+        } else {
+          await tx.material.create({
+            data: {
+              name: po.itemName,
+              stock: po.quantity,
+              unit: po.unit || "kg",
+              supplierId: po.supplierId || null,
+              category: this.guessCategory(po.itemName),
+              notes: `Otomatis dibuat dari PO ${po.orderNumber}`,
+            } as any,
+          });
+        }
+      } else if (!isReceived && wasReceived) {
+        const existing = await tx.material.findFirst({ where: { name: po.itemName } });
+        if (existing) {
+          const newStock = Math.max(0, existing.stock - po.quantity);
+          await tx.material.update({
+            where: { id: existing.id },
+            data: { stock: newStock },
+          });
+        }
+      }
+
+      return updated;
     });
+  }
+
+  private guessCategory(itemName: string): string {
+    const n = itemName.toLowerCase();
+    if (n.includes("kardus") || n.includes("occ") || n.includes("dlk") || n.includes("onp")) return "Kardus";
+    if (n.includes("kertas") || n.includes("hvs")) return "Kertas";
+    if (n.includes("plastik")) return "Plastik";
+    return "Lainnya";
   }
 
   async delete(id: string) {
