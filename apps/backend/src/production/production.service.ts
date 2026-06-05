@@ -9,7 +9,17 @@ export class ProductionService {
   getMachines() { return this.prisma.machine.findMany(); }
   createMachine(dto: { name: string; type: any; location?: string }) { return this.prisma.machine.create({ data: dto as any }); }
   updateMachine(id: string, dto: { name?: string; type?: any; location?: string; status?: any }) { return this.prisma.machine.update({ where: { id }, data: dto }); }
-  deleteMachine(id: string) { return this.prisma.machine.delete({ where: { id } }); }
+  async deleteMachine(id: string) {
+    return this.prisma.$transaction(async (tx) => {
+      const records = await tx.productionRecord.findMany({ where: { machineId: id }, select: { id: true } });
+      const recordIds = records.map(r => r.id);
+      if (recordIds.length > 0) {
+        await tx.inventoryItem.deleteMany({ where: { productionId: { in: recordIds } } });
+        await tx.productionRecord.deleteMany({ where: { machineId: id } });
+      }
+      return tx.machine.delete({ where: { id } });
+    });
+  }
   updateMachineStatus(id: string, status: any) { return this.prisma.machine.update({ where: { id }, data: { status } }); }
 
   getRecords(machineId?: string) {
