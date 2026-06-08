@@ -34,17 +34,21 @@ export class LogisticsService {
 
   async updateStatus(id: string, status: DeliveryStatus) {
     return this.prisma.$transaction(async (tx) => {
+      const doOrder = await tx.deliveryOrder.findUnique({ where: { id } });
+      if (!doOrder) throw new Error("Delivery order not found");
+
       if (status === DeliveryStatus.CANCELLED) {
-        const doOrder = await tx.deliveryOrder.findUnique({ where: { id } });
-        if (doOrder) {
-          await tx.vehicle.update({ where: { id: doOrder.vehicleId }, data: { status: 'AVAILABLE' } });
-          await tx.inventoryItem.updateMany({ where: { deliveryOrderId: id }, data: { status: 'IN_STOCK', deliveryOrderId: null } });
-          await tx.deliveryOrder.delete({ where: { id } });
-        }
+        await tx.vehicle.update({ where: { id: doOrder.vehicleId }, data: { status: 'AVAILABLE' } });
+        await tx.inventoryItem.updateMany({ where: { deliveryOrderId: id }, data: { status: 'IN_STOCK', deliveryOrderId: null } });
+        await tx.deliveryOrder.delete({ where: { id } });
         return { deleted: true };
       }
 
-      const doOrder = await tx.deliveryOrder.update({
+      if (status === DeliveryStatus.LOADING) {
+        await tx.vehicle.update({ where: { id: doOrder.vehicleId }, data: { status: 'ON_TRIP' } });
+      }
+
+      const updated = await tx.deliveryOrder.update({
         where: { id },
         data: {
           status,
@@ -53,13 +57,12 @@ export class LogisticsService {
       });
 
       if (status === DeliveryStatus.IN_TRANSIT) {
-        await tx.vehicle.update({ where: { id: doOrder.vehicleId }, data: { status: 'ON_TRIP' } });
         await tx.inventoryItem.updateMany({ where: { deliveryOrderId: id }, data: { status: 'SHIPPED' } });
       } else if (status === DeliveryStatus.DELIVERED) {
         await tx.vehicle.update({ where: { id: doOrder.vehicleId }, data: { status: 'AVAILABLE' } });
       }
 
-      return doOrder;
+      return updated;
     });
   }
 
@@ -68,6 +71,13 @@ export class LogisticsService {
     const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate() + 1);
     return this.prisma.deliveryOrder.aggregate({
       where: { createdAt: { gte: today, lt: tomorrow } },
+      _count: true,
+      _sum: { loadingWeight: true },
+    });
+  }
+
+  stats() {
+    return this.prisma.deliveryOrder.aggregate({
       _count: true,
       _sum: { loadingWeight: true },
     });

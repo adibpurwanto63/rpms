@@ -29,6 +29,10 @@ export class LogisticsController {
   @Roles(UserRole.SUPER_ADMIN, UserRole.LOGISTICS_MANAGER, UserRole.DIRECTOR, UserRole.WAREHOUSE_SUPERVISOR)
   getDeliveries(@Query("status") status?: DeliveryStatus) { return this.svc.getDeliveries(status); }
 
+  @Get("stats")
+  @Roles(UserRole.SUPER_ADMIN, UserRole.LOGISTICS_MANAGER, UserRole.DIRECTOR)
+  stats() { return this.svc.stats(); }
+
   @Get("stats/today")
   @Roles(UserRole.SUPER_ADMIN, UserRole.LOGISTICS_MANAGER, UserRole.DIRECTOR)
   todayStats() { return this.svc.todayStats(); }

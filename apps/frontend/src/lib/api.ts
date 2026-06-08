@@ -6,7 +6,7 @@ const api = axios.create({ baseURL: API_URL });
 
 api.interceptors.request.use((config) => {
   if (typeof window !== "undefined") {
-    const token = localStorage.getItem("rpms_token");
+    const token = localStorage.getItem("rpms_token") || sessionStorage.getItem("rpms_token");
     if (token) config.headers.Authorization = `Bearer ${token}`;
   }
   return config;

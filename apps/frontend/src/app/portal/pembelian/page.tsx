@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
 import { useRefresh } from "@/lib/refresh-context";
-import { ClipboardList, Hourglass, CheckCircle2, Banknote, ShoppingBag, Save } from "lucide-react";
+import { ClipboardList, Hourglass, CheckCircle2, Banknote, ShoppingBag, Save, CheckCircle, Truck, PackageCheck, Trash2 } from "lucide-react";
 
 const statusColor: any = {
   PENDING: "badge-warning",
@@ -361,36 +361,48 @@ export default function PembelianPage() {
                       <td>
                         <span className={`badge ${statusColor[o.status]}`}>{statusLabel[o.status]}</span>
                       </td>
-                      <td>
-                        <div style={{ display: "flex", gap: 6 }}>
-                          {statusNext[o.status] && (
-                            <button
-                              onClick={() => updateStatus(o.id, statusNext[o.status])}
-                              style={{
-                                fontSize: 12, fontWeight: 600, padding: "4px 10px", borderRadius: 6,
-                                border: "1px solid var(--color-purple)", color: "var(--color-purple)",
-                                background: "transparent", cursor: "pointer",
-                              }}
-                            >
-                              {statusNext[o.status] === "APPROVED" && "✅ Setujui"}
-                              {statusNext[o.status] === "ORDERED" && "📦 Pesan"}
-                              {statusNext[o.status] === "RECEIVED" && "✔ Terima"}
-                            </button>
-                          )}
-                          {(o.status === "PENDING" || o.status === "CANCELLED") && (
-                            <button
-                              onClick={() => deleteOrder(o.id)}
-                              style={{
-                                fontSize: 12, fontWeight: 600, padding: "4px 10px", borderRadius: 6,
-                                border: "1px solid #FF6B6B", color: "#FF6B6B",
-                                background: "transparent", cursor: "pointer",
-                              }}
-                            >
-                              🗑 Hapus
-                            </button>
-                          )}
-                        </div>
-                      </td>
+<td>
+  <div style={{ display: "flex", gap: 6 }}>
+    {statusNext[o.status] && (
+      <button
+        onClick={() => updateStatus(o.id, statusNext[o.status])}
+        title={statusNext[o.status] === "APPROVED" ? "Setujui" : statusNext[o.status] === "ORDERED" ? "Pesan" : "Terima"}
+        style={{
+          display: "flex", alignItems: "center", gap: 4,
+          fontSize: 12, fontWeight: 600, padding: "4px 10px", borderRadius: 6,
+          border: "1px solid var(--color-purple)", color: "var(--color-purple)",
+          background: "transparent", cursor: "pointer", transition: "background 0.15s",
+        }}
+        onMouseEnter={e => (e.currentTarget.style.background = "rgba(124,111,224,0.08)")}
+        onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+      >
+        {statusNext[o.status] === "APPROVED" && <CheckCircle size={13} />}
+        {statusNext[o.status] === "ORDERED" && <Truck size={13} />}
+        {statusNext[o.status] === "RECEIVED" && <PackageCheck size={13} />}
+        {statusNext[o.status] === "APPROVED" && "Setujui"}
+        {statusNext[o.status] === "ORDERED" && "Pesan"}
+        {statusNext[o.status] === "RECEIVED" && "Terima"}
+      </button>
+    )}
+    {(o.status === "PENDING" || o.status === "CANCELLED") && (
+      <button
+        onClick={() => deleteOrder(o.id)}
+        title="Hapus"
+        style={{
+          display: "flex", alignItems: "center", gap: 4,
+          fontSize: 12, fontWeight: 600, padding: "4px 10px", borderRadius: 6,
+          border: "1px solid #FF6B6B", color: "#FF6B6B",
+          background: "transparent", cursor: "pointer", transition: "background 0.15s",
+        }}
+        onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,107,107,0.08)")}
+        onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+      >
+        <Trash2 size={13} />
+        Hapus
+      </button>
+    )}
+  </div>
+</td>
                     </tr>
                   ))
                 )}
