@@ -245,10 +245,13 @@ export default function ProductionPage() {
       )}
 
       {/* Today stats summary row */}
-      {!loading && stats && (
-        <div className="rg-4">
-          {[
-            { label: "Material", value: `${((stats._sum?.inputWeight || 0) / 1000).toFixed(2)} Ton`, Icon: ArrowDownToLine, variant: "neutral" },
+      {!loading && stats && (() => {
+        const displayMaterials = filterMaterialId ? materials.filter((m: any) => m.id === filterMaterialId) : materials;
+        const totalStock = displayMaterials.reduce((s: number, m: any) => s + (m.stock || 0), 0);
+        return (
+          <div className="rg-4">
+            {[
+              { label: "Material", value: `${(totalStock / 1000).toFixed(2)} Ton`, Icon: ArrowDownToLine, variant: "neutral" },
             { label: "Output Produksi", value: `${((stats._sum?.outputWeight || 0) / 1000).toFixed(2)} Ton`, Icon: ArrowUpFromLine, variant: "mint" },
             { label: "Bale Selesai", value: stats._sum?.baleCount || 0, Icon: Package, variant: "dark" },
             { label: "Rata-Rata OEE", value: `${(stats._avg?.oee || 0).toFixed(1)}%`, Icon: BarChart2, variant: "pink" },
@@ -296,7 +299,8 @@ export default function ProductionPage() {
             </div>
           ))}
         </div>
-      )}
+      );
+    })()}
 
       {/* Material Stock Dashboard */}
       {!loading && materials.length > 0 && (
