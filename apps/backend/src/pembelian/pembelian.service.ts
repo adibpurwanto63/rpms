@@ -40,19 +40,38 @@ export class PembelianService {
     deliveryDate?: string;
   }) {
     const totalAmount = dto.quantity * dto.unitPrice;
-    return this.prisma.purchaseOrder.create({
-      data: {
-        orderNumber: this.generateOrderNumber(),
-        supplierId: dto.supplierId,
-        itemName: dto.itemName,
-        quantity: dto.quantity,
-        unit: dto.unit || "kg",
-        unitPrice: dto.unitPrice,
-        totalAmount,
-        notes: dto.notes,
-        deliveryDate: dto.deliveryDate ? new Date(dto.deliveryDate) : undefined,
-      },
-      include: { supplier: { select: { companyName: true } } },
+
+    return this.prisma.$transaction(async (tx) => {
+      const po = await tx.purchaseOrder.create({
+        data: {
+          orderNumber: this.generateOrderNumber(),
+          supplierId: dto.supplierId,
+          itemName: dto.itemName,
+          quantity: dto.quantity,
+          unit: dto.unit || "kg",
+          unitPrice: dto.unitPrice,
+          totalAmount,
+          notes: dto.notes,
+          deliveryDate: dto.deliveryDate ? new Date(dto.deliveryDate) : undefined,
+        },
+        include: { supplier: { select: { companyName: true } } },
+      });
+
+      const existing = await tx.material.findFirst({ where: { name: dto.itemName } });
+      if (!existing) {
+        await tx.material.create({
+          data: {
+            name: dto.itemName,
+            stock: 0,
+            unit: dto.unit || "kg",
+            supplierId: dto.supplierId || null,
+            category: this.guessCategory(dto.itemName),
+            notes: `Otomatis dibuat dari PO ${po.orderNumber}`,
+          } as any,
+        });
+      }
+
+      return po;
     });
   }
 
