@@ -106,7 +106,7 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 20 }}>
           <div>
-            <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 8 }}>Alamat Email</label>
+            <label htmlFor="email" style={{ display: "block", fontSize: 13, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 8 }}>Alamat Email</label>
             <div style={{ position: "relative" }}>
               <div style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }}>
                 <Mail size={18} />
@@ -132,7 +132,7 @@ export default function LoginPage() {
             </div>
           </div>
           <div>
-            <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 8 }}>Kata Sandi</label>
+            <label htmlFor="password" style={{ display: "block", fontSize: 13, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 8 }}>Kata Sandi</label>
             <div style={{ position: "relative" }}>
               <div style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }}>
                 <Lock size={18} />
