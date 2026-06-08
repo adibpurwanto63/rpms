@@ -9,7 +9,7 @@ import api from "@/lib/api";
 import {
   LayoutDashboard, ShoppingCart, Scale, ShoppingBag, Factory,
   Warehouse, Truck, BarChart2, ShieldCheck, Settings,
-  Bell, ChevronRight, Home, LogOut, User, HelpCircle, Moon, Package
+  Bell, ChevronRight, Home, LogOut, User, HelpCircle, Moon, Package, Clock, AlertTriangle
 } from "lucide-react";
 
 const navItems = [
@@ -52,6 +52,38 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
   const notificationsRef = useRef<HTMLDivElement>(null);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [sessionRemaining, setSessionRemaining] = useState<number | null>(null);
+  const [lastActivity, setLastActivity] = useState(Date.now());
+
+  const SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutes
+
+  useEffect(() => {
+    const events = ["mousedown", "mousemove", "keydown", "scroll", "touchstart", "click"];
+    const resetActivity = () => setLastActivity(Date.now());
+    events.forEach(e => window.addEventListener(e, resetActivity, { passive: true }));
+    return () => events.forEach(e => window.removeEventListener(e, resetActivity));
+  }, []);
+
+  useEffect(() => {
+    if (!user) return;
+    const updateCountdown = () => {
+      const elapsed = Date.now() - lastActivity;
+      const remaining = Math.max(0, SESSION_TIMEOUT - elapsed);
+      setSessionRemaining(remaining);
+      if (remaining === 0) {
+        logout();
+      }
+    };
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 1000);
+    return () => clearInterval(interval);
+  }, [user, lastActivity, logout]);
+
+  const formatSession = (ms: number) => {
+    const min = Math.floor(ms / 60000);
+    const sec = Math.floor((ms % 60000) / 1000);
+    return `${min}:${sec.toString().padStart(2, "0")}`;
+  };
 
   useEffect(() => {
     const saved = localStorage.getItem("rpms_theme") as "light" | "dark" | null;
@@ -312,6 +344,43 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            {sessionRemaining !== null && (
+              <div
+                title="Waktu sebelum logout otomatis (30 menit tanpa aktivitas)"
+                style={{
+                  display: "flex", alignItems: "center", gap: 5,
+                  padding: "4px 10px",
+                  borderRadius: 6,
+                  fontSize: 12,
+                  fontWeight: 600,
+                  fontFamily: "monospace",
+                  background: sessionRemaining < 5 * 60 * 1000
+                    ? sessionRemaining < 60 * 1000
+                      ? "rgba(255, 107, 157, 0.15)"
+                      : "rgba(251, 191, 36, 0.15)"
+                    : "var(--bg-secondary)",
+                  color: sessionRemaining < 5 * 60 * 1000
+                    ? sessionRemaining < 60 * 1000
+                      ? "var(--color-pink)"
+                      : "#FBBF24"
+                    : "var(--text-muted)",
+                  border: `1px solid ${sessionRemaining < 5 * 60 * 1000
+                    ? sessionRemaining < 60 * 1000
+                      ? "var(--color-pink)"
+                      : "#FBBF24"
+                    : "var(--border-light)"}`,
+                  cursor: "default",
+                }}
+              >
+                {sessionRemaining < 5 * 60 * 1000 ? (
+                  <AlertTriangle size={12} />
+                ) : (
+                  <Clock size={12} />
+                )}
+                {formatSession(sessionRemaining)}
+              </div>
+            )}
+
             {/* Notification bell */}
             <div ref={notificationsRef} style={{ position: "relative" }}>
               <div

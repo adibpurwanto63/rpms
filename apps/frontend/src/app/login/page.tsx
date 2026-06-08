@@ -9,6 +9,7 @@ import {
 export default function LoginPage() {
   const [email, setEmail] = useState("admin@rpms.id");
   const [password, setPassword] = useState("Admin@123");
+  const [remember, setRemember] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const { login } = useAuth();
@@ -18,7 +19,7 @@ export default function LoginPage() {
     e.preventDefault();
     setError(""); setLoading(true);
     try {
-      await login(email, password);
+      await login(email, password, remember);
       router.push("/portal/dashboard");
     } catch {
       setError("Email atau password salah. Silakan coba lagi.");
@@ -159,8 +160,15 @@ export default function LoginPage() {
           
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: -4 }}>
             <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
-              <input type="checkbox" style={{ accentColor: "var(--color-primary)", width: 16, height: 16 }} />
-              <span style={{ fontSize: 13, color: "var(--text-secondary)" }}>Ingat saya</span>
+              <input
+                type="checkbox"
+                checked={remember}
+                onChange={(e) => setRemember(e.target.checked)}
+                style={{ accentColor: "var(--color-primary)", width: 16, height: 16 }}
+              />
+              <span style={{ fontSize: 13, color: "var(--text-secondary)" }}>
+                Ingat saya ({remember ? "30 hari" : "sesi ini saja"})
+              </span>
             </label>
             <a href="#" style={{ fontSize: 13, fontWeight: 600, color: "var(--color-primary)", textDecoration: "none" }}>Lupa sandi?</a>
           </div>
