@@ -114,7 +114,7 @@ export default function SettingsPage() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+      <div className="page-header-responsive" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
           <div style={{ width: 48, height: 48, borderRadius: 12, background: "rgba(124,111,224,0.1)", color: "var(--color-primary)", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <Settings size={24} strokeWidth={2} />
@@ -148,7 +148,7 @@ export default function SettingsPage() {
         )}
       </div>
 
-      <div className="erp-card" style={{ display: "flex", alignItems: "center", gap: 24, padding: "24px 32px" }}>
+      <div className="erp-card" style={{ display: "flex", alignItems: "center", gap: 24, padding: "24px 32px", flexWrap: "wrap" }}>
         <div style={{ position: "relative" }}>
           <div style={{
             width: 80, height: 80, borderRadius: "50%",
@@ -211,7 +211,7 @@ export default function SettingsPage() {
             </div>
             <div className="erp-card-body" style={{ padding: "24px" }}>
               <form onSubmit={submit}>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 24 }}>
+                <div className="modal-form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 24 }}>
                   <div style={{ gridColumn: "span 2" }}>
                     <label className="form-label" style={{ display: "flex", alignItems: "center", gap: 6 }}><User size={14} /> Nama Lengkap</label>
                     <input className="form-input" value={form.name} onChange={e => setForm({...form, name: e.target.value})} placeholder="Masukkan nama pengguna" required />

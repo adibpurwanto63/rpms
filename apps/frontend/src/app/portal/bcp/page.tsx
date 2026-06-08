@@ -55,7 +55,7 @@ export default function BcpPage() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
       {/* Page Header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+      <div className="page-header-responsive" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div>
           <h2 style={{ fontSize: 22, fontWeight: 700, color: "var(--text-primary)", letterSpacing: "-0.02em" }}>Business Continuity Center</h2>
           <p style={{ fontSize: 14, color: "var(--text-secondary)", marginTop: 4 }}>Manajemen Insiden, Mitigasi Risiko, & Sistem Notifikasi BCP</p>
@@ -67,7 +67,7 @@ export default function BcpPage() {
 
       {/* Alert Summary */}
       {!loading && alerts && (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
+        <div className="rg-3">
           {[
             { label: "Insiden Terbuka", value: alerts.openIncidents, Icon: AlertTriangle, variant: "dark", colorHex: "#7C6FE0" },
             { label: "Insiden Kritis", value: alerts.criticalIncidents, Icon: Siren, variant: "pink", colorHex: "#FF6B9D" },
@@ -100,7 +100,7 @@ export default function BcpPage() {
             </div>
             <div className="erp-card-body" style={{ padding: 24 }}>
               <form onSubmit={submit}>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
+                <div className="modal-form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
                   <div>
                     <label className="form-label">Tipe Insiden</label>
                     <select className="form-input" value={form.type} onChange={e => setForm({ ...form, type: e.target.value })}>
@@ -137,7 +137,7 @@ export default function BcpPage() {
           <div style={{ width: 36, height: 36, border: "3px solid #EDE9FF", borderTop: "3px solid #7C6FE0", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
         </div>
       ) : (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
+        <div className="rg-1-1">
           {/* Incidents */}
           <div className="erp-card">
             <div className="erp-card-header">

@@ -131,7 +131,7 @@ export default function WarehousePage() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+      <div className="page-header-responsive" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div>
           <h2 style={{ fontSize: 22, fontWeight: 700, color: "var(--text-primary)", letterSpacing: "-0.02em" }}>Manajemen Gudang (WMS)</h2>
           <p style={{ fontSize: 14, color: "var(--text-secondary)", marginTop: 4 }}>Sistem manajemen gudang terintegrasi — Penerimaan, Stok, dan Pengiriman</p>
@@ -170,7 +170,7 @@ export default function WarehousePage() {
       {activeTab === "DASHBOARD" && (
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
           {/* KPI Row */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16 }}>
+          <div className="rg-auto">
             {[
               { label: "Total Stok Aktif", value: `${(totalStock / 1000).toFixed(2)} Ton`, sub: `${inventory.length} bale`, color: "var(--kpi-dark)", dark: true },
               { label: "Masuk Hari Ini", value: todayStats.inbound, sub: "bale diterima", color: "var(--kpi-mint-bg)", dark: false },
@@ -224,8 +224,8 @@ export default function WarehousePage() {
                 </span>
               </div>
               <div className="erp-card-body" style={{ padding: 24 }}>
-                <form onSubmit={submitInbound}>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginBottom: 16 }}>
+                  <form onSubmit={submitInbound}>
+                  <div className="modal-form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginBottom: 16 }}>
                     <div>
                       <label className="form-label">Bale ID</label>
                       <input className="form-input" value={inboundForm.baleId} onChange={e => setInboundForm({ ...inboundForm, baleId: e.target.value })} placeholder="BALE-2024-001" required />
@@ -308,7 +308,7 @@ export default function WarehousePage() {
       {activeTab === "STOCK" && (
         <div className="erp-card">
           <div className="erp-card-header" style={{ borderBottom: "none", paddingBottom: 0 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", width: "100%", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", width: "100%", alignItems: "flex-start", flexDirection: "column", gap: 12 }}>
               <div>
                 <span className="erp-card-title">Daftar Stok Bale</span>
                 <div style={{ fontSize: 13, color: "var(--text-secondary)", marginTop: 4 }}>
@@ -316,34 +316,34 @@ export default function WarehousePage() {
                   {selectedIds.length > 0 && <span style={{ color: "var(--brand-purple)", fontWeight: 600, marginLeft: 12 }}>{selectedIds.length} terpilih</span>}
                 </div>
               </div>
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                <select className="form-input" style={{ width: 150 }} value={stockFilter.area} onChange={e => setStockFilter({ ...stockFilter, area: e.target.value })}>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", width: "100%" }}>
+                <select className="form-input" style={{ flex: "1 1 120px", minWidth: 120 }} value={stockFilter.area} onChange={e => setStockFilter({ ...stockFilter, area: e.target.value })}>
                   <option value="">Semua Area</option>
                   <option value="RAW_MATERIAL">Bahan Baku</option>
                   <option value="FINISHED_GOODS">Barang Jadi</option>
                   <option value="REJECTED">Reject</option>
                 </select>
-                <select className="form-input" style={{ width: 130 }} value={stockFilter.grade} onChange={e => setStockFilter({ ...stockFilter, grade: e.target.value })}>
+                <select className="form-input" style={{ flex: "1 1 100px", minWidth: 100 }} value={stockFilter.grade} onChange={e => setStockFilter({ ...stockFilter, grade: e.target.value })}>
                   <option value="">Semua Grade</option>
                   <option value="A">Grade A</option>
                   <option value="B">Grade B</option>
                   <option value="REJECT">Reject</option>
                 </select>
-                <select className="form-input" style={{ width: 130 }} value={stockFilter.status} onChange={e => setStockFilter({ ...stockFilter, status: e.target.value })}>
+                <select className="form-input" style={{ flex: "1 1 100px", minWidth: 100 }} value={stockFilter.status} onChange={e => setStockFilter({ ...stockFilter, status: e.target.value })}>
                   <option value="">Semua Status</option>
                   <option value="IN_STOCK">In Stock</option>
                   <option value="RESERVED">Reserved</option>
                   <option value="SHIPPED">Shipped</option>
                 </select>
                 {selectedIds.length > 0 && (
-                  <>
+                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap", width: "100%", marginTop: 4 }}>
                     <button onClick={reserveSelected} className="btn btn-secondary" style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 12px", fontSize: 13 }}>
                       <Pin size={14} /> Reservasi ({selectedIds.length})
                     </button>
                     <button onClick={() => { setMoveForm({ ...moveForm, id: selectedIds[0] }); setShowMoveModal(true); }} className="btn btn-secondary" style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 12px", fontSize: 13 }}>
                       <ArrowRightLeft size={14} /> Pindah
                     </button>
-                  </>
+                  </div>
                 )}
               </div>
             </div>

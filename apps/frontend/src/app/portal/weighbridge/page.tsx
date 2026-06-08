@@ -37,7 +37,7 @@ export default function WeighbridgePage() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
       {/* Page Header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+      <div className="page-header-responsive" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div>
           <h2 style={{ fontSize: 22, fontWeight: 700, color: "var(--text-primary)", letterSpacing: "-0.02em" }}>Manajemen Timbangan</h2>
           <p style={{ fontSize: 14, color: "var(--text-secondary)", marginTop: 4 }}>Tiket timbang digital, tracking armada, & histori transaksi</p>
@@ -49,7 +49,7 @@ export default function WeighbridgePage() {
 
       {/* Today stats summary row */}
       {!loading && stats && (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
+        <div className="rg-3">
           {[
             { label: "Tiket Hari Ini", value: stats._count || 0, Icon: Ticket, variant: "dark" },
             { label: "Total Netto", value: `${((stats._sum?.netWeight || 0) / 1000).toFixed(2)} Ton`, Icon: Scale, variant: "mint" },
@@ -81,7 +81,7 @@ export default function WeighbridgePage() {
             </div>
             <div className="erp-card-body" style={{ padding: 24 }}>
               <form onSubmit={submit}>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 20 }}>
+                <div className="modal-form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 20 }}>
                   <div style={{ gridColumn: "span 2" }}>
                     <label className="form-label">Supplier Pengirim</label>
                     <select className="form-input" value={form.supplierId} onChange={e => setForm({ ...form, supplierId: e.target.value })} required>

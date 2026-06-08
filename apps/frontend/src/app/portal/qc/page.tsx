@@ -36,7 +36,7 @@ export default function QcPage() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
       {/* Page Header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+      <div className="page-header-responsive" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div>
           <h2 style={{ fontSize: 22, fontWeight: 700, color: "var(--text-primary)", letterSpacing: "-0.02em" }}>Quality Control</h2>
           <p style={{ fontSize: 14, color: "var(--text-secondary)", marginTop: 4 }}>Inspeksi material & grading kualitas OCC</p>
@@ -48,7 +48,7 @@ export default function QcPage() {
 
       {/* Stats summary row */}
       {!loading && stats.length > 0 && (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
+        <div className="rg-3">
           {[
             { label: "Grade A (Diterima)", value: getStat("A"), Icon: CheckCircle2, variant: "mint" },
             { label: "Grade B (Sortir)", value: getStat("B"), Icon: AlertTriangle, variant: "dark" },
@@ -80,7 +80,7 @@ export default function QcPage() {
             </div>
             <div className="erp-card-body" style={{ padding: 24 }}>
               <form onSubmit={submit}>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
+                <div className="modal-form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
                   <div>
                     <label className="form-label">Tiket Timbangan</label>
                     <select className="form-input" value={form.ticketId} onChange={e => setForm({ ...form, ticketId: e.target.value })} required>

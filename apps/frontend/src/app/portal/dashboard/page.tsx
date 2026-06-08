@@ -53,7 +53,7 @@ export default function DashboardPage() {
 
   if (loading) return (
     <div className="flex items-center justify-center h-64">
-      <div style={{ width: 40, height: 40, border: "3px solid #EDE9FF", borderTop: "3px solid #7C6FE0", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+      <div style={{ width: 40, height: 40, border: "3px solid var(--color-primary-light)", borderTop: "3px solid var(--color-primary)", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
     </div>
   );
 
@@ -130,13 +130,13 @@ export default function DashboardPage() {
   const totalSales = donutData.reduce((acc, curr) => acc + curr.value, 0);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+    <div className="db-gap" style={{ display: "flex", flexDirection: "column", gap: 24 }}>
 
       {/* Risk Alert */}
       {data.riskStatus.openIncidents > 0 && (
-        <div style={{
-          background: "#FFF5F5",
-          border: "1px solid #FEE2E2",
+        <div className="db-risk-alert" style={{
+          background: "var(--color-red-light)",
+          border: "1px solid var(--color-red)",
           borderRadius: 12,
           padding: "14px 20px",
           display: "flex",
@@ -152,22 +152,23 @@ export default function DashboardPage() {
       )}
 
       {/* Overview header row */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <h2 style={{ fontSize: 20, fontWeight: 700, color: "var(--text-primary)", letterSpacing: "-0.02em" }}>Overview</h2>
+      <div className="page-header-responsive" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <h2 className="db-overview-title" style={{ fontSize: 20, fontWeight: 700, color: "var(--text-primary)", letterSpacing: "-0.02em" }}>Overview</h2>
         <div style={{
           display: "flex", alignItems: "center", gap: 8,
           padding: "8px 14px",
-          background: "#fff",
+          background: "var(--bg-card)",
           border: "1px solid var(--border-light)",
           borderRadius: 8,
           fontSize: 13,
           color: "var(--text-secondary)",
           cursor: "pointer",
           position: "relative",
-          overflow: "hidden"
+          overflow: "hidden",
+          flexShrink: 0,
         }}>
           <Calendar size={14} />
-          <span style={{ minWidth: 85 }}>{new Date(selectedDate).toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}</span>
+          <span style={{ minWidth: 85, fontSize: 12 }}>{new Date(selectedDate).toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })}</span>
           <ChevronDown size={14} />
           <input 
             type="date"
@@ -179,25 +180,25 @@ export default function DashboardPage() {
       </div>
 
       {/* KPI Grid */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 20 }}>
+      <div className="rg-4">
         {kpis.map((k, i) => (
-          <div key={i} className="kpi-card" style={variantStyles[k.variant]}>
+          <div key={i} className="kpi-card db-kpi-card" style={variantStyles[k.variant]}>
             <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
-              <div style={{ fontSize: 12, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--text-secondary)" }}>
+              <div className="db-kpi-sub" style={{ fontSize: 12, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--text-secondary)" }}>
                 {k.label}
               </div>
-              <div style={{ width: 36, height: 36, borderRadius: 8, background: k.iconBg, display: "flex", alignItems: "center", justifyContent: "center", color: "var(--color-primary)" }}>
+              <div className="db-kpi-icon" style={{ width: 36, height: 36, borderRadius: 8, background: k.iconBg, display: "flex", alignItems: "center", justifyContent: "center", color: "var(--color-primary)" }}>
                 {k.Icon && <k.Icon size={18} strokeWidth={2} />}
               </div>
             </div>
-            <div style={{ fontSize: "1.65rem", fontWeight: 700, letterSpacing: "-0.03em", color: "var(--text-primary)", lineHeight: 1.15 }}>
+            <div className="db-kpi-value" style={{ fontSize: "1.65rem", fontWeight: 700, letterSpacing: "-0.03em", color: "var(--text-primary)", lineHeight: 1.15 }}>
               {k.value}
             </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
               <span style={{ display: "flex", alignItems: "center", gap: 2, fontSize: 12, fontWeight: 600, color: k.trendUp ? "var(--color-green)" : "var(--color-red)" }}>
                 {k.trendUp ? <ArrowUp size={12} strokeWidth={3} /> : <ArrowDown size={12} strokeWidth={3} />} {k.trend}
               </span>
-              <span style={{ fontSize: 12, color: k.variant === "dark" ? "rgba(255,255,255,0.5)" : "var(--text-muted)" }}>
+              <span className="db-kpi-sub" style={{ fontSize: 12, color: "var(--text-muted)" }}>
                 {k.sub}
               </span>
             </div>
@@ -206,11 +207,11 @@ export default function DashboardPage() {
       </div>
 
       {/* Charts Row 1 */}
-      <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 20 }}>
+      <div className="rg-chart-2-1">
 
         {/* Orders Overview Area Chart */}
         <div className="erp-card">
-          <div className="erp-card-header">
+          <div className="erp-card-header db-chart-header">
             <span className="erp-card-title">Tren Pembelian & Penjualan</span>
             <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
               {(chartFilter === "Semua" || chartFilter === "Pembelian") && (
@@ -240,7 +241,7 @@ export default function DashboardPage() {
               </select>
             </div>
           </div>
-          <div style={{ padding: "1.25rem 1rem 0.5rem" }}>
+          <div className="db-chart-area" style={{ padding: "1.25rem 1rem 0.5rem" }}>
             <ResponsiveContainer width="100%" height={220}>
               <AreaChart data={trend} margin={{ top: 5, right: 5, left: -20, bottom: 5 }}>
                 <defs>
@@ -253,12 +254,12 @@ export default function DashboardPage() {
                     <stop offset="95%" stopColor="#4ECDC4" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#F0F2F7" vertical={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border-light)" vertical={false} />
                 <XAxis dataKey="date" tick={{ fill: "#9CA3AF", fontSize: 11 }} tickFormatter={d => d.slice(5)} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fill: "#9CA3AF", fontSize: 11 }} tickFormatter={v => `${(v / 1000).toFixed(0)}T`} axisLine={false} tickLine={false} />
                 <Tooltip
-                  contentStyle={{ background: "#1A1C2B", border: "none", borderRadius: 8, fontSize: 12, color: "#fff", boxShadow: "0 4px 12px rgba(0,0,0,0.3)" }}
-                  labelStyle={{ color: "rgba(255,255,255,0.7)", marginBottom: 4 }}
+                  contentStyle={{ background: "var(--bg-card)", border: "1px solid var(--border-light)", borderRadius: 8, fontSize: 12, color: "var(--text-primary)", boxShadow: "var(--shadow-dropdown)" }}
+                  labelStyle={{ color: "var(--text-secondary)", marginBottom: 4 }}
                   formatter={(v: any) => [`${(v / 1000).toFixed(2)} Ton`]}
                 />
                 {(chartFilter === "Semua" || chartFilter === "Pembelian") && (
@@ -278,7 +279,7 @@ export default function DashboardPage() {
             <span className="erp-card-title">Sale Analytics</span>
           </div>
           <div className="erp-card-body" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 20 }}>
-            <div style={{ position: "relative", width: 180, height: 180 }}>
+            <div className="db-donut-wrap" style={{ position: "relative", width: 180, height: 180 }}>
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
@@ -300,7 +301,7 @@ export default function DashboardPage() {
                 position: "absolute", inset: 0,
                 display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center"
               }}>
-                <div style={{ fontSize: 26, fontWeight: 800, color: "var(--text-primary)", letterSpacing: "-0.03em" }}>
+                <div className="db-donut-label" style={{ fontSize: 26, fontWeight: 800, color: "var(--text-primary)", letterSpacing: "-0.03em" }}>
                   {fmtPct(data.todayProduction.avgOee)}
                 </div>
                 <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>OEE Hari ini</div>
@@ -325,7 +326,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Charts Row 2 */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 20 }}>
+      <div className="rg-chart-1-2">
         {/* Finance KPIs */}
         <div className="erp-card">
           <div className="erp-card-header">
@@ -338,13 +339,13 @@ export default function DashboardPage() {
               { label: "Piutang (AR)", value: fmtRp(data.finance.totalAR), color: "var(--color-amber)", Icon: TrendingUp },
               { label: "Hutang (AP)", value: fmtRp(data.finance.totalAP), color: "var(--color-red)", Icon: TrendingDown },
             ].map((item, i) => (
-              <div key={i} style={{
+              <div key={i} className="db-finance-item" style={{
                 display: "flex", alignItems: "center", justifyContent: "space-between",
                 padding: "14px 0",
                 borderBottom: i < 3 ? "1px solid var(--border-light)" : "none",
               }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <div style={{
+                  <div className="db-finance-icon" style={{
                     width: 36, height: 36, borderRadius: 8,
                     background: `${item.color}15`,
                     display: "flex", alignItems: "center", justifyContent: "center",
@@ -352,9 +353,9 @@ export default function DashboardPage() {
                   }}>
                     <item.Icon size={18} strokeWidth={2} />
                   </div>
-                  <span style={{ fontSize: 14, color: "var(--text-secondary)", fontWeight: 500 }}>{item.label}</span>
+                  <span className="db-finance-label" style={{ fontSize: 14, color: "var(--text-secondary)", fontWeight: 500 }}>{item.label}</span>
                 </div>
-                <span style={{ fontSize: 15, fontWeight: 700, color: item.color }}>{item.value}</span>
+                <span className="db-finance-value" style={{ fontSize: 15, fontWeight: 700, color: item.color }}>{item.value}</span>
               </div>
             ))}
 
@@ -363,13 +364,13 @@ export default function DashboardPage() {
                 <span style={{ fontSize: 13, color: "var(--text-secondary)" }}>OEE Rata-rata</span>
                 <span style={{ fontSize: 14, fontWeight: 700, color: "var(--text-primary)" }}>{fmtPct(data.todayProduction.avgOee)}</span>
               </div>
-              <div style={{ height: 8, background: "#F0F2F7", borderRadius: 99 }}>
-                <div style={{
-                  height: 8, borderRadius: 99,
-                  width: `${Math.min(100, data.todayProduction.avgOee)}%`,
-                  background: "linear-gradient(90deg, #7C6FE0, #4ECDC4)",
-                  transition: "width 1s ease",
-                }} />
+                  <div style={{ height: 8, background: "var(--bg-secondary)", borderRadius: 99 }}>
+                    <div style={{
+                      height: 8, borderRadius: 99,
+                      width: `${Math.min(100, data.todayProduction.avgOee)}%`,
+                      background: "linear-gradient(90deg, var(--color-primary), var(--color-teal))",
+                      transition: "width 1s ease",
+                    }} />
               </div>
             </div>
           </div>
@@ -432,7 +433,7 @@ export default function DashboardPage() {
                   <td style={{ fontWeight: 600 }}>{p.outputWeight?.toLocaleString("id-ID") || "—"}</td>
                   <td>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      <div style={{ flex: 1, height: 6, background: "#F0F2F7", borderRadius: 99, minWidth: 60 }}>
+                      <div style={{ flex: 1, height: 6, background: "var(--bg-secondary)", borderRadius: 99, minWidth: 60 }}>
                         <div style={{
                           height: 6, borderRadius: 99,
                           width: `${Math.min(100, p.oee || 0)}%`,
@@ -456,15 +457,15 @@ export default function DashboardPage() {
       {/* Pembelian PO Widget */}
       {data.pembelian && (
         <div className="erp-card">
-          <div className="erp-card-header">
-            <span className="erp-card-title">🛍️ Purchase Order Terbaru</span>
+          <div className="erp-card-header db-po-header">
+            <span className="erp-card-title">Purchase Order Terbaru</span>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
               {data.pembelian.pendingPO > 0 && (
-                <span style={{ fontSize: 13, fontWeight: 600, color: "var(--color-amber)", background: "#FFF8E7", padding: "4px 10px", borderRadius: 6 }}>
-                  ⏳ {data.pembelian.pendingPO} PO aktif
+                <span style={{ fontSize: 13, fontWeight: 600, color: "var(--color-amber)", background: "var(--color-amber-light)", padding: "4px 10px", borderRadius: 6 }}>
+                  {data.pembelian.pendingPO} PO aktif
                 </span>
               )}
-              <a href="/portal/pembelian" style={{ fontSize: 13, color: "var(--color-purple)", fontWeight: 600, textDecoration: "none" }}>Lihat Semua →</a>
+              <a href="/portal/pembelian" style={{ fontSize: 13, color: "var(--color-purple)", fontWeight: 600, textDecoration: "none", whiteSpace: "nowrap" }}>Lihat Semua →</a>
             </div>
           </div>
           <div style={{ overflowX: "auto" }}>

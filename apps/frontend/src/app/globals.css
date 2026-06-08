@@ -5,7 +5,8 @@
    Clean, compact, enterprise-grade UI
    ============================================ */
 
-:root {
+:root,
+[data-theme="light"] {
   /* ── Brand / Primary ─────────────────────────────────── */
   --color-primary:        #2490EF;
   --color-primary-light:  rgba(36, 144, 239, 0.10);
@@ -67,6 +68,57 @@
   --border-radius-sm:     4px;
   --border-radius-md:     6px;
   --border-radius-lg:     8px;
+}
+
+/* ============================================
+   Dark Theme
+   ============================================ */
+[data-theme="dark"] {
+  --color-primary:        #4B9EFF;
+  --color-primary-light:  rgba(75, 158, 255, 0.15);
+  --color-primary-dark:   #6BB0FF;
+
+  --color-green:          #34D399;
+  --color-green-light:    rgba(52, 211, 153, 0.15);
+  --color-amber:          #FBBF24;
+  --color-amber-light:    rgba(251, 191, 36, 0.15);
+  --color-red:            #F87171;
+  --color-red-light:      rgba(248, 113, 113, 0.15);
+  --color-info:           #60A5FA;
+  --color-info-light:     rgba(96, 165, 250, 0.15);
+  --color-purple:         #A78BFA;
+  --color-purple-light:   rgba(167, 139, 250, 0.15);
+  --color-teal:           #34D399;
+  --color-teal-light:     rgba(52, 211, 153, 0.15);
+
+  --brand-purple:         var(--color-primary);
+  --brand-teal:           var(--color-teal);
+  --color-purple-x:       var(--color-purple);
+
+  --bg-app:               #0F1117;
+  --bg-card:              #1A1D28;
+  --bg-sidebar:           #13151E;
+  --bg-secondary:         #1E212E;
+  --bg-hover:             #252836;
+
+  --text-primary:         #EDEDEE;
+  --text-secondary:       #9CA3AF;
+  --text-muted:           #6B7280;
+  --text-white:           #FFFFFF;
+
+  --border-light:         #2A2D3A;
+  --border-medium:        #373B4A;
+  --border-strong:        #4B4F5E;
+
+  --shadow-card:          0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
+  --shadow-card-hover:    0 4px 12px rgba(0,0,0,0.4);
+  --shadow-dropdown:      0 8px 24px rgba(0,0,0,0.5);
+  --shadow-sidebar:       1px 0 0 var(--border-light);
+
+  --kpi-dark:             #1A1D28;
+  --kpi-mint-bg:          #1A1D28;
+  --kpi-pink-bg:          #1A1D28;
+  --kpi-neutral-bg:       #1A1D28;
 }
 
 /* ============================================
@@ -481,3 +533,192 @@ th, td { text-align: left; }
 .alert-warning { background: var(--color-amber-light); border-color: var(--color-amber); color: var(--color-amber); }
 .alert-success { background: var(--color-green-light); border-color: var(--color-green); color: var(--color-green); }
 .alert-danger  { background: var(--color-red-light);   border-color: var(--color-red);   color: var(--color-red); }
+
+/* ============================================
+   Responsive Grid Classes
+   ============================================ */
+.rg-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.rg-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.rg-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+.rg-auto { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+.rg-chart-2-1 { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+.rg-chart-1-2 { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; }
+.rg-1-1 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+
+/* ============================================
+   Responsive Breakpoints
+   ============================================ */
+@media (max-width: 1200px) {
+  .rg-4 { grid-template-columns: repeat(2, 1fr); }
+  .rg-chart-2-1 { grid-template-columns: 1fr; }
+  .rg-chart-1-2 { grid-template-columns: 1fr; }
+}
+@media (max-width: 900px) {
+  .rg-3 { grid-template-columns: repeat(2, 1fr); }
+  .rg-2 { grid-template-columns: 1fr; }
+  .rg-1-1 { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .rg-4 { grid-template-columns: 1fr; }
+  .rg-3 { grid-template-columns: 1fr; }
+  .rg-2 { grid-template-columns: 1fr; }
+}
+
+/* ============================================
+   Mobile Sidebar Overlay
+   ============================================ */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 45;
+  backdrop-filter: blur(4px);
+}
+
+@media (max-width: 768px) {
+  html.mobile-sidebar-open { overflow: hidden; }
+  .sidebar-overlay { display: block; }
+
+  .mobile-only { display: flex !important; }
+  .desktop-only { display: none !important; }
+
+  .sidebar-responsive {
+    position: fixed !important;
+    left: -280px !important;
+    width: 260px !important;
+    transition: left 0.3s cubic-bezier(0.4,0,0.2,1) !important;
+    z-index: 50 !important;
+  }
+  .sidebar-responsive.open {
+    left: 0 !important;
+  }
+
+  .main-content-responsive {
+    margin-left: 0 !important;
+    transition: none !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .mobile-only { display: none !important; }
+}
+
+/* ============================================
+   Responsive Table Wrapper
+   ============================================ */
+.table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.table-wrap table { min-width: 600px; }
+
+/* ============================================
+   Responsive Modal
+   ============================================ */
+@media (max-width: 640px) {
+  .modal-content {
+    margin: 10px !important;
+    max-width: calc(100vw - 20px) !important;
+    max-height: 85vh !important;
+  }
+  .modal-form-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .modal-form-grid > [style*="gridColumn: span 2"],
+  .modal-form-grid > [style*="grid-column: span 2"] {
+    grid-column: span 1 !important;
+  }
+}
+
+/* ============================================
+   Responsive Page Content Padding
+   ============================================ */
+@media (max-width: 768px) {
+  .page-content-responsive {
+    padding: 16px !important;
+  }
+}
+
+/* ============================================
+   Responsive Header Area
+   ============================================ */
+@media (max-width: 640px) {
+  .page-header-responsive {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+  .page-header-actions {
+    width: 100% !important;
+  }
+  .page-header-actions button,
+  .page-header-actions a {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+  .page-title { font-size: 1.1rem !important; }
+  .page-subtitle { font-size: 0.75rem !important; }
+}
+
+/* ============================================
+   Dark theme overrides for recharts tooltips
+   ============================================ */
+[data-theme="dark"] .recharts-tooltip-wrapper .recharts-default-tooltip {
+  background: #1A1D28 !important;
+  border: 1px solid #2A2D3A !important;
+}
+[data-theme="dark"] .recharts-cartesian-grid-horizontal line,
+[data-theme="dark"] .recharts-cartesian-grid-vertical line {
+  stroke: #2A2D3A !important;
+}
+[data-theme="dark"] input,
+[data-theme="dark"] select,
+[data-theme="dark"] textarea {
+  background: #1A1D28 !important;
+  color: #EDEDEE !important;
+  border-color: #373B4A !important;
+}
+[data-theme="dark"] .btn-secondary {
+  background: #1A1D28 !important;
+  color: #EDEDEE !important;
+  border-color: #373B4A !important;
+}
+[data-theme="dark"] .btn-secondary:hover {
+  background: #252836 !important;
+}
+
+/* ============================================
+   Dashboard-specific responsive fixes
+   ============================================ */
+@media (max-width: 640px) {
+  .db-gap { gap: 16px !important; }
+  .db-kpi-value { font-size: 1.2rem !important; }
+  .db-kpi-sub { font-size: 0.65rem !important; }
+  .db-kpi-card { padding: 0.75rem 1rem !important; }
+  .db-kpi-icon { width: 30px !important; height: 30px !important; }
+  .db-kpi-icon svg { width: 15px !important; height: 15px !important; }
+
+  .db-chart-header { flex-direction: column; align-items: flex-start !important; gap: 8px; }
+  .db-chart-header > div { flex-wrap: wrap; gap: 6px; }
+  .db-chart-header select { width: 100%; }
+
+  .db-donut-wrap { width: 140px !important; height: 140px !important; }
+  .db-donut-label { font-size: 22px !important; }
+
+  .db-chart-area { height: 180px !important; padding: 0.75rem 0.5rem 0.25rem !important; }
+
+  .db-finance-item { padding: 10px 0 !important; }
+  .db-finance-item .db-finance-icon { width: 30px !important; height: 30px !important; }
+  .db-finance-item .db-finance-icon svg { width: 15px !important; height: 15px !important; }
+  .db-finance-item .db-finance-label { font-size: 13px !important; }
+  .db-finance-item .db-finance-value { font-size: 13px !important; }
+
+  .db-overview-title { font-size: 17px !important; }
+
+  .db-risk-alert { padding: 10px 14px !important; font-size: 13px !important; }
+  .db-risk-alert svg { width: 16px !important; height: 16px !important; }
+
+  .db-po-header { flex-direction: column; align-items: flex-start !important; gap: 8px; }
+  .db-po-header > div { flex-wrap: wrap; }
+}

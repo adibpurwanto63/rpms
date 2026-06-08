@@ -68,12 +68,12 @@ export default function LogisticsPage() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
       {/* Page Header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+      <div className="page-header-responsive" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div>
           <h2 style={{ fontSize: 22, fontWeight: 700, color: "var(--text-primary)", letterSpacing: "-0.02em" }}>Manajemen Logistik</h2>
           <p style={{ fontSize: 14, color: "var(--text-secondary)", marginTop: 4 }}>Monitoring armada kendaraan dan Delivery Order (DO)</p>
         </div>
-        <div style={{ display: "flex", gap: 12 }}>
+        <div className="page-header-actions" style={{ display: "flex", gap: 12 }}>
           {activeTab === "DO" ? (
             <button className="btn btn-primary" onClick={() => setShowDoForm(true)}>+ Buat DO Baru</button>
           ) : (
@@ -213,7 +213,7 @@ export default function LogisticsPage() {
             </div>
             <div className="erp-card-body" style={{ padding: 24 }}>
               <form onSubmit={submitDo}>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginBottom: 16 }}>
+                <div className="modal-form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginBottom: 16 }}>
                   <div>
                     <label className="form-label">Kendaraan</label>
                     <select className="form-input" value={doForm.vehicleId} onChange={e => setDoForm({ ...doForm, vehicleId: e.target.value })} required>

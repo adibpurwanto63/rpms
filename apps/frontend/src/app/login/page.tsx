@@ -65,34 +65,34 @@ export default function LoginPage() {
       {/* Login Card */}
       <div style={{ 
         width: "100%", maxWidth: 480,
-        background: "#fff",
+        background: "var(--bg-card)",
         padding: "48px",
         borderRadius: 24,
-        boxShadow: "0 20px 40px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.02)",
+        boxShadow: "var(--shadow-card)",
         position: "relative",
         zIndex: 10
       }}>
         {/* Brand */}
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 40, justifyContent: "center" }}>
           <img src="/logo.png" alt="RPMS Logo" style={{ width: 44, height: 44, objectFit: "contain" }} />
-          <span style={{ color: "#0F172A", fontSize: 24, fontWeight: 800, letterSpacing: "-0.02em" }}>
-            Aftech<span style={{ color: "#94A3B8", fontWeight: 400 }}> RPMS</span>
+          <span style={{ color: "var(--text-primary)", fontSize: 24, fontWeight: 800, letterSpacing: "-0.02em" }}>
+            Aftech<span style={{ color: "var(--text-muted)", fontWeight: 400 }}> RPMS</span>
           </span>
         </div>
 
         <div style={{ marginBottom: 36, textAlign: "center" }}>
-          <h2 style={{ fontSize: 26, fontWeight: 800, color: "#0F172A", letterSpacing: "-0.03em" }}>Selamat datang kembali</h2>
-          <p style={{ color: "#64748B", marginTop: 8, fontSize: 15 }}>Masuk ke akun RPMS Anda untuk melanjutkan</p>
+          <h2 style={{ fontSize: 26, fontWeight: 800, color: "var(--text-primary)", letterSpacing: "-0.03em" }}>Selamat datang kembali</h2>
+          <p style={{ color: "var(--text-secondary)", marginTop: 8, fontSize: 15 }}>Masuk ke akun RPMS Anda untuk melanjutkan</p>
         </div>
 
         {error && (
           <div style={{
-            background: "#FEF2F2",
-            border: "1px solid #FECACA",
+            background: "var(--color-red-light)",
+            border: "1px solid var(--color-red)",
             borderRadius: 12,
             padding: "14px 16px",
             marginBottom: 24,
-            color: "#DC2626",
+            color: "var(--color-red)",
             fontSize: 14,
             fontWeight: 500,
             display: "flex",
@@ -105,9 +105,9 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 20 }}>
           <div>
-            <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#334155", marginBottom: 8 }}>Alamat Email</label>
+            <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 8 }}>Alamat Email</label>
             <div style={{ position: "relative" }}>
-              <div style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: "#94A3B8" }}>
+              <div style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }}>
                 <Mail size={18} />
               </div>
               <input
@@ -120,19 +120,20 @@ export default function LoginPage() {
                 autoComplete="username"
                 style={{ 
                   width: "100%", padding: "12px 16px 12px 42px", 
-                  border: "1px solid #E2E8F0", borderRadius: 12, 
-                  fontSize: 14, color: "#0F172A", outline: "none",
+                  border: "1px solid var(--border-medium)", borderRadius: 12, 
+                  fontSize: 14, color: "var(--text-primary)", outline: "none",
+                  background: "var(--bg-card)",
                   transition: "all 0.2s ease"
                 }}
-                onFocus={e => { e.target.style.borderColor = "#7C6FE0"; e.target.style.boxShadow = "0 0 0 3px rgba(124,111,224,0.15)"; }}
-                onBlur={e => { e.target.style.borderColor = "#E2E8F0"; e.target.style.boxShadow = "none"; }}
+                onFocus={e => { e.target.style.borderColor = "var(--color-primary)"; e.target.style.boxShadow = "0 0 0 3px rgba(124,111,224,0.15)"; }}
+                onBlur={e => { e.target.style.borderColor = "var(--border-medium)"; e.target.style.boxShadow = "none"; }}
               />
             </div>
           </div>
           <div>
-            <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#334155", marginBottom: 8 }}>Kata Sandi</label>
+            <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 8 }}>Kata Sandi</label>
             <div style={{ position: "relative" }}>
-              <div style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: "#94A3B8" }}>
+              <div style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }}>
                 <Lock size={18} />
               </div>
               <input
@@ -145,22 +146,23 @@ export default function LoginPage() {
                 autoComplete="current-password"
                 style={{ 
                   width: "100%", padding: "12px 16px 12px 42px", 
-                  border: "1px solid #E2E8F0", borderRadius: 12, 
-                  fontSize: 14, color: "#0F172A", outline: "none",
+                  border: "1px solid var(--border-medium)", borderRadius: 12, 
+                  fontSize: 14, color: "var(--text-primary)", outline: "none",
+                  background: "var(--bg-card)",
                   transition: "all 0.2s ease"
                 }}
-                onFocus={e => { e.target.style.borderColor = "#7C6FE0"; e.target.style.boxShadow = "0 0 0 3px rgba(124,111,224,0.15)"; }}
-                onBlur={e => { e.target.style.borderColor = "#E2E8F0"; e.target.style.boxShadow = "none"; }}
+                onFocus={e => { e.target.style.borderColor = "var(--color-primary)"; e.target.style.boxShadow = "0 0 0 3px rgba(124,111,224,0.15)"; }}
+                onBlur={e => { e.target.style.borderColor = "var(--border-medium)"; e.target.style.boxShadow = "none"; }}
               />
             </div>
           </div>
           
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: -4 }}>
             <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
-              <input type="checkbox" style={{ accentColor: "#7C6FE0", width: 16, height: 16 }} />
-              <span style={{ fontSize: 13, color: "#64748B" }}>Ingat saya</span>
+              <input type="checkbox" style={{ accentColor: "var(--color-primary)", width: 16, height: 16 }} />
+              <span style={{ fontSize: 13, color: "var(--text-secondary)" }}>Ingat saya</span>
             </label>
-            <a href="#" style={{ fontSize: 13, fontWeight: 600, color: "#7C6FE0", textDecoration: "none" }}>Lupa sandi?</a>
+            <a href="#" style={{ fontSize: 13, fontWeight: 600, color: "var(--color-primary)", textDecoration: "none" }}>Lupa sandi?</a>
           </div>
 
           <button
@@ -169,7 +171,7 @@ export default function LoginPage() {
             style={{
               width: "100%",
               padding: "14px",
-              background: loading ? "#94A3B8" : "#1E1E2E",
+              background: loading ? "var(--text-muted)" : "#4ECDC4",
               color: "#fff",
               border: "none",
               borderRadius: 12,
@@ -183,8 +185,8 @@ export default function LoginPage() {
               gap: 8,
               transition: "all 0.2s ease",
             }}
-            onMouseEnter={e => { if(!loading) e.currentTarget.style.background = "#0F172A"; }}
-            onMouseLeave={e => { if(!loading) e.currentTarget.style.background = "#1E1E2E"; }}
+            onMouseEnter={e => { if(!loading) e.currentTarget.style.background = "#3DB5AD"; }}
+            onMouseLeave={e => { if(!loading) e.currentTarget.style.background = "#4ECDC4"; }}
           >
             {loading ? (
               <>
@@ -200,11 +202,11 @@ export default function LoginPage() {
         {/* Demo Accounts */}
         <div style={{ marginTop: 40 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
-            <div style={{ flex: 1, height: 1, background: "#E2E8F0" }} />
-            <span style={{ fontSize: 11, color: "#94A3B8", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em" }}>Atau coba demo akses</span>
-            <div style={{ flex: 1, height: 1, background: "#E2E8F0" }} />
+            <div style={{ flex: 1, height: 1, background: "var(--border-light)" }} />
+            <span style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em" }}>Atau coba demo akses</span>
+            <div style={{ flex: 1, height: 1, background: "var(--border-light)" }} />
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+          <div className="rg-2" style={{ gap: 8 }}>
             {demoAccounts.map((a, i) => (
               <button
                 type="button"
@@ -215,18 +217,18 @@ export default function LoginPage() {
                   textAlign: "left",
                   padding: "10px 14px",
                   borderRadius: 10,
-                  border: "1px solid #E2E8F0",
-                  background: "#fff",
+                  border: "1px solid var(--border-light)",
+                  background: "var(--bg-card)",
                   cursor: "pointer",
                   transition: "all 0.2s ease",
                 }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = a.color; e.currentTarget.style.background = "#F8FAFC"; }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = "#E2E8F0"; e.currentTarget.style.background = "#fff"; }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = a.color; e.currentTarget.style.background = "var(--bg-hover)"; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border-light)"; e.currentTarget.style.background = "var(--bg-card)"; }}
               >
                 <div style={{ width: 6, height: 6, borderRadius: "50%", background: a.color }} />
                 <div>
-                  <div style={{ fontSize: 12, fontWeight: 600, color: "#334155" }}>{a.role}</div>
-                  <div style={{ fontSize: 11, color: "#94A3B8", marginTop: 2 }}>{a.email.split('@')[0]}</div>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text-primary)" }}>{a.role}</div>
+                  <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>{a.email.split('@')[0]}</div>
                 </div>
               </button>
             ))}

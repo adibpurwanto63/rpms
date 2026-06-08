@@ -23,7 +23,7 @@ export default function ProductionPage() {
   const [materials, setMaterials] = useState<any[]>([]);
   const [materialFilter, setMaterialFilter] = useState("");
 
-  const { triggerRefresh } = useRefresh();
+  const { triggerRefresh, refreshKey } = useRefresh();
 
   const load = async () => {
     setLoading(true);
@@ -49,7 +49,7 @@ export default function ProductionPage() {
     
     setLoading(false);
   };
-  useEffect(() => { load(); }, []);
+  useEffect(() => { load(); }, [refreshKey]);
 
   const updateMachineStatus = async (id: string, status: string) => {
     try {

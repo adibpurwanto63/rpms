@@ -23,7 +23,7 @@ export default function MaterialPage() {
   const [adjustModal, setAdjustModal] = useState<{ id: string; name: string; stock: number; unit: string } | null>(null);
   const [adjustDelta, setAdjustDelta] = useState("");
   const [adjustNote, setAdjustNote] = useState("");
-  const { triggerRefresh } = useRefresh();
+  const { triggerRefresh, refreshKey } = useRefresh();
 
   const load = async () => {
     setLoading(true);
@@ -43,7 +43,7 @@ export default function MaterialPage() {
     setLoading(false);
   };
 
-  useEffect(() => { load(); }, [search, filterLowStock]);
+  useEffect(() => { load(); }, [search, filterLowStock, refreshKey]);
 
   const openForm = (m?: any) => {
     if (m) {

@@ -51,7 +51,7 @@ export default function FinancePage() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
       {/* Page Header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+      <div className="page-header-responsive" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div>
           <h2 style={{ fontSize: 22, fontWeight: 700, color: "var(--text-primary)", letterSpacing: "-0.02em" }}>Manajemen Keuangan</h2>
           <p style={{ fontSize: 14, color: "var(--text-secondary)", marginTop: 4 }}>Invoice, AR/AP, dan dashboard finansial</p>
@@ -63,7 +63,7 @@ export default function FinancePage() {
 
       {/* Finance KPI Cards */}
       {dashboard && (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 20 }}>
+        <div className="rg-4">
           {kpis.map((k, i) => (
             <div key={i} className="kpi-card" style={{ background: variantBg[k.variant], borderColor: undefined }}>
               <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
@@ -97,7 +97,7 @@ export default function FinancePage() {
             </div>
             <div className="erp-card-body" style={{ padding: 24 }}>
               <form onSubmit={submit}>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
+                <div className="modal-form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
                   <div className="form-group" style={{ marginBottom: 0 }}>
                     <label className="form-label">Tipe Invoice</label>
                     <select className="form-select" value={form.type} onChange={e => setForm({ ...form, type: e.target.value })}>
@@ -133,7 +133,7 @@ export default function FinancePage() {
       )}
 
       {/* Tabs */}
-      <div style={{ display: "flex", gap: 4, background: "#F3F4F6", borderRadius: 10, padding: 4, alignSelf: "flex-start" }}>
+      <div style={{ display: "flex", gap: 4, background: "var(--bg-secondary)", borderRadius: 10, padding: 4, alignSelf: "flex-start", flexWrap: "wrap" }}>
         {[{ key: "all", label: "Semua" }, { key: "AP", label: "Hutang (AP)" }, { key: "AR", label: "Piutang (AR)" }].map(t => (
           <button key={t.key} onClick={() => setTab(t.key as any)}
             style={{
