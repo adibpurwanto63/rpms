@@ -29,13 +29,15 @@ const fmtRp = (n: number) => new Intl.NumberFormat("id-ID", { style: "currency",
 export default function PembelianPage() {
   const [orders, setOrders] = useState<any[]>([]);
   const [suppliers, setSuppliers] = useState<any[]>([]);
+  const [materials, setMaterials] = useState<any[]>([]);
   const [dashboard, setDashboard] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [filterStatus, setFilterStatus] = useState("all");
   const [form, setForm] = useState({
     supplierId: "",
-    itemName: "Kardus (OCC)",
+    materialId: "",
+    itemName: "",
     quantity: "",
     unit: "kg",
     unitPrice: "",
@@ -50,11 +52,13 @@ export default function PembelianPage() {
       api.get(`/pembelian${params}`),
       api.get("/pembelian/dashboard"),
       api.get("/suppliers?status=ACTIVE"),
+      api.get("/materials"),
     ])
-      .then(([o, d, s]) => {
+      .then(([o, d, s, m]) => {
         setOrders(o.data);
         setDashboard(d.data);
         setSuppliers(s.data);
+        setMaterials(m.data);
       })
       .finally(() => setLoading(false));
   };
@@ -63,14 +67,22 @@ export default function PembelianPage() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!form.itemName.trim()) {
+      alert("Nama barang harus diisi. Pilih material dari database atau ketik manual.");
+      return;
+    }
     try {
       await api.post("/pembelian", {
-        ...form,
+        supplierId: form.supplierId,
+        itemName: form.itemName,
         quantity: parseFloat(form.quantity),
+        unit: form.unit,
         unitPrice: parseFloat(form.unitPrice),
+        notes: form.notes || undefined,
+        deliveryDate: form.deliveryDate || undefined,
       });
       setShowForm(false);
-      setForm({ supplierId: "", itemName: "Kardus (OCC)", quantity: "", unit: "kg", unitPrice: "", notes: "", deliveryDate: "" });
+      setForm({ supplierId: "", materialId: "", itemName: "", quantity: "", unit: "kg", unitPrice: "", notes: "", deliveryDate: "" });
       load();
       triggerRefresh();
     } catch (e: any) {
@@ -212,14 +224,40 @@ export default function PembelianPage() {
 
                   <div className="form-group" style={{ gridColumn: "span 2", marginBottom: 0 }}>
                     <label className="form-label">Nama Barang</label>
-                    <select className="form-input" value={form.itemName} onChange={(e) => setForm({ ...form, itemName: e.target.value })}>
-                      <option value="Kardus (OCC)">Kardus (OCC)</option>
-                      <option value="Kardus (DLK)">Kardus (DLK)</option>
-                      <option value="Kardus (ONP)">Kardus (ONP)</option>
-                      <option value="Kardus Campuran">Kardus Campuran</option>
-                      <option value="Kertas HVS Bekas">Kertas HVS Bekas</option>
+                    <select
+                      className="form-input"
+                      value={form.materialId}
+                      onChange={(e) => {
+                        const selected = materials.find((m: any) => m.id === e.target.value);
+                        if (selected) {
+                          setForm({ ...form, materialId: selected.id, itemName: selected.name, unit: selected.unit });
+                        } else if (e.target.value === "__other__") {
+                          setForm({ ...form, materialId: "", itemName: "" });
+                        } else {
+                          setForm({ ...form, materialId: "", itemName: "" });
+                        }
+                      }}
+                    >
+                      <option value="">-- Pilih Material (dari database) --</option>
+                      {materials.map((m: any) => (
+                        <option key={m.id} value={m.id}>{m.name} (Stok: {m.stock.toLocaleString("id-ID")} {m.unit})</option>
+                      ))}
+                      <option value="__other__">+ Lainnya (ketik manual)</option>
                     </select>
                   </div>
+
+                  {form.materialId === "" && (
+                    <div className="form-group" style={{ gridColumn: "span 2", marginBottom: 0 }}>
+                      <label className="form-label">Nama Barang (ketik manual)</label>
+                      <input
+                        className="form-input"
+                        value={form.itemName}
+                        onChange={(e) => setForm({ ...form, itemName: e.target.value })}
+                        placeholder="Ketik nama barang..."
+                        required={form.materialId === ""}
+                      />
+                    </div>
+                  )}
 
                   <div className="form-group" style={{ marginBottom: 0 }}>
                     <label className="form-label">Jumlah</label>
