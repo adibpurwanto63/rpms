@@ -262,34 +262,65 @@ export default function ProductionPage() {
         </div>
       )}
 
-      {/* Material Stock Dashboard */}
+      {/* Filter & Material Stock Dashboard */}
       {!loading && materials.length > 0 && (
-        <div>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-            <h3 style={{ fontSize: 16, fontWeight: 600, color: "var(--text-primary)" }}>Dashboard Bahan Baku</h3>
-            <span style={{ fontSize: 13, color: "var(--text-muted)" }}>{materials.length} material</span>
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          {/* Filter Dropdown */}
+          <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+            <select
+              value={filterMaterialId}
+              onChange={e => setFilterMaterialId(e.target.value)}
+              className="form-input"
+              style={{ minWidth: 260, padding: "10px 14px", fontSize: 14, fontWeight: 600, background: "var(--bg-card)", boxShadow: "0 2px 4px rgba(0,0,0,0.02)" }}
+            >
+              <option value="">Semua Material</option>
+              {materials.map((m: any) => (
+                <option key={m.id} value={m.id}>{m.name} (Stok: {m.stock.toLocaleString("id-ID")} {m.unit})</option>
+              ))}
+            </select>
+            {filterMaterialId && (
+              <button
+                onClick={() => setFilterMaterialId("")}
+                className="btn btn-secondary"
+                style={{ padding: "8px 16px", fontSize: 13 }}
+              >
+                Reset Filter
+              </button>
+            )}
           </div>
-          <div className="rg-4">
-            {(() => {
-              const totalStock = materials.reduce((s: number, m: any) => s + (m.stock || 0), 0);
-              const lowStock = materials.filter((m: any) => m.lowStockThreshold > 0 && m.stock <= m.lowStockThreshold);
-              const units = [...new Set(materials.map((m: any) => m.unit))];
-              return [
-                { label: "Total Stok", value: `${totalStock.toLocaleString("id-ID")} ${units.join("/")}`, Icon: Package, variant: "neutral" },
-                { label: "Stok Menipis", value: lowStock.length > 0 ? lowStock.map((m: any) => m.name).join(", ") : "Tidak ada", Icon: AlertTriangle, variant: lowStock.length > 0 ? "pink" : "mint" },
-                { label: "Kategori", value: [...new Set(materials.map((m: any) => m.category))].filter(Boolean).join(", ") || "—", Icon: Tags, variant: "dark" },
-              ].map((k, i) => (
-                <div key={i} className="kpi-card" style={{ background: ({ dark: "var(--kpi-dark)", mint: "var(--kpi-mint-bg)", pink: "var(--kpi-pink-bg)", neutral: "var(--kpi-neutral-bg)" } as any)[k.variant], borderColor: undefined }}>
-                  <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
-                    <span style={{ fontSize: 12, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--text-secondary)" }}>{k.label}</span>
-                    <div style={{ width: 36, height: 36, borderRadius: 8, background: "rgba(124,111,224,0.12)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--color-primary)" }}>
-                      <k.Icon size={18} strokeWidth={2} />
+
+          <div>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+              <h3 style={{ fontSize: 16, fontWeight: 600, color: "var(--text-primary)" }}>
+                Dashboard Bahan Baku {filterMaterialId ? ` - ${materials.find((m: any) => m.id === filterMaterialId)?.name}` : ""}
+              </h3>
+              <span style={{ fontSize: 13, color: "var(--text-muted)" }}>
+                {filterMaterialId ? "1" : materials.length} material
+              </span>
+            </div>
+            <div className="rg-4">
+              {(() => {
+                const displayMaterials = filterMaterialId ? materials.filter((m: any) => m.id === filterMaterialId) : materials;
+                const totalStock = displayMaterials.reduce((s: number, m: any) => s + (m.stock || 0), 0);
+                const lowStock = displayMaterials.filter((m: any) => m.lowStockThreshold > 0 && m.stock <= m.lowStockThreshold);
+                const units = [...new Set(displayMaterials.map((m: any) => m.unit))];
+                return [
+                  { label: "Total Stok", value: `${totalStock.toLocaleString("id-ID")} ${units.join("/") || "kg"}`, Icon: Package, variant: "neutral" },
+                  { label: "Stok Menipis", value: lowStock.length > 0 ? lowStock.map((m: any) => m.name).join(", ") : "Tidak ada", Icon: AlertTriangle, variant: lowStock.length > 0 ? "pink" : "mint" },
+                  { label: "Kategori", value: [...new Set(displayMaterials.map((m: any) => m.category))].filter(Boolean).join(", ") || "—", Icon: Tags, variant: "dark" },
+                ].map((k, i) => (
+                  <div key={i} className="kpi-card" style={{ background: ({ dark: "var(--kpi-dark)", mint: "var(--kpi-mint-bg)", pink: "var(--kpi-pink-bg)", neutral: "var(--kpi-neutral-bg)" } as any)[k.variant], borderColor: undefined }}>
+                    <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+                      <span style={{ fontSize: 12, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--text-secondary)" }}>{k.label}</span>
+                      <div style={{ width: 36, height: 36, borderRadius: 8, background: "rgba(124,111,224,0.12)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--color-primary)" }}>
+                        <k.Icon size={18} strokeWidth={2} />
+                      </div>
                     </div>
+                    <div style={{ fontSize: "1.1rem", fontWeight: 700, letterSpacing: "-0.03em", color: "var(--text-primary)", lineHeight: 1.2 }}>{k.value}</div>
                   </div>
-                  <div style={{ fontSize: "1.1rem", fontWeight: 700, letterSpacing: "-0.03em", color: "var(--text-primary)", lineHeight: 1.2 }}>{k.value}</div>
-                </div>
-              ));
-            })()}
+                ));
+              })()}
+            </div>
           </div>
         </div>
       )}
@@ -379,31 +410,7 @@ export default function ProductionPage() {
         </div>
       )}
 
-      {/* Filter & Table */}
-      {!loading && (
-        <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-          <select
-            value={filterMaterialId}
-            onChange={e => setFilterMaterialId(e.target.value)}
-            className="form-input"
-            style={{ minWidth: 220, padding: "8px 12px" }}
-          >
-            <option value="">Semua Material</option>
-            {materials.map((m: any) => (
-              <option key={m.id} value={m.id}>{m.name} (stok: {m.stock.toLocaleString("id-ID")} {m.unit})</option>
-            ))}
-          </select>
-          {filterMaterialId && (
-            <button
-              onClick={() => setFilterMaterialId("")}
-              className="btn btn-secondary"
-              style={{ padding: "6px 12px", fontSize: 13 }}
-            >
-              Reset
-            </button>
-          )}
-        </div>
-      )}
+      {/* Table section without the old filter dropdown */}
       {loading ? (
         <div style={{ display: "flex", justifyContent: "center", padding: "4rem" }}>
           <div style={{ width: 36, height: 36, border: "3px solid #EDE9FF", borderTop: "3px solid #7C6FE0", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
