@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
 import { useRefresh } from "@/lib/refresh-context";
-import { ArrowDownToLine, ArrowUpFromLine, Package, BarChart2, Factory, Save, Trash2, Edit2, Plus, PlusCircle } from "lucide-react";
+import { ArrowDownToLine, ArrowUpFromLine, Package, BarChart2, Factory, Save, Trash2, Edit2, Plus, PlusCircle, AlertTriangle, Tags } from "lucide-react";
 
 const machineStatusColor: any = { RUNNING: "badge-success", IDLE: "badge-neutral", MAINTENANCE: "badge-warning", BREAKDOWN: "badge-danger" };
 const machineStatusLabel: any = { RUNNING: "Berjalan", IDLE: "Standby", MAINTENANCE: "Maintenance", BREAKDOWN: "Rusak" };
@@ -259,6 +259,38 @@ export default function ProductionPage() {
               <div style={{ fontSize: "1.75rem", fontWeight: 700, letterSpacing: "-0.03em", color: "var(--text-primary)", lineHeight: 1.2 }}>{k.value}</div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Material Stock Dashboard */}
+      {!loading && materials.length > 0 && (
+        <div>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+            <h3 style={{ fontSize: 16, fontWeight: 600, color: "var(--text-primary)" }}>Dashboard Bahan Baku</h3>
+            <span style={{ fontSize: 13, color: "var(--text-muted)" }}>{materials.length} material</span>
+          </div>
+          <div className="rg-4">
+            {(() => {
+              const totalStock = materials.reduce((s: number, m: any) => s + (m.stock || 0), 0);
+              const lowStock = materials.filter((m: any) => m.lowStockThreshold > 0 && m.stock <= m.lowStockThreshold);
+              const units = [...new Set(materials.map((m: any) => m.unit))];
+              return [
+                { label: "Total Stok", value: `${totalStock.toLocaleString("id-ID")} ${units.join("/")}`, Icon: Package, variant: "neutral" },
+                { label: "Stok Menipis", value: lowStock.length > 0 ? lowStock.map((m: any) => m.name).join(", ") : "Tidak ada", Icon: AlertTriangle, variant: lowStock.length > 0 ? "pink" : "mint" },
+                { label: "Kategori", value: [...new Set(materials.map((m: any) => m.category))].filter(Boolean).join(", ") || "—", Icon: Tags, variant: "dark" },
+              ].map((k, i) => (
+                <div key={i} className="kpi-card" style={{ background: ({ dark: "var(--kpi-dark)", mint: "var(--kpi-mint-bg)", pink: "var(--kpi-pink-bg)", neutral: "var(--kpi-neutral-bg)" } as any)[k.variant], borderColor: undefined }}>
+                  <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+                    <span style={{ fontSize: 12, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--text-secondary)" }}>{k.label}</span>
+                    <div style={{ width: 36, height: 36, borderRadius: 8, background: "rgba(124,111,224,0.12)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--color-primary)" }}>
+                      <k.Icon size={18} strokeWidth={2} />
+                    </div>
+                  </div>
+                  <div style={{ fontSize: "1.1rem", fontWeight: 700, letterSpacing: "-0.03em", color: "var(--text-primary)", lineHeight: 1.2 }}>{k.value}</div>
+                </div>
+              ));
+            })()}
+          </div>
         </div>
       )}
 
