@@ -39,7 +39,7 @@ export class ProductionController {
 
   @Get("stats/today")
   @Roles(UserRole.SUPER_ADMIN, UserRole.PRODUCTION_SUPERVISOR, UserRole.DIRECTOR)
-  todayStats() { return this.svc.todayStats(); }
+  todayStats(@Query("materialId") materialId?: string) { return this.svc.todayStats(materialId); }
 
   @Post()
   @Roles(UserRole.SUPER_ADMIN, UserRole.PRODUCTION_SUPERVISOR)

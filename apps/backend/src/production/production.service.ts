@@ -157,11 +157,13 @@ export class ProductionService {
     });
   }
 
-  todayStats() {
+  todayStats(materialId?: string) {
     const today = new Date(); today.setHours(0,0,0,0);
     const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate() + 1);
+    const where: any = { date: { gte: today, lt: tomorrow } };
+    if (materialId) where.materialId = materialId;
     return this.prisma.productionRecord.aggregate({
-      where: { date: { gte: today, lt: tomorrow } },
+      where,
       _sum: { inputWeight: true, outputWeight: true, baleCount: true, downtimeMinutes: true },
       _avg: { oee: true },
     });
