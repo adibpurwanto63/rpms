@@ -22,6 +22,7 @@ export default function ProductionPage() {
 
   const [materials, setMaterials] = useState<any[]>([]);
   const [materialFilter, setMaterialFilter] = useState("");
+  const [filterMaterialId, setFilterMaterialId] = useState("");
 
   const { triggerRefresh, refreshKey } = useRefresh();
 
@@ -346,7 +347,31 @@ export default function ProductionPage() {
         </div>
       )}
 
-      {/* Table */}
+      {/* Filter & Table */}
+      {!loading && (
+        <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+          <select
+            value={filterMaterialId}
+            onChange={e => setFilterMaterialId(e.target.value)}
+            className="form-input"
+            style={{ minWidth: 220, padding: "8px 12px" }}
+          >
+            <option value="">Semua Material</option>
+            {materials.map((m: any) => (
+              <option key={m.id} value={m.id}>{m.name} (stok: {m.stock.toLocaleString("id-ID")} {m.unit})</option>
+            ))}
+          </select>
+          {filterMaterialId && (
+            <button
+              onClick={() => setFilterMaterialId("")}
+              className="btn btn-secondary"
+              style={{ padding: "6px 12px", fontSize: 13 }}
+            >
+              Reset
+            </button>
+          )}
+        </div>
+      )}
       {loading ? (
         <div style={{ display: "flex", justifyContent: "center", padding: "4rem" }}>
           <div style={{ width: 36, height: 36, border: "3px solid #EDE9FF", borderTop: "3px solid #7C6FE0", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
@@ -373,9 +398,11 @@ export default function ProductionPage() {
                 </tr>
               </thead>
               <tbody>
-                {records.length === 0 ? (
-                  <tr><td colSpan={10} style={{ textAlign: "center", padding: "3rem", color: "var(--text-muted)" }}>Belum ada catatan produksi</td></tr>
-                ) : records.map((r: any) => (
+                {(() => {
+                  const filtered = filterMaterialId ? records.filter((r: any) => r.materialId === filterMaterialId) : records;
+                  return filtered.length === 0 ? (
+                    <tr><td colSpan={10} style={{ textAlign: "center", padding: "3rem", color: "var(--text-muted)" }}>{filterMaterialId ? "Tidak ada catatan produksi dengan material ini" : "Belum ada catatan produksi"}</td></tr>
+                  ) : filtered.map((r: any) => (
                   <tr key={r.id}>
                     <td style={{ fontWeight: 600, color: "var(--brand-purple)" }}>{r.machine?.name}</td>
                     <td style={{ color: "var(--text-secondary)", fontSize: 12 }}>{r.material?.name || "—"}</td>
@@ -400,7 +427,8 @@ export default function ProductionPage() {
                       </div>
                     </td>
                   </tr>
-                ))}
+                ));
+              })()}
               </tbody>
             </table>
           </div>

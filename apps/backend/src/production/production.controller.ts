@@ -35,7 +35,7 @@ export class ProductionController {
 
   @Get()
   @Roles(UserRole.SUPER_ADMIN, UserRole.PRODUCTION_SUPERVISOR, UserRole.DIRECTOR, UserRole.WAREHOUSE_SUPERVISOR)
-  getRecords(@Query("machineId") machineId?: string) { return this.svc.getRecords(machineId); }
+  getRecords(@Query("machineId") machineId?: string, @Query("materialId") materialId?: string) { return this.svc.getRecords(machineId, materialId); }
 
   @Get("stats/today")
   @Roles(UserRole.SUPER_ADMIN, UserRole.PRODUCTION_SUPERVISOR, UserRole.DIRECTOR)

@@ -22,9 +22,12 @@ export class ProductionService {
   }
   updateMachineStatus(id: string, status: any) { return this.prisma.machine.update({ where: { id }, data: { status } }); }
 
-  getRecords(machineId?: string) {
+  getRecords(machineId?: string, materialId?: string) {
+    const where: any = {};
+    if (machineId) where.machineId = machineId;
+    if (materialId) where.materialId = materialId;
     return this.prisma.productionRecord.findMany({
-      where: machineId ? { machineId } : {},
+      where,
       include: { machine: true, material: true },
       orderBy: { date: "desc" },
       take: 100,
