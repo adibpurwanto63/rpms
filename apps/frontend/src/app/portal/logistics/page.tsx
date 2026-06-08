@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
 import { useRefresh } from "@/lib/refresh-context";
-import { Truck, Edit2, PlusCircle } from "lucide-react";
+import { Truck, Edit2, PlusCircle, Save } from "lucide-react";
 
 const deliveryStatusColor: any = { SCHEDULED: "badge-neutral", LOADING: "badge-warning", IN_TRANSIT: "badge-warning", DELIVERED: "badge-success", CANCELLED: "badge-danger" };
 const vehicleStatusColor: any = { AVAILABLE: "badge-success", ON_TRIP: "badge-warning", MAINTENANCE: "badge-danger" };
@@ -241,7 +241,7 @@ export default function LogisticsPage() {
                 </div>
                 <div style={{ paddingTop: 20, borderTop: "1px solid var(--border-light)", display: "flex", gap: 12, justifyContent: "flex-end" }}>
                   <button type="button" className="btn btn-secondary" onClick={() => setShowDoForm(false)}>Batal</button>
-                  <button type="submit" className="btn btn-primary" style={{ padding: "0 24px" }}>📝 Simpan Delivery Order</button>
+                  <button type="submit" className="btn btn-primary" style={{ display: "flex", alignItems: "center", gap: 6 }}><Save size={16} /> Simpan Delivery Order</button>
                 </div>
               </form>
             </div>
@@ -292,7 +292,7 @@ export default function LogisticsPage() {
                 </div>
                 <div style={{ paddingTop: 20, borderTop: "1px solid var(--border-light)", display: "flex", gap: 12, justifyContent: "flex-end" }}>
                   <button type="button" className="btn btn-secondary" onClick={() => setShowVehicleForm(false)}>Batal</button>
-                  <button type="submit" className="btn btn-primary" style={{ padding: "0 24px" }}>💾 Simpan Armada</button>
+                  <button type="submit" className="btn btn-primary" style={{ display: "flex", alignItems: "center", gap: 6 }}><Save size={16} /> Simpan Armada</button>
                 </div>
               </form>
             </div>

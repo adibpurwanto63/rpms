@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
 import { useRefresh } from "@/lib/refresh-context";
-import { TrendingUp, Landmark, ArrowUpFromLine, ArrowDownToLine, ArrowUp, ArrowDown, FileText } from "lucide-react";
+import { TrendingUp, Landmark, ArrowUpFromLine, ArrowDownToLine, ArrowUp, ArrowDown, FileText, Save } from "lucide-react";
 
 const paymentStatusBadge: any = {
   PENDING: "badge-purple",
@@ -127,7 +127,7 @@ export default function FinancePage() {
                 </div>
                 <div style={{ paddingTop: 20, borderTop: "1px solid var(--border-light)", display: "flex", gap: 12, justifyContent: "flex-end" }}>
                   <button type="button" className="btn btn-secondary" onClick={() => setShowForm(false)}>Batal</button>
-                  <button type="submit" className="btn btn-primary" style={{ padding: "0 24px" }}>💾 Simpan Invoice</button>
+                  <button type="submit" className="btn btn-primary" style={{ display: "flex", alignItems: "center", gap: 6 }}><Save size={16} /> Simpan Invoice</button>
                 </div>
               </form>
             </div>

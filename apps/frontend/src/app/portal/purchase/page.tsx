@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
 import { useRefresh } from "@/lib/refresh-context";
-import { Building2, CheckCircle2, Ban, Users, Package, ClipboardList } from "lucide-react";
+import { Building2, CheckCircle2, Ban, Users, Package, ClipboardList, Save } from "lucide-react";
 
 const fmtRp = (n: number) => new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n || 0);
 
@@ -265,7 +265,7 @@ export default function PurchasePage() {
                     </div>
                     <div style={{ paddingTop: 20, borderTop: "1px solid var(--border-light)", display: "flex", gap: 12, justifyContent: "flex-end" }}>
                       <button type="button" className="btn btn-secondary" onClick={() => setShowSupplierForm(false)}>Batal</button>
-                      <button type="submit" className="btn btn-primary" style={{ padding: "0 24px" }}>💾 Simpan Supplier</button>
+                      <button type="submit" className="btn btn-primary" style={{ display: "flex", alignItems: "center", gap: 6 }}><Save size={16} /> Simpan Supplier</button>
                     </div>
                   </form>
                 </div>
@@ -344,7 +344,7 @@ export default function PurchasePage() {
                     </div>
                     <div style={{ paddingTop: 20, borderTop: "1px solid var(--border-light)", display: "flex", gap: 12, justifyContent: "flex-end" }}>
                       <button type="button" className="btn btn-secondary" onClick={() => setShowCustomerForm(false)}>Batal</button>
-                      <button type="submit" className="btn btn-primary" style={{ padding: "0 24px" }}>💾 Simpan Customer</button>
+                      <button type="submit" className="btn btn-primary" style={{ display: "flex", alignItems: "center", gap: 6 }}><Save size={16} /> Simpan Customer</button>
                     </div>
                   </form>
                 </div>
@@ -449,7 +449,7 @@ export default function PurchasePage() {
 
                     <div style={{ paddingTop: 20, borderTop: "1px solid var(--border-light)", display: "flex", gap: 12, justifyContent: "flex-end" }}>
                       <button type="button" className="btn btn-secondary" onClick={() => setShowSalesForm(false)}>Batal</button>
-                      <button type="submit" className="btn btn-primary" style={{ padding: "0 24px" }}>💾 Buat Sales Order</button>
+                      <button type="submit" className="btn btn-primary" style={{ display: "flex", alignItems: "center", gap: 6 }}><Save size={16} /> Buat Sales Order</button>
                     </div>
                   </form>
                 </div>

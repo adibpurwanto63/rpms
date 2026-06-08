@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
 import { useRefresh } from "@/lib/refresh-context";
-import { ClipboardList, Hourglass, CheckCircle2, Banknote, ShoppingBag } from "lucide-react";
+import { ClipboardList, Hourglass, CheckCircle2, Banknote, ShoppingBag, Save } from "lucide-react";
 
 const statusColor: any = {
   PENDING: "badge-warning",
@@ -259,7 +259,7 @@ export default function PembelianPage() {
 
                 <div style={{ paddingTop: 20, borderTop: "1px solid var(--border-light)", display: "flex", gap: 12, justifyContent: "flex-end" }}>
                   <button type="button" className="btn btn-secondary" onClick={() => setShowForm(false)}>Batal</button>
-                  <button type="submit" className="btn btn-primary" style={{ padding: "0 24px" }}>💾 Buat Purchase Order</button>
+                  <button type="submit" className="btn btn-primary" style={{ display: "flex", alignItems: "center", gap: 6 }}><Save size={16} /> Buat Purchase Order</button>
                 </div>
               </form>
             </div>

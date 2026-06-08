@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
 import { useRefresh } from "@/lib/refresh-context";
-import { Ticket, Scale, BarChart2 } from "lucide-react";
+import { Ticket, Scale, BarChart2, Save } from "lucide-react";
 
 export default function WeighbridgePage() {
   const [tickets, setTickets] = useState<any[]>([]);
@@ -128,7 +128,7 @@ export default function WeighbridgePage() {
 
                 <div style={{ paddingTop: 20, borderTop: "1px solid var(--border-light)", display: "flex", gap: 12, justifyContent: "flex-end" }}>
                   <button type="button" className="btn btn-secondary" onClick={() => setShowForm(false)}>Batal</button>
-                  <button type="submit" className="btn btn-primary" style={{ padding: "0 24px" }}>💾 Simpan Tiket</button>
+                  <button type="submit" className="btn btn-primary" style={{ display: "flex", alignItems: "center", gap: 6 }}><Save size={16} /> Simpan Tiket</button>
                 </div>
               </form>
             </div>

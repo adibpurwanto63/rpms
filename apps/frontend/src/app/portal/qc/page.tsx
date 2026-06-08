@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
 import { useRefresh } from "@/lib/refresh-context";
-import { CheckCircle2, AlertTriangle, Ban } from "lucide-react";
+import { CheckCircle2, AlertTriangle, Ban, Save } from "lucide-react";
 
 const gradeColor: any = { A: "badge-success", B: "badge-warning", REJECT: "badge-danger" };
 const gradeLabel: any = { A: "Grade A", B: "Grade B", REJECT: "Reject" };
@@ -123,7 +123,7 @@ export default function QcPage() {
                 </div>
                 <div style={{ paddingTop: 20, borderTop: "1px solid var(--border-light)", display: "flex", gap: 12, justifyContent: "flex-end" }}>
                   <button type="button" className="btn btn-secondary" onClick={() => setShowForm(false)}>Batal</button>
-                  <button type="submit" className="btn btn-primary" style={{ padding: "0 24px" }}>💾 Simpan Inspeksi</button>
+                  <button type="submit" className="btn btn-primary" style={{ display: "flex", alignItems: "center", gap: 6 }}><Save size={16} /> Simpan Inspeksi</button>
                 </div>
               </form>
             </div>
