@@ -478,7 +478,10 @@ export default function WarehousePage() {
         <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.5)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", backdropFilter: "blur(4px)" }}>
           <div className="erp-card animate-fade-in" style={{ width: "100%", maxWidth: 480, margin: 20, border: "none", boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}>
             <div className="erp-card-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <h3 className="erp-card-title">Pindahkan Bale</h3>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <ArrowRightLeft size={20} color="var(--color-primary)" />
+                <h3 className="erp-card-title" style={{ margin: 0 }}>Pindahkan Bale</h3>
+              </div>
               <button onClick={() => setShowMoveModal(false)} style={{ background: "transparent", border: "none", fontSize: 20, cursor: "pointer" }}>✕</button>
             </div>
             <div className="erp-card-body" style={{ padding: 24 }}>

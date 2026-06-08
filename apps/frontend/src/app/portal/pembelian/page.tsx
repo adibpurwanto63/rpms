@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
 import { useRefresh } from "@/lib/refresh-context";
-import { ClipboardList, Hourglass, CheckCircle2, Banknote } from "lucide-react";
+import { ClipboardList, Hourglass, CheckCircle2, Banknote, ShoppingBag } from "lucide-react";
 
 const statusColor: any = {
   PENDING: "badge-warning",
@@ -191,7 +191,10 @@ export default function PembelianPage() {
         }}>
           <div className="erp-card animate-fade-in" style={{ width: "100%", maxWidth: 680, margin: 20, maxHeight: "90vh", overflowY: "auto", border: "none", boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}>
             <div className="erp-card-header" style={{ position: "sticky", top: 0, background: "#fff", zIndex: 10, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <h3 className="erp-card-title" style={{ fontSize: 20 }}>Buat Purchase Order Baru</h3>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <ShoppingBag size={20} color="var(--color-primary)" />
+                <h3 className="erp-card-title" style={{ fontSize: 20, margin: 0 }}>Buat Purchase Order Baru</h3>
+              </div>
               <button type="button" onClick={() => setShowForm(false)} style={{ background: "transparent", border: "none", fontSize: 20, cursor: "pointer", color: "var(--text-muted)" }}>✕</button>
             </div>
             <div className="erp-card-body" style={{ padding: 24 }}>

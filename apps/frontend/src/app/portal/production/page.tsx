@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
 import { useRefresh } from "@/lib/refresh-context";
-import { ArrowDownToLine, ArrowUpFromLine, Package, BarChart2, Factory, Save, Trash2, Edit2, Plus, PlusCircle, AlertTriangle, Tags } from "lucide-react";
+import { ArrowDownToLine, ArrowUpFromLine, Package, BarChart2, Factory, Save, Trash2, Edit2, Plus, PlusCircle, AlertTriangle, Tags, ClipboardList } from "lucide-react";
 
 const machineStatusColor: any = { RUNNING: "badge-success", IDLE: "badge-neutral", MAINTENANCE: "badge-warning", BREAKDOWN: "badge-danger" };
 const machineStatusLabel: any = { RUNNING: "Berjalan", IDLE: "Standby", MAINTENANCE: "Maintenance", BREAKDOWN: "Rusak" };
@@ -212,7 +212,10 @@ export default function ProductionPage() {
         <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.5)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", backdropFilter: "blur(4px)" }}>
           <div className="erp-card animate-fade-in" style={{ width: "100%", maxWidth: 500, margin: 20, border: "none", boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}>
             <div className="erp-card-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <h3 className="erp-card-title" style={{ fontSize: 18 }}>{editMachineId ? "Edit Mesin" : "Tambah Mesin Baru"}</h3>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                {editMachineId ? <Edit2 size={20} color="var(--color-primary)" /> : <PlusCircle size={20} color="var(--color-primary)" />}
+                <h3 className="erp-card-title" style={{ fontSize: 18, margin: 0 }}>{editMachineId ? "Edit Mesin" : "Tambah Mesin Baru"}</h3>
+              </div>
               <button type="button" onClick={() => setShowMachineForm(false)} style={{ background: "transparent", border: "none", fontSize: 20, cursor: "pointer", color: "var(--text-muted)" }}>✕</button>
             </div>
             <div className="erp-card-body" style={{ padding: 24 }}>
@@ -349,7 +352,10 @@ export default function ProductionPage() {
         }}>
           <div className="erp-card animate-fade-in" style={{ width: "100%", maxWidth: 700, margin: 20, maxHeight: "90vh", overflowY: "auto", border: "none", boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}>
             <div className="erp-card-header" style={{ position: "sticky", top: 0, background: "#fff", zIndex: 10, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <h3 className="erp-card-title" style={{ fontSize: 20 }}>{editId ? "Edit Catatan Produksi" : "Catat Hasil Produksi"}</h3>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                {editId ? <Edit2 size={20} color="var(--color-primary)" /> : <ClipboardList size={20} color="var(--color-primary)" />}
+                <h3 className="erp-card-title" style={{ fontSize: 20, margin: 0 }}>{editId ? "Edit Catatan Produksi" : "Catat Hasil Produksi"}</h3>
+              </div>
               <button type="button" onClick={() => setShowForm(false)} style={{ background: "transparent", border: "none", fontSize: 20, cursor: "pointer", color: "var(--text-muted)" }}>✕</button>
             </div>
             <div className="erp-card-body" style={{ padding: 24 }}>

@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
 import { useRefresh } from "@/lib/refresh-context";
-import { Building2, CheckCircle2, Ban, Users, Package } from "lucide-react";
+import { Building2, CheckCircle2, Ban, Users, Package, ClipboardList } from "lucide-react";
 
 const fmtRp = (n: number) => new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n || 0);
 
@@ -236,10 +236,13 @@ export default function PurchasePage() {
           {showSupplierForm && (
             <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.5)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", backdropFilter: "blur(4px)" }}>
               <div className="erp-card animate-fade-in" style={{ width: "100%", maxWidth: 700, margin: 20, maxHeight: "90vh", overflowY: "auto", border: "none", boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}>
-                <div className="erp-card-header" style={{ position: "sticky", top: 0, background: "#fff", zIndex: 10, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <h3 className="erp-card-title" style={{ fontSize: 20 }}>Registrasi Supplier Baru</h3>
-                  <button type="button" onClick={() => setShowSupplierForm(false)} style={{ background: "transparent", border: "none", fontSize: 20, cursor: "pointer", color: "var(--text-muted)" }}>✕</button>
-                </div>
+            <div className="erp-card-header" style={{ position: "sticky", top: 0, background: "#fff", zIndex: 10, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <Building2 size={20} color="var(--color-primary)" />
+                <h3 className="erp-card-title" style={{ fontSize: 20, margin: 0 }}>Registrasi Supplier Baru</h3>
+              </div>
+              <button type="button" onClick={() => setShowSupplierForm(false)} style={{ background: "transparent", border: "none", fontSize: 20, cursor: "pointer", color: "var(--text-muted)" }}>✕</button>
+            </div>
                 <div className="erp-card-body" style={{ padding: 24 }}>
                   <form onSubmit={submitSupplier}>
                     <div className="modal-form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
@@ -313,9 +316,12 @@ export default function PurchasePage() {
             <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.5)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", backdropFilter: "blur(4px)" }}>
               <div className="erp-card animate-fade-in" style={{ width: "100%", maxWidth: 700, margin: 20, maxHeight: "90vh", overflowY: "auto", border: "none", boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}>
                 <div className="erp-card-header" style={{ position: "sticky", top: 0, background: "#fff", zIndex: 10, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <h3 className="erp-card-title" style={{ fontSize: 20 }}>Registrasi Customer Baru</h3>
-                  <button type="button" onClick={() => setShowCustomerForm(false)} style={{ background: "transparent", border: "none", fontSize: 20, cursor: "pointer", color: "var(--text-muted)" }}>✕</button>
-                </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <Users size={20} color="var(--color-primary)" />
+                <h3 className="erp-card-title" style={{ fontSize: 20, margin: 0 }}>Registrasi Customer Baru</h3>
+              </div>
+              <button type="button" onClick={() => setShowCustomerForm(false)} style={{ background: "transparent", border: "none", fontSize: 20, cursor: "pointer", color: "var(--text-muted)" }}>✕</button>
+            </div>
                 <div className="erp-card-body" style={{ padding: 24 }}>
                   <form onSubmit={submitCustomer}>
                     <div className="modal-form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
@@ -390,9 +396,12 @@ export default function PurchasePage() {
             <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.5)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", backdropFilter: "blur(4px)" }}>
               <div className="erp-card animate-fade-in" style={{ width: "100%", maxWidth: 680, margin: 20, maxHeight: "90vh", overflowY: "auto", border: "none", boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}>
                 <div className="erp-card-header" style={{ position: "sticky", top: 0, background: "#fff", zIndex: 10, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <h3 className="erp-card-title" style={{ fontSize: 20 }}>Buat Sales Order Baru</h3>
-                  <button type="button" onClick={() => setShowSalesForm(false)} style={{ background: "transparent", border: "none", fontSize: 20, cursor: "pointer", color: "var(--text-muted)" }}>✕</button>
-                </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <ClipboardList size={20} color="var(--color-primary)" />
+                <h3 className="erp-card-title" style={{ fontSize: 20, margin: 0 }}>Buat Sales Order Baru</h3>
+              </div>
+              <button type="button" onClick={() => setShowSalesForm(false)} style={{ background: "transparent", border: "none", fontSize: 20, cursor: "pointer", color: "var(--text-muted)" }}>✕</button>
+            </div>
                 <div className="erp-card-body" style={{ padding: 24 }}>
                   <form onSubmit={submitSales}>
                     <div className="modal-form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>

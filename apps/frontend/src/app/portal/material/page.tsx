@@ -245,7 +245,10 @@ export default function MaterialPage() {
         <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.5)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", backdropFilter: "blur(4px)" }}>
           <div className="erp-card animate-fade-in" style={{ width: "100%", maxWidth: 580, margin: 20, maxHeight: "90vh", overflowY: "auto", border: "none", boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}>
             <div className="erp-card-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <h3 className="erp-card-title" style={{ fontSize: 18 }}>{editId ? "Edit Material" : "Tambah Material Baru"}</h3>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                {editId ? <Edit2 size={20} color="var(--color-primary)" /> : <Package size={20} color="var(--color-primary)" />}
+                <h3 className="erp-card-title" style={{ fontSize: 18, margin: 0 }}>{editId ? "Edit Material" : "Tambah Material Baru"}</h3>
+              </div>
               <button type="button" onClick={() => setShowForm(false)} style={{ background: "transparent", border: "none", fontSize: 20, cursor: "pointer", color: "var(--text-muted)" }}>✕</button>
             </div>
             <div className="erp-card-body" style={{ padding: 24 }}>
@@ -305,7 +308,10 @@ export default function MaterialPage() {
         <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.5)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", backdropFilter: "blur(4px)" }}>
           <div className="erp-card animate-fade-in" style={{ width: "100%", maxWidth: 420, margin: 20, border: "none", boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}>
             <div className="erp-card-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <h3 className="erp-card-title" style={{ fontSize: 16 }}>Sesuaikan Stok</h3>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <TrendingUp size={20} color="var(--color-primary)" />
+                <h3 className="erp-card-title" style={{ fontSize: 16, margin: 0 }}>Sesuaikan Stok</h3>
+              </div>
               <button type="button" onClick={() => setAdjustModal(null)} style={{ background: "transparent", border: "none", fontSize: 20, cursor: "pointer", color: "var(--text-muted)" }}>✕</button>
             </div>
             <div className="erp-card-body" style={{ padding: 24 }}>

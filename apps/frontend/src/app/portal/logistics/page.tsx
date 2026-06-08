@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
 import { useRefresh } from "@/lib/refresh-context";
+import { Truck, Edit2, PlusCircle } from "lucide-react";
 
 const deliveryStatusColor: any = { SCHEDULED: "badge-neutral", LOADING: "badge-warning", IN_TRANSIT: "badge-warning", DELIVERED: "badge-success", CANCELLED: "badge-danger" };
 const vehicleStatusColor: any = { AVAILABLE: "badge-success", ON_TRIP: "badge-warning", MAINTENANCE: "badge-danger" };
@@ -208,7 +209,10 @@ export default function LogisticsPage() {
         <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.5)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", backdropFilter: "blur(4px)" }}>
           <div className="erp-card animate-fade-in" style={{ width: "100%", maxWidth: 700, margin: 20, maxHeight: "90vh", overflowY: "auto", border: "none", boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}>
             <div className="erp-card-header" style={{ position: "sticky", top: 0, background: "#fff", zIndex: 10, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <h3 className="erp-card-title" style={{ fontSize: 20 }}>Delivery Order Baru</h3>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <Truck size={20} color="var(--color-primary)" />
+                <h3 className="erp-card-title" style={{ fontSize: 20, margin: 0 }}>Delivery Order Baru</h3>
+              </div>
               <button type="button" onClick={() => setShowDoForm(false)} style={{ background: "transparent", border: "none", fontSize: 20, cursor: "pointer", color: "var(--text-muted)" }}>✕</button>
             </div>
             <div className="erp-card-body" style={{ padding: 24 }}>
@@ -250,7 +254,10 @@ export default function LogisticsPage() {
         <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.5)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", backdropFilter: "blur(4px)" }}>
           <div className="erp-card animate-fade-in" style={{ width: "100%", maxWidth: 500, margin: 20, maxHeight: "90vh", overflowY: "auto", border: "none", boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}>
             <div className="erp-card-header" style={{ position: "sticky", top: 0, background: "#fff", zIndex: 10, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <h3 className="erp-card-title" style={{ fontSize: 20 }}>{vehicleForm.id ? "Edit Armada" : "Tambah Armada Baru"}</h3>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                {vehicleForm.id ? <Edit2 size={20} color="var(--color-primary)" /> : <Truck size={20} color="var(--color-primary)" />}
+                <h3 className="erp-card-title" style={{ fontSize: 20, margin: 0 }}>{vehicleForm.id ? "Edit Armada" : "Tambah Armada Baru"}</h3>
+              </div>
               <button type="button" onClick={() => setShowVehicleForm(false)} style={{ background: "transparent", border: "none", fontSize: 20, cursor: "pointer", color: "var(--text-muted)" }}>✕</button>
             </div>
             <div className="erp-card-body" style={{ padding: 24 }}>
