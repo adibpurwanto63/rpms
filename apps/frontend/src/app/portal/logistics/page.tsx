@@ -166,9 +166,16 @@ export default function LogisticsPage() {
           </button>
           <button
             className="btn btn-primary"
-            disabled={readyPickupBales === 0}
-            title={readyPickupBales === 0 ? "Gudang belum memiliki stok ready pickup" : undefined}
-            onClick={() => { setSelectedBaleIds([]); setForm({ vehicleId: "", customerId: "", destination: "", loadingWeight: "" }); setShowForm(true); }}
+            style={{ opacity: readyPickupBales === 0 ? 0.6 : 1 }}
+            onClick={() => { 
+              if (readyPickupBales === 0) {
+                alert("Gudang belum memiliki stok siap kirim. Silakan selesaikan produksi atau masukkan barang ke Gudang terlebih dahulu.");
+                return;
+              }
+              setSelectedBaleIds([]); 
+              setForm({ vehicleId: "", customerId: "", destination: "", loadingWeight: "" }); 
+              setShowForm(true); 
+            }}
           >
             + Buat Surat Jalan Baru
           </button>
