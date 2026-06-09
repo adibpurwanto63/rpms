@@ -68,11 +68,20 @@ export class WarehouseService {
       const dateStr = now.toISOString().slice(0, 10).replace(/-/g, ""); // YYYYMMDD
       
       const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      const count = await this.prisma.inventoryItem.count({
-        where: { createdAt: { gte: startOfDay } }
+      const latestItem = await this.prisma.inventoryItem.findFirst({
+        where: { createdAt: { gte: startOfDay } },
+        orderBy: { createdAt: 'desc' }
       });
       
-      baleId = `BALE-${dateStr}-${String(count + 1).padStart(4, "0")}`;
+      let nextNumber = 1;
+      if (latestItem && latestItem.baleId.startsWith(`BALE-${dateStr}-`)) {
+        const parts = latestItem.baleId.split('-');
+        if (parts.length === 3) {
+          nextNumber = parseInt(parts[2], 10) + 1;
+        }
+      }
+      
+      baleId = `BALE-${dateStr}-${String(nextNumber).padStart(4, "0")}`;
     }
 
     const item = await this.prisma.inventoryItem.create({

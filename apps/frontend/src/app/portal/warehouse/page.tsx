@@ -70,21 +70,37 @@ export default function WarehousePage() {
   // ─── Actions ─────────────────────────────────────────────────────────────────
   const submitInbound = async (e: React.FormEvent) => {
     e.preventDefault();
-    await api.post("/warehouse/inbound", { ...inboundForm, weight: parseFloat(inboundForm.weight) });
-    setInboundForm({ weight: "", grade: "A", notes: "", submittedBy: "" });
-    setShowInboundForm(false);
-    load();
+    try {
+      await api.post("/warehouse/inbound", { ...inboundForm, weight: parseFloat(inboundForm.weight) });
+      setInboundForm({ weight: "", grade: "A", notes: "", submittedBy: "" });
+      setShowInboundForm(false);
+      load();
+      alert("Bale berhasil dicatat dan menunggu approval.");
+    } catch (err: any) {
+      console.error(err);
+      alert("Gagal mencatat penerimaan: " + (err.response?.data?.message || err.message));
+    }
   };
 
   const approve = async (id: string) => {
-    await api.put(`/warehouse/inbound/${id}/approve`, { approvedBy: "Supervisor" });
-    load();
+    try {
+      await api.put(`/warehouse/inbound/${id}/approve`, { approvedBy: "Supervisor" });
+      load();
+    } catch (err: any) {
+      console.error(err);
+      alert("Gagal melakukan approval: " + (err.response?.data?.message || err.message));
+    }
   };
 
   const reject = async (id: string) => {
     if (!confirm("Yakin menolak penerimaan bale ini? Data akan dihapus.")) return;
-    await api.put(`/warehouse/inbound/${id}/reject`, { rejectedBy: "Supervisor" });
-    load();
+    try {
+      await api.put(`/warehouse/inbound/${id}/reject`, { rejectedBy: "Supervisor" });
+      load();
+    } catch (err: any) {
+      console.error(err);
+      alert("Gagal menolak penerimaan: " + (err.response?.data?.message || err.message));
+    }
   };
 
   const submitMove = async (e: React.FormEvent) => {
