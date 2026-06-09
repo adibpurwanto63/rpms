@@ -34,7 +34,7 @@ export default function WarehousePage() {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   // ─── Form states ─────────────────────────────────────────────────────────────
-  const [inboundForm, setInboundForm] = useState({ baleId: "", weight: "", grade: "A", location: "", notes: "", submittedBy: "" });
+  const [inboundForm, setInboundForm] = useState({ weight: "", grade: "A", notes: "", submittedBy: "" });
   const [moveForm, setMoveForm] = useState({ id: "", toArea: "FINISHED_GOODS", toLocation: "" });
   const [showMoveModal, setShowMoveModal] = useState(false);
   const [showInboundForm, setShowInboundForm] = useState(false);
@@ -71,7 +71,7 @@ export default function WarehousePage() {
   const submitInbound = async (e: React.FormEvent) => {
     e.preventDefault();
     await api.post("/warehouse/inbound", { ...inboundForm, weight: parseFloat(inboundForm.weight) });
-    setInboundForm({ baleId: "", weight: "", grade: "A", location: "", notes: "", submittedBy: "" });
+    setInboundForm({ weight: "", grade: "A", notes: "", submittedBy: "" });
     setShowInboundForm(false);
     load();
   };
@@ -137,8 +137,8 @@ export default function WarehousePage() {
           <p style={{ fontSize: 14, color: "var(--text-secondary)", marginTop: 4 }}>Sistem manajemen gudang terintegrasi — Penerimaan, Stok, dan Pengiriman</p>
         </div>
         {activeTab === "INBOUND" && (
-          <button className="btn btn-primary" onClick={() => setShowInboundForm(!showInboundForm)}>
-            {showInboundForm ? "✕ Tutup" : "+ Catat Penerimaan"}
+          <button className="btn btn-primary" onClick={() => setShowInboundForm(true)}>
+            + Catat Penerimaan
           </button>
         )}
       </div>
@@ -216,54 +216,7 @@ export default function WarehousePage() {
       {/* ── TAB: INBOUND ──────────────────────────────────────────────────────── */}
       {activeTab === "INBOUND" && (
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-          {showInboundForm && (
-            <div className="erp-card animate-fade-in">
-              <div className="erp-card-header">
-                <span className="erp-card-title">Form Penerimaan Bale Baru</span>
-                <span style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 12, color: "var(--text-secondary)", marginLeft: 12 }}>
-                  <AlertTriangle size={14} /> Memerlukan persetujuan Supervisor
-                </span>
-              </div>
-              <div className="erp-card-body" style={{ padding: 24 }}>
-                  <form onSubmit={submitInbound}>
-                  <div className="modal-form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginBottom: 16 }}>
-                    <div>
-                      <label className="form-label">Bale ID</label>
-                      <input className="form-input" value={inboundForm.baleId} onChange={e => setInboundForm({ ...inboundForm, baleId: e.target.value })} placeholder="BALE-2024-001" required />
-                    </div>
-                    <div>
-                      <label className="form-label">Berat (kg)</label>
-                      <input className="form-input" type="number" value={inboundForm.weight} onChange={e => setInboundForm({ ...inboundForm, weight: e.target.value })} placeholder="250" required />
-                    </div>
-                    <div>
-                      <label className="form-label">Grade</label>
-                      <select className="form-input" value={inboundForm.grade} onChange={e => setInboundForm({ ...inboundForm, grade: e.target.value })}>
-                        <option value="A">Grade A</option>
-                        <option value="B">Grade B</option>
-                        <option value="REJECT">Reject</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="form-label">Lokasi Rak</label>
-                      <input className="form-input" value={inboundForm.location} onChange={e => setInboundForm({ ...inboundForm, location: e.target.value })} placeholder="R-A-03" />
-                    </div>
-                    <div>
-                      <label className="form-label">Dicatat Oleh</label>
-                      <input className="form-input" value={inboundForm.submittedBy} onChange={e => setInboundForm({ ...inboundForm, submittedBy: e.target.value })} placeholder="Nama Operator" />
-                    </div>
-                    <div>
-                      <label className="form-label">Catatan</label>
-                      <input className="form-input" value={inboundForm.notes} onChange={e => setInboundForm({ ...inboundForm, notes: e.target.value })} placeholder="Opsional" />
-                    </div>
-                  </div>
-                  <div style={{ display: "flex", gap: 12, justifyContent: "flex-end", borderTop: "1px solid var(--border-light)", paddingTop: 16 }}>
-                    <button type="button" className="btn btn-secondary" onClick={() => setShowInboundForm(false)}>Batal</button>
-                    <button type="submit" className="btn btn-primary" style={{ display: "flex", alignItems: "center", gap: 6 }}><Download size={16} /> Kirim untuk Approval</button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          )}
+          {/* Form moved to modal */}
 
           {/* Pending Approval Table */}
           <div className="erp-card">
@@ -470,6 +423,55 @@ export default function WarehousePage() {
                 ))}
               </tbody>
             </table>
+          </div>
+        </div>
+      )}
+
+      {/* ── INBOUND MODAL ────────────────────────────────────────────────────── */}
+      {showInboundForm && (
+        <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.5)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", backdropFilter: "blur(4px)" }}>
+          <div className="erp-card animate-fade-in" style={{ width: "100%", maxWidth: 600, margin: 20, border: "none", boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}>
+            <div className="erp-card-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <Download size={20} color="var(--color-primary)" />
+                <h3 className="erp-card-title" style={{ margin: 0 }}>Catat Penerimaan Bale Baru</h3>
+              </div>
+              <button onClick={() => setShowInboundForm(false)} style={{ background: "transparent", border: "none", fontSize: 20, cursor: "pointer" }}>✕</button>
+            </div>
+            <div className="erp-card-body" style={{ padding: 24 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, color: "var(--text-secondary)", marginBottom: 16, padding: "8px 12px", background: "#fef3c7", borderRadius: 6 }}>
+                <AlertTriangle size={14} color="#d97706" />
+                <span style={{ color: "#d97706" }}>Memerlukan persetujuan Supervisor. ID Bale akan dibuat secara otomatis.</span>
+              </div>
+              <form onSubmit={submitInbound}>
+                <div className="rg-1-1" style={{ marginBottom: 16 }}>
+                  <div>
+                    <label className="form-label">Berat (kg)</label>
+                    <input className="form-input" type="number" value={inboundForm.weight} onChange={e => setInboundForm({ ...inboundForm, weight: e.target.value })} placeholder="Cth: 250" required />
+                  </div>
+                  <div>
+                    <label className="form-label">Grade</label>
+                    <select className="form-input" value={inboundForm.grade} onChange={e => setInboundForm({ ...inboundForm, grade: e.target.value })}>
+                      <option value="A">Grade A</option>
+                      <option value="B">Grade B</option>
+                      <option value="REJECT">Reject</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="form-label">Dicatat Oleh</label>
+                    <input className="form-input" value={inboundForm.submittedBy} onChange={e => setInboundForm({ ...inboundForm, submittedBy: e.target.value })} placeholder="Nama Operator" />
+                  </div>
+                  <div>
+                    <label className="form-label">Catatan</label>
+                    <input className="form-input" value={inboundForm.notes} onChange={e => setInboundForm({ ...inboundForm, notes: e.target.value })} placeholder="Opsional" />
+                  </div>
+                </div>
+                <div style={{ display: "flex", gap: 12, justifyContent: "flex-end", marginTop: 24, borderTop: "1px solid var(--border-light)", paddingTop: 16 }}>
+                  <button type="button" className="btn btn-secondary" onClick={() => setShowInboundForm(false)}>Batal</button>
+                  <button type="submit" className="btn btn-primary" style={{ display: "flex", alignItems: "center", gap: 6 }}><Download size={16} /> Kirim untuk Approval</button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}

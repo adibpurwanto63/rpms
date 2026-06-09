@@ -41,18 +41,43 @@ export class WarehouseService {
 
   // ─── INBOUND ─────────────────────────────────────────────────────────────────
   async create(dto: any) {
-    // When created manually (not from production), mark as pendingApproval = true
     const isManual = !dto.productionId;
+    
+    if (!dto.baleId) {
+      const now = new Date();
+      const dateStr = now.toISOString().slice(0, 10).replace(/-/g, ""); // YYYYMMDD
+      
+      const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const count = await this.prisma.inventoryItem.count({
+        where: { createdAt: { gte: startOfDay } }
+      });
+      
+      dto.baleId = `BALE-${dateStr}-${String(count + 1).padStart(4, "0")}`;
+    }
+
     return this.prisma.inventoryItem.create({
       data: { ...dto, pendingApproval: isManual },
     });
   }
 
   /** Operator submits a pending inbound receipt for Supervisor to approve */
-  async submitInbound(dto: { baleId: string; weight: number; grade: QcGrade; location?: string; notes?: string; submittedBy?: string }) {
+  async submitInbound(dto: { baleId?: string; weight: number; grade: QcGrade; location?: string; notes?: string; submittedBy?: string }) {
+    let baleId = dto.baleId;
+    if (!baleId) {
+      const now = new Date();
+      const dateStr = now.toISOString().slice(0, 10).replace(/-/g, ""); // YYYYMMDD
+      
+      const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const count = await this.prisma.inventoryItem.count({
+        where: { createdAt: { gte: startOfDay } }
+      });
+      
+      baleId = `BALE-${dateStr}-${String(count + 1).padStart(4, "0")}`;
+    }
+
     const item = await this.prisma.inventoryItem.create({
       data: {
-        baleId: dto.baleId,
+        baleId,
         weight: dto.weight,
         grade: dto.grade,
         area: InventoryArea.RAW_MATERIAL,
