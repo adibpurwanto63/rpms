@@ -213,20 +213,21 @@ export default function DashboardPage() {
         <div className="erp-card">
           <div className="erp-card-header db-chart-header">
             <span className="erp-card-title">Tren Pembelian & Penjualan</span>
-            <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+            <div className="db-trend-controls" style={{ display: "flex", alignItems: "center", gap: 16 }}>
               {(chartFilter === "Semua" || chartFilter === "Pembelian") && (
-                <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--text-secondary)" }}>
+                <div className="db-trend-legend" style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--text-secondary)" }}>
                   <div style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--color-purple)" }} />
                   Pembelian
                 </div>
               )}
               {(chartFilter === "Semua" || chartFilter === "Penjualan") && (
-                <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--text-secondary)" }}>
+                <div className="db-trend-legend" style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--text-secondary)" }}>
                   <div style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--color-teal)" }} />
                   Penjualan
                 </div>
               )}
               <select 
+                className="db-trend-select"
                 value={chartFilter}
                 onChange={(e) => setChartFilter(e.target.value)}
                 style={{

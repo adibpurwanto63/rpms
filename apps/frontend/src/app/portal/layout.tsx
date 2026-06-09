@@ -283,20 +283,25 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
           borderBottom: "1px solid var(--border-light)",
           position: "sticky",
           top: 0,
-          zIndex: 40,
+          zIndex: 100,
         }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             {/* Mobile hamburger button */}
             <button
               className="mobile-only"
-              onClick={() => setMobileOpen(!mobileOpen)}
+              onPointerDown={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                setMobileOpen(open => !open);
+              }}
               style={{
                 width: 28, height: 28, borderRadius: 4,
                 border: "1px solid var(--border-light)",
                 background: "transparent",
-                display: "none", alignItems: "center", justifyContent: "center",
+                alignItems: "center", justifyContent: "center",
                 cursor: "pointer", color: "var(--text-secondary)",
                 fontSize: 13,
+                touchAction: "manipulation",
                 transition: "all 0.15s ease",
               }}
               title="Toggle menu"

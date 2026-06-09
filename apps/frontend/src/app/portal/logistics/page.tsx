@@ -45,37 +45,43 @@ export default function LogisticsPage() {
   const [vehicles, setVehicles] = useState<any[]>([]);
   const [customers, setCustomers] = useState<any[]>([]);
   const [showForm, setShowForm] = useState(false);
+  const [showVehicleForm, setShowVehicleForm] = useState(false);
   const [loading, setLoading] = useState(true);
   const [availableBales, setAvailableBales] = useState<any[]>([]);
   const [selectedBaleIds, setSelectedBaleIds] = useState<string[]>([]);
 
   const [form, setForm] = useState({ vehicleId: "", customerId: "", destination: "", loadingWeight: "" });
+  const [vehicleForm, setVehicleForm] = useState({ plate: "", driverName: "", type: "TRONTON", status: "AVAILABLE" });
   const [dashboard, setDashboard] = useState<any>(null);
 
   const { triggerRefresh } = useRefresh();
 
-  const load = () => {
+  const load = async () => {
     setLoading(true);
-    Promise.all([
+    const [d, v, c, bales, stats] = await Promise.allSettled([
       api.get("/logistics/deliveries"),
       api.get("/logistics/vehicles"),
       api.get("/customers"),
       api.get("/warehouse/fifo?grade=A"),
       api.get("/logistics/stats"),
-    ]).then(([d, v, c, bales, stats]) => {
-      setDeliveries(d.data);
-      setVehicles(v.data);
-      setCustomers(c.data);
-      setAvailableBales(bales.data);
-      setDashboard(stats.data);
-    }).finally(() => setLoading(false));
+    ]);
+    
+    if (d.status === "fulfilled") setDeliveries(d.value.data);
+    if (v.status === "fulfilled") setVehicles(v.value.data);
+    if (c.status === "fulfilled") setCustomers(c.value.data);
+    if (bales.status === "fulfilled") setAvailableBales(bales.value.data);
+    if (stats.status === "fulfilled") setDashboard(stats.value.data);
+    
+    setLoading(false);
   };
 
   useEffect(() => { load(); }, []);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (readyPickupBales === 0) return alert("Gudang belum memiliki stok ready pickup.");
     if (selectedBaleIds.length === 0) return alert("Pilih minimal 1 bale dari Gudang.");
+    if (!form.vehicleId) return alert("Pilih kendaraan tersedia terlebih dahulu.");
     const customer = customers.find(c => c.id === form.customerId);
     const destination = customer ? `${customer.companyName} - ${customer.address}` : form.destination;
     try {
@@ -86,9 +92,9 @@ export default function LogisticsPage() {
       setSelectedBaleIds([]);
       load();
       triggerRefresh();
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert("Gagal membuat surat jalan.");
+      alert(err?.response?.data?.message || "Gagal membuat surat jalan.");
     }
   };
 
@@ -108,6 +114,30 @@ export default function LogisticsPage() {
     } catch (e) { console.error(e); }
   };
 
+  const saveVehicle = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await api.post("/logistics/vehicles", vehicleForm);
+      setVehicleForm({ plate: "", driverName: "", type: "TRONTON", status: "AVAILABLE" });
+      setShowVehicleForm(false);
+      load();
+    } catch (err: any) {
+      console.error(err);
+      alert(err?.response?.data?.message || "Gagal menyimpan kendaraan.");
+    }
+  };
+
+  const updateVehicleStatus = async (vehicle: any, status: string) => {
+    if (vehicle.deliveries?.length > 0) return alert("Kendaraan masih aktif di Surat Jalan dan status tidak bisa diubah.");
+    try {
+      await api.put(`/logistics/vehicles/${vehicle.id}`, { status });
+      load();
+    } catch (err: any) {
+      console.error(err);
+      alert(err?.response?.data?.message || "Gagal mengubah status kendaraan.");
+    }
+  };
+
   const toggleBale = (id: string) => {
     setSelectedBaleIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
   };
@@ -117,6 +147,9 @@ export default function LogisticsPage() {
     else setSelectedBaleIds(availableBales.map((b: any) => b.id));
   };
 
+  const readyPickupBales = availableBales.length;
+  const readyPickupWeight = availableBales.reduce((a: number, b: any) => a + (b.weight || 0), 0);
+  const availableVehicles = vehicles.filter((v: any) => v.status === "AVAILABLE" && (!v.deliveries || v.deliveries.length === 0));
   const totalSelectedWeight = availableBales.filter((b: any) => selectedBaleIds.includes(b.id)).reduce((a: number, b: any) => a + b.weight, 0);
 
   return (
@@ -127,9 +160,19 @@ export default function LogisticsPage() {
           <h2 style={{ fontSize: 22, fontWeight: 700, color: "var(--text-primary)", letterSpacing: "-0.02em" }}>Manajemen Pengiriman</h2>
           <p style={{ fontSize: 14, color: "var(--text-secondary)", marginTop: 4 }}>Surat Jalan — Terintegrasi dengan Produksi & Gudang</p>
         </div>
-        <button className="btn btn-primary" onClick={() => { setSelectedBaleIds([]); setShowForm(true); }}>
-          + Buat Surat Jalan Baru
-        </button>
+        <div className="page-header-actions" style={{ display: "flex", gap: 10 }}>
+          <button className="btn btn-secondary" onClick={() => setShowVehicleForm(true)} style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <Truck size={16} /> Tambah Kendaraan
+          </button>
+          <button
+            className="btn btn-primary"
+            disabled={readyPickupBales === 0}
+            title={readyPickupBales === 0 ? "Gudang belum memiliki stok ready pickup" : undefined}
+            onClick={() => { setSelectedBaleIds([]); setForm({ vehicleId: "", customerId: "", destination: "", loadingWeight: "" }); setShowForm(true); }}
+          >
+            + Buat Surat Jalan Baru
+          </button>
+        </div>
       </div>
 
       {/* KPI Stats */}
@@ -137,8 +180,8 @@ export default function LogisticsPage() {
         <div className="rg-auto">
           {[
             { label: "Total DO", value: dashboard._count || 0, sub: "surat jalan", color: "var(--kpi-dark)", dark: true },
-            { label: "Hari Ini", value: dashboard._count || 0, sub: "dibuat hari ini", color: "#EDE9FF", dark: false },
-            { label: "Berattotal", value: dashboard._sum?.loadingWeight ? `${(dashboard._sum.loadingWeight / 1000).toFixed(1)} Ton` : "0 Ton", sub: "dimuat", color: "var(--kpi-mint-bg)", dark: false },
+            { label: "Ready Pickup", value: readyPickupBales, sub: `${(readyPickupWeight / 1000).toFixed(1)} Ton dari Gudang`, color: "#EDE9FF", dark: false },
+            { label: "Kendaraan Tersedia", value: availableVehicles.length, sub: `${vehicles.length} total kendaraan`, color: "var(--kpi-mint-bg)", dark: false },
           ].map((kpi, i) => (
             <div key={i} className="kpi-card" style={{ background: kpi.color, borderColor: undefined }}>
               <div style={{ fontSize: 12, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--text-secondary)", marginBottom: 8 }}>{kpi.label}</div>
@@ -252,6 +295,122 @@ export default function LogisticsPage() {
         </div>
       )}
 
+      {/* Vehicle Management */}
+      <div className="erp-card">
+        <div className="erp-card-header page-header-responsive">
+          <div>
+            <span className="erp-card-title">Daftar Kendaraan</span>
+            <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 3 }}>
+              Kendaraan tersedia di sini akan muncul di dropdown Surat Jalan jika Gudang punya stok ready pickup.
+            </div>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13, color: "var(--text-muted)" }}>
+            <Truck size={14} /> {availableVehicles.length} tersedia / {vehicles.length} total
+          </div>
+        </div>
+        <div style={{ overflowX: "auto" }}>
+          <table className="erp-table">
+            <thead>
+              <tr>
+                <th>No. Polisi</th>
+                <th>Supir</th>
+                <th>Tipe</th>
+                <th>Status</th>
+                <th>Surat Jalan Aktif</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              {vehicles.length === 0 ? (
+                <tr><td colSpan={6} style={{ textAlign: "center", padding: "2rem", color: "var(--text-muted)" }}>Belum ada kendaraan. Tambahkan kendaraan dulu sebelum membuat Surat Jalan.</td></tr>
+              ) : vehicles.map((v: any) => {
+                const activeDelivery = v.deliveries?.[0];
+                const isSelectable = v.status === "AVAILABLE" && !activeDelivery;
+                return (
+                  <tr key={v.id}>
+                    <td style={{ fontFamily: "monospace", fontWeight: 700, color: "var(--brand-purple)", fontSize: 13 }}>{v.plate}</td>
+                    <td style={{ fontWeight: 600 }}>{v.driverName}</td>
+                    <td><span className="badge badge-neutral">{v.type}</span></td>
+                    <td>
+                      <span className={`badge ${isSelectable ? "badge-success" : activeDelivery ? "badge-warning" : "badge-neutral"}`}>
+                        {isSelectable ? "Tersedia" : activeDelivery ? "Aktif SJ" : v.status}
+                      </span>
+                    </td>
+                    <td style={{ fontSize: 13, color: activeDelivery ? "var(--text-primary)" : "var(--text-muted)", fontWeight: activeDelivery ? 600 : 400 }}>
+                      {activeDelivery ? `${activeDelivery.orderNumber || "DO aktif"} (${statusLabel[activeDelivery.status] || activeDelivery.status})` : "-"}
+                    </td>
+                    <td>
+                      <select
+                        className="form-input"
+                        value={v.status}
+                        disabled={!!activeDelivery}
+                        onChange={e => updateVehicleStatus(v, e.target.value)}
+                        style={{ minWidth: 140, fontSize: 12, padding: "4px 8px" }}
+                        title={activeDelivery ? "Kendaraan aktif di Surat Jalan tidak bisa diubah" : undefined}
+                      >
+                        <option value="AVAILABLE">AVAILABLE</option>
+                        <option value="MAINTENANCE">MAINTENANCE</option>
+                      </select>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Vehicle Form Modal */}
+      {showVehicleForm && (
+        <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.5)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", backdropFilter: "blur(4px)" }}>
+          <div className="erp-card animate-fade-in" style={{ width: "100%", maxWidth: 520, margin: 20, border: "none", boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}>
+            <div className="erp-card-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <Truck size={20} color="var(--color-primary)" />
+                <h3 className="erp-card-title" style={{ fontSize: 20, margin: 0 }}>Tambah Kendaraan</h3>
+              </div>
+              <button type="button" onClick={() => setShowVehicleForm(false)} style={{ background: "transparent", border: "none", cursor: "pointer", color: "var(--text-muted)" }}><X size={20} /></button>
+            </div>
+            <div className="erp-card-body" style={{ padding: 24 }}>
+              <form onSubmit={saveVehicle} style={{ display: "grid", gap: 16 }}>
+                <div>
+                  <label className="form-label">No. Polisi</label>
+                  <input className="form-input" value={vehicleForm.plate} onChange={e => setVehicleForm({ ...vehicleForm, plate: e.target.value.toUpperCase() })} placeholder="B 1234 ABC" required />
+                </div>
+                <div>
+                  <label className="form-label">Nama Supir</label>
+                  <input className="form-input" value={vehicleForm.driverName} onChange={e => setVehicleForm({ ...vehicleForm, driverName: e.target.value })} placeholder="Nama supir" required />
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                  <div>
+                    <label className="form-label">Tipe Kendaraan</label>
+                    <select className="form-input" value={vehicleForm.type} onChange={e => setVehicleForm({ ...vehicleForm, type: e.target.value })} required>
+                      <option value="TRONTON">TRONTON</option>
+                      <option value="ENGKEL">ENGKEL</option>
+                      <option value="VENDOR">VENDOR</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="form-label">Status</label>
+                    <select className="form-input" value={vehicleForm.status} onChange={e => setVehicleForm({ ...vehicleForm, status: e.target.value })} required>
+                      <option value="AVAILABLE">AVAILABLE</option>
+                      <option value="MAINTENANCE">MAINTENANCE</option>
+                    </select>
+                  </div>
+                </div>
+                <div style={{ padding: "12px 14px", background: "var(--bg-secondary)", borderRadius: 10, fontSize: 13, color: "var(--text-secondary)" }}>
+                  Kendaraan dengan status AVAILABLE akan muncul di dropdown Surat Jalan hanya jika tidak sedang aktif di Surat Jalan lain.
+                </div>
+                <div style={{ display: "flex", gap: 12, justifyContent: "flex-end" }}>
+                  <button type="button" className="btn btn-secondary" onClick={() => setShowVehicleForm(false)}>Batal</button>
+                  <button type="submit" className="btn btn-primary" style={{ display: "flex", alignItems: "center", gap: 6 }}><Save size={16} /> Simpan Kendaraan</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Create Form Modal */}
       {showForm && (
         <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.5)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", backdropFilter: "blur(4px)" }}>
@@ -273,10 +432,15 @@ export default function LogisticsPage() {
                       <label className="form-label">Kendaraan</label>
                       <select className="form-input" value={form.vehicleId} onChange={e => setForm({ ...form, vehicleId: e.target.value })} required>
                         <option value="">-- Pilih Kendaraan --</option>
-                        {vehicles.filter((v: any) => v.status === "AVAILABLE").map((v: any) => (
+                        {availableVehicles.map((v: any) => (
                           <option key={v.id} value={v.id}>{v.plate} — {v.driverName}</option>
                         ))}
                       </select>
+                      {availableVehicles.length === 0 && (
+                        <div style={{ fontSize: 12, color: "var(--color-red)", marginTop: 6 }}>
+                          Tidak ada kendaraan tersedia. Kendaraan aktif di Surat Jalan tidak bisa dipilih.
+                        </div>
+                      )}
                     </div>
                     <div>
                       <label className="form-label">Pelanggan</label>

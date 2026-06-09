@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { DeliveryStatus } from "@prisma/client";
 
@@ -6,7 +6,22 @@ import { DeliveryStatus } from "@prisma/client";
 export class LogisticsService {
   constructor(private prisma: PrismaService) {}
 
-  getVehicles() { return this.prisma.vehicle.findMany({ include: { deliveries: { where: { status: { not: DeliveryStatus.DELIVERED } }, take: 1 } } }); }
+  private readonly activeDeliveryStatuses = [
+    DeliveryStatus.SCHEDULED,
+    DeliveryStatus.LOADING,
+    DeliveryStatus.IN_TRANSIT,
+  ];
+
+  getVehicles() {
+    return this.prisma.vehicle.findMany({
+      include: {
+        deliveries: {
+          where: { status: { in: this.activeDeliveryStatuses } },
+          take: 1,
+        },
+      },
+    });
+  }
 
   getDeliveries(status?: DeliveryStatus) {
     return this.prisma.deliveryOrder.findMany({
@@ -17,6 +32,18 @@ export class LogisticsService {
   }
 
   async createDelivery(dto: any) {
+    const activeDelivery = await this.prisma.deliveryOrder.findFirst({
+      where: {
+        vehicleId: dto.vehicleId,
+        status: { in: this.activeDeliveryStatuses },
+      },
+      select: { orderNumber: true, status: true },
+    });
+
+    if (activeDelivery) {
+      throw new BadRequestException(`Kendaraan masih aktif di ${activeDelivery.orderNumber}. Selesaikan atau batalkan surat jalan tersebut terlebih dahulu.`);
+    }
+
     const count = await this.prisma.deliveryOrder.count();
     return this.prisma.deliveryOrder.create({
       data: { ...dto, orderNumber: `DO-${new Date().getFullYear()}-${String(count+1).padStart(4,"0")}` },
