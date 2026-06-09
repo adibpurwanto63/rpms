@@ -144,25 +144,21 @@ export default function WarehousePage() {
       </div>
 
       {/* Tabs */}
-      <div style={{ display: "flex", gap: 4, borderBottom: "1px solid var(--border-light)", flexWrap: "wrap" }}>
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
         {tabs.map(tab => (
-          <div
+          <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            style={{
-              paddingBottom: 12, paddingLeft: 4, paddingRight: 16, cursor: "pointer", fontWeight: 600, fontSize: 14,
-              color: activeTab === tab.id ? "var(--brand-purple)" : "var(--text-secondary)",
-              borderBottom: activeTab === tab.id ? "2px solid var(--brand-purple)" : "2px solid transparent",
-              transition: "all 0.2s", display: "flex", alignItems: "center", gap: 6,
-            }}
+            className={`btn ${activeTab === tab.id ? "btn-primary" : "btn-secondary"}`}
+            style={{ borderRadius: 20, display: "flex", alignItems: "center", gap: 6 }}
           >
             <tab.Icon size={16} /> {tab.label}
             {tab.badge ? (
-              <span style={{ background: "#ef4444", color: "#fff", borderRadius: 999, fontSize: 11, fontWeight: 700, padding: "1px 6px" }}>
+              <span style={{ background: activeTab === tab.id ? "rgba(255,255,255,0.2)" : "#ef4444", color: "#fff", borderRadius: 999, fontSize: 11, fontWeight: 700, padding: "2px 6px", marginLeft: 4 }}>
                 {tab.badge}
               </span>
             ) : null}
-          </div>
+          </button>
         ))}
       </div>
 
@@ -170,18 +166,23 @@ export default function WarehousePage() {
       {activeTab === "DASHBOARD" && (
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
           {/* KPI Row */}
-          <div className="rg-auto">
+          <div className="rg-auto" style={{ marginBottom: 24 }}>
             {[
-              { label: "Total Stok Aktif", value: `${(totalStock / 1000).toFixed(2)} Ton`, sub: `${inventory.length} bale`, color: "var(--kpi-dark)", dark: true },
-              { label: "Masuk Hari Ini", value: todayStats.inbound, sub: "bale diterima", color: "var(--kpi-mint-bg)", dark: false },
-              { label: "Keluar Hari Ini", value: todayStats.outbound, sub: "bale dikirim", color: "var(--kpi-pink-bg)", dark: false },
-              { label: "Menunggu Approval", value: todayStats.pending, sub: "pending Supervisor", color: "#FFF7ED", dark: false },
-              { label: "Stok Terreservasi", value: reservedCount, sub: "bale", color: "#EDE9FF", dark: false },
-            ].map((kpi, i) => (
-              <div key={i} className="kpi-card" style={{ background: kpi.color, borderColor: undefined }}>
-                <div style={{ fontSize: 12, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--text-secondary)", marginBottom: 8 }}>{kpi.label}</div>
-                <div style={{ fontSize: "1.8rem", fontWeight: 700, letterSpacing: "-0.03em", color: "var(--text-primary)", lineHeight: 1.1 }}>{kpi.value}</div>
-                <div style={{ fontSize: "0.8rem", color: "var(--text-muted)", marginTop: 4 }}>{kpi.sub}</div>
+              { label: "Total Stok Aktif", value: `${(totalStock / 1000).toFixed(2)} Ton`, sub: `${inventory.length} bale`, variant: "dark", Icon: Package },
+              { label: "Masuk Hari Ini", value: todayStats.inbound, sub: "bale diterima", variant: "mint", Icon: Download },
+              { label: "Keluar Hari Ini", value: todayStats.outbound, sub: "bale dikirim", variant: "pink", Icon: Truck },
+              { label: "Menunggu Approval", value: todayStats.pending, sub: "pending Supervisor", variant: "neutral", Icon: AlertTriangle },
+              { label: "Stok Terreservasi", value: reservedCount, sub: "bale", variant: "dark", Icon: Pin },
+            ].map((k, i) => (
+              <div key={i} className="kpi-card" style={{ background: ({ dark: "var(--kpi-dark)", mint: "var(--kpi-mint-bg)", pink: "var(--kpi-pink-bg)", neutral: "var(--kpi-neutral-bg)" } as any)[k.variant], borderColor: undefined }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
+                  <div className="kpi-label" style={{ color: "var(--text-secondary)" }}>{k.label}</div>
+                  <div className={`kpi-card-icon kpi-card-${k.variant}`} style={{ background: "var(--bg-card)", border: "1px solid var(--border-light)" }}>
+                    <k.Icon size={16} />
+                  </div>
+                </div>
+                <div className="kpi-value">{k.value}</div>
+                <div style={{ fontSize: "0.8rem", color: "var(--text-muted)", marginTop: 4 }}>{k.sub}</div>
               </div>
             ))}
           </div>
