@@ -28,7 +28,7 @@ async function bootstrap() {
   SwaggerModule.setup('api/docs', app, document);
 
   const port = process.env.PORT || 7860;
-  console.log(`Database URL configured as: ${process.env.DATABASE_URL ? process.env.DATABASE_URL.substring(0, 30) + '...' : 'UNDEFINED (Falling back to localhost)'}`);
+  console.log(`Database URL configured as: ${process.env.DATABASE_URL ? 'provided by environment' : 'not provided; using configured fallback'}`);
   await app.listen(port);
   console.log(`🚀 RPMS Backend running on port ${port}`);
 }

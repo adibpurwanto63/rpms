@@ -118,23 +118,25 @@ export default function LogisticsPage() {
     e.preventDefault();
     try {
       await api.post("/logistics/vehicles", vehicleForm);
+      const vr = await api.get("/logistics/vehicles");
+      setVehicles(vr.data);
       setVehicleForm({ plate: "", driverName: "", type: "TRONTON", status: "AVAILABLE" });
       setShowVehicleForm(false);
-      load();
     } catch (err: any) {
-      console.error(err);
-      alert(err?.response?.data?.message || "Gagal menyimpan kendaraan.");
+      console.error("Vehicle save error:", err);
+      alert(err?.response?.data?.message || err?.message || "Gagal menyimpan kendaraan.");
     }
   };
 
   const updateVehicleStatus = async (vehicle: any, status: string) => {
-    if (vehicle.deliveries?.length > 0) return alert("Kendaraan masih aktif di Surat Jalan dan status tidak bisa diubah.");
+    if (vehicle.deliveries?.length > 0) return alert("Kendaraan aktif di Surat Jalan dan status tidak bisa diubah.");
     try {
       await api.put(`/logistics/vehicles/${vehicle.id}`, { status });
-      load();
+      const vr = await api.get("/logistics/vehicles");
+      setVehicles(vr.data);
     } catch (err: any) {
-      console.error(err);
-      alert(err?.response?.data?.message || "Gagal mengubah status kendaraan.");
+      console.error("Vehicle status update error:", err);
+      alert(err?.response?.data?.message || err?.message || "Gagal mengubah status kendaraan.");
     }
   };
 
