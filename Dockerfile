@@ -1,4 +1,5 @@
 FROM node:20-slim
+# Build: 2026-06-10 with Groq AI module
 
 # Install OpenSSL for Prisma
 RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
