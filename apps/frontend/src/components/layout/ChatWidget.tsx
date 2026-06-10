@@ -38,7 +38,6 @@ export default function ChatWidget() {
         parts: [{ text: msg.text }]
       }));
 
-      // In the real system, you might want to slice history to prevent oversized requests
       const recentHistory = history.slice(-10);
 
       const response = await api.post("/ai/chat", {
@@ -56,54 +55,62 @@ export default function ChatWidget() {
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+    <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
       {/* Chat Window */}
       {isOpen && (
         <div 
-          className="mb-4 w-80 sm:w-96 h-[500px] max-h-[80vh] flex flex-col bg-white/90 backdrop-blur-xl border border-white/20 shadow-2xl rounded-2xl overflow-hidden transition-all duration-300 origin-bottom-right"
-          style={{ animation: "scaleIn 0.2s ease-out forwards" }}
+          style={{ 
+            marginBottom: 16, width: "100%", maxWidth: 380, height: 500, maxHeight: "80vh", 
+            display: "flex", flexDirection: "column", background: "rgba(255,255,255,0.95)", 
+            backdropFilter: "blur(12px)", border: "1px solid rgba(0,0,0,0.1)", 
+            boxShadow: "0 25px 50px -12px rgba(0,0,0,0.25)", borderRadius: 16, overflow: "hidden",
+            animation: "scaleIn 0.2s ease-out forwards", transformOrigin: "bottom right"
+          }}
         >
           {/* Header */}
-          <div className="bg-gradient-to-r from-[#1a365d] to-[#2563eb] p-4 text-white flex justify-between items-center shadow-md">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-sm">
-                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div style={{ background: "linear-gradient(to right, #1a365d, #2563eb)", padding: "16px", color: "white", display: "flex", justifyContent: "space-between", alignItems: "center", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <div style={{ width: 32, height: 32, borderRadius: "50%", background: "rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <svg style={{ width: 20, height: 20, color: "white" }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
               <div>
-                <h3 className="font-bold text-sm">RPMS Assistant</h3>
-                <p className="text-xs text-blue-100">AI Powered Guide</p>
+                <h3 style={{ margin: 0, fontWeight: 700, fontSize: 14 }}>RPMS Assistant</h3>
+                <p style={{ margin: 0, fontSize: 12, color: "#DBEAFE" }}>AI Powered Guide</p>
               </div>
             </div>
-            <button onClick={toggleChat} className="text-white/80 hover:text-white transition-colors">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <button onClick={toggleChat} style={{ background: "none", border: "none", cursor: "pointer", color: "white", opacity: 0.8 }} onMouseEnter={e => e.currentTarget.style.opacity="1"} onMouseLeave={e => e.currentTarget.style.opacity="0.8"}>
+              <svg style={{ width: 24, height: 24 }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           </div>
 
           {/* Messages Area */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50">
+          <div style={{ flex: 1, overflowY: "auto", padding: 16, display: "flex", flexDirection: "column", gap: 16, background: "#F8FAFC" }}>
             {messages.map((msg, index) => (
-              <div key={index} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+              <div key={index} style={{ display: "flex", justifyContent: msg.role === "user" ? "flex-end" : "flex-start" }}>
                 <div 
-                  className={`max-w-[85%] p-3 rounded-2xl text-sm shadow-sm ${
-                    msg.role === "user" 
-                      ? "bg-[#2563eb] text-white rounded-tr-sm" 
-                      : "bg-white border border-slate-100 text-slate-800 rounded-tl-sm"
-                  }`}
+                  style={{ 
+                    maxWidth: "85%", padding: 12, borderRadius: 16, fontSize: 14, boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
+                    background: msg.role === "user" ? "#2563eb" : "white",
+                    color: msg.role === "user" ? "white" : "#1e293b",
+                    border: msg.role === "user" ? "none" : "1px solid #f1f5f9",
+                    borderTopRightRadius: msg.role === "user" ? 4 : 16,
+                    borderTopLeftRadius: msg.role === "user" ? 16 : 4,
+                  }}
                 >
-                  <p className="leading-relaxed whitespace-pre-wrap">{msg.text}</p>
+                  <p style={{ margin: 0, lineHeight: 1.5, whiteSpace: "pre-wrap" }}>{msg.text}</p>
                 </div>
               </div>
             ))}
             {isLoading && (
-              <div className="flex justify-start">
-                <div className="bg-white border border-slate-100 p-3 rounded-2xl rounded-tl-sm shadow-sm flex space-x-1 items-center">
-                  <div className="w-2 h-2 bg-slate-300 rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></div>
-                  <div className="w-2 h-2 bg-slate-300 rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></div>
-                  <div className="w-2 h-2 bg-slate-300 rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></div>
+              <div style={{ display: "flex", justifyContent: "flex-start" }}>
+                <div style={{ background: "white", border: "1px solid #f1f5f9", padding: 12, borderRadius: 16, borderTopLeftRadius: 4, display: "flex", gap: 4, alignItems: "center" }}>
+                  <div style={{ width: 8, height: 8, background: "#cbd5e1", borderRadius: "50%", animation: "bounce 1.4s infinite ease-in-out both", animationDelay: "0s" }}></div>
+                  <div style={{ width: 8, height: 8, background: "#cbd5e1", borderRadius: "50%", animation: "bounce 1.4s infinite ease-in-out both", animationDelay: "0.15s" }}></div>
+                  <div style={{ width: 8, height: 8, background: "#cbd5e1", borderRadius: "50%", animation: "bounce 1.4s infinite ease-in-out both", animationDelay: "0.3s" }}></div>
                 </div>
               </div>
             )}
@@ -111,22 +118,22 @@ export default function ChatWidget() {
           </div>
 
           {/* Input Area */}
-          <div className="p-3 bg-white border-t border-slate-100">
-            <form onSubmit={sendMessage} className="flex space-x-2">
+          <div style={{ padding: 12, background: "white", borderTop: "1px solid #f1f5f9" }}>
+            <form onSubmit={sendMessage} style={{ display: "flex", gap: 8 }}>
               <input
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Tanyakan sesuatu..."
-                className="flex-1 bg-slate-50 border border-slate-200 rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#2563eb] focus:border-transparent transition-all"
+                style={{ flex: 1, background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 9999, padding: "8px 16px", fontSize: 14, outline: "none" }}
                 disabled={isLoading}
               />
               <button 
                 type="submit" 
                 disabled={!input.trim() || isLoading}
-                className="bg-[#2563eb] text-white rounded-full p-2 w-10 h-10 flex items-center justify-center hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-md hover:shadow-lg"
+                style={{ background: "#2563eb", color: "white", border: "none", borderRadius: 9999, width: 40, height: 40, display: "flex", alignItems: "center", justifyContent: "center", cursor: (!input.trim() || isLoading) ? "not-allowed" : "pointer", opacity: (!input.trim() || isLoading) ? 0.5 : 1 }}
               >
-                <svg className="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg style={{ width: 20, height: 20, marginLeft: 2 }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                 </svg>
               </button>
@@ -138,18 +145,20 @@ export default function ChatWidget() {
       {/* Floating Toggle Button */}
       <button
         onClick={toggleChat}
-        className="w-14 h-14 bg-gradient-to-r from-[#1a365d] to-[#2563eb] rounded-full flex items-center justify-center shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 relative group"
+        style={{ width: 56, height: 56, background: "linear-gradient(to right, #1a365d, #2563eb)", borderRadius: "50%", border: "none", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04)", cursor: "pointer", position: "relative", transition: "transform 0.3s" }}
+        onMouseEnter={e => e.currentTarget.style.transform = "scale(1.05)"}
+        onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}
       >
-        <span className="absolute -top-1 -right-1 flex h-3 w-3">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-          <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
+        <span style={{ position: "absolute", top: -4, right: -4, display: "flex", width: 12, height: 12 }}>
+          <span style={{ position: "absolute", display: "inline-flex", width: "100%", height: "100%", borderRadius: "50%", background: "#60a5fa", opacity: 0.75, animation: "ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite" }}></span>
+          <span style={{ position: "relative", display: "inline-flex", borderRadius: "50%", width: 12, height: 12, background: "#3b82f6" }}></span>
         </span>
         {isOpen ? (
-          <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg style={{ width: 24, height: 24, color: "white" }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
         ) : (
-          <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg style={{ width: 28, height: 28, color: "white" }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
           </svg>
         )}
@@ -160,6 +169,13 @@ export default function ChatWidget() {
         @keyframes scaleIn {
           from { opacity: 0; transform: scale(0.9) translateY(10px); }
           to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        @keyframes ping {
+          75%, 100% { transform: scale(2); opacity: 0; }
+        }
+        @keyframes bounce {
+          0%, 80%, 100% { transform: scale(0); }
+          40% { transform: scale(1); }
         }
       `}} />
     </div>
