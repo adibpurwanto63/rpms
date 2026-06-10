@@ -1,23 +1,43 @@
 "use client";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
-import {
-  ShieldCheck, Mail, Lock, ArrowRight, Activity
-} from "lucide-react";
+import { Eye, EyeOff, ShieldCheck, Recycle } from "lucide-react";
+
+const DEMO_ACCOUNTS = [
+  { email: "admin@rpms.id", role: "SUPER_ADMIN", label: "Super Admin", color: "#2563eb" },
+  { email: "director@rpms.id", role: "DIRECTOR", label: "Director", color: "#2563eb" },
+  { email: "finance@rpms.id", role: "FINANCE_MANAGER", label: "Finance Manager", color: "#2563eb" },
+  { email: "procurement@rpms.id", role: "PROCUREMENT_MANAGER", label: "Procurement Mgr", color: "#2563eb" },
+  { email: "qc@rpms.id", role: "QC_OFFICER", label: "QC Officer", color: "#2563eb" },
+  { email: "production@rpms.id", role: "PRODUCTION_SUPERVISOR", label: "Production Supv.", color: "#2563eb" },
+  { email: "warehouse@rpms.id", role: "WAREHOUSE_SUPERVISOR", label: "Warehouse Supv.", color: "#2563eb" },
+  { email: "logistics@rpms.id", role: "LOGISTICS_MANAGER", label: "Logistics Mgr", color: "#2563eb" },
+  { email: "supplier@rpms.id", role: "SUPPLIER", label: "Supplier", color: "#2563eb" },
+];
+
+const DEMO_PASSWORD = "password123";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("admin@rpms.id");
-  const [password, setPassword] = useState("Admin@123");
+  const [password, setPassword] = useState(DEMO_PASSWORD);
   const [remember, setRemember] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showDemoAccounts, setShowDemoAccounts] = useState(false);
   const { login } = useAuth();
   const router = useRouter();
 
+  const selectedAccount = useMemo(
+    () => DEMO_ACCOUNTS.find(a => a.email === email),
+    [email]
+  );
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(""); setLoading(true);
+    setError("");
+    setLoading(true);
     try {
       await login(email, password, remember);
       router.push("/portal/dashboard");
@@ -28,16 +48,12 @@ export default function LoginPage() {
     }
   };
 
-  const demoAccounts = [
-    { email: "admin@rpms.id", role: "Super Admin", color: "#7C6FE0" },
-    { email: "director@rpms.id", role: "Director", color: "#4ECDC4" },
-    { email: "finance@rpms.id", role: "Finance Manager", color: "#FF6B9D" },
-    { email: "procurement@rpms.id", role: "Procurement", color: "#7C6FE0" },
-    { email: "qc@rpms.id", role: "QC Officer", color: "#FFB020" },
-    { email: "production@rpms.id", role: "Production", color: "#4ECDC4" },
-    { email: "warehouse@rpms.id", role: "Warehouse", color: "#FF6B9D" },
-    { email: "logistics@rpms.id", role: "Logistics", color: "#7C6FE0" },
-  ];
+  const selectAccount = (acc: typeof DEMO_ACCOUNTS[0]) => {
+    setEmail(acc.email);
+    setPassword(DEMO_PASSWORD);
+    setError("");
+    setShowDemoAccounts(false);
+  };
 
   return (
     <div style={{
@@ -45,156 +61,172 @@ export default function LoginPage() {
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
-      background: "linear-gradient(135deg, #0F172A 0%, #1E293B 100%)",
-      fontFamily: "'Inter', -apple-system, sans-serif",
-      position: "relative",
-      padding: 24,
-      overflow: "hidden"
+      background: "#ffffff",
+      fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+      padding: "24px",
     }}>
-      {/* Ambient Glow Effects */}
-      <div style={{ position: "absolute", top: "5%", left: "10%", width: 600, height: 600, borderRadius: "50%", background: "radial-gradient(circle, rgba(124,111,224,0.15) 0%, rgba(124,111,224,0) 60%)", pointerEvents: "none" }} />
-      <div style={{ position: "absolute", bottom: "5%", right: "10%", width: 700, height: 700, borderRadius: "50%", background: "radial-gradient(circle, rgba(78,205,196,0.12) 0%, rgba(78,205,196,0) 60%)", pointerEvents: "none" }} />
-
-      {/* Modern dark grid background */}
       <div style={{
-        position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
-        backgroundImage: "linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)",
-        backgroundSize: "40px 40px",
-        pointerEvents: "none"
-      }} />
-
-      {/* Login Card */}
-      <div style={{ 
-        width: "100%", maxWidth: 480,
-        background: "var(--bg-card)",
-        padding: "48px",
-        borderRadius: 24,
-        boxShadow: "var(--shadow-card)",
-        position: "relative",
-        zIndex: 10
+        width: "100%",
+        maxWidth: 440,
+        animation: "fadeInUp 0.35s ease both",
       }}>
-        {/* Brand */}
-        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 40, justifyContent: "center" }}>
-          <img src="/logo.png" alt="RPMS Logo" style={{ width: 44, height: 44, objectFit: "contain" }} />
-          <span style={{ color: "var(--text-primary)", fontSize: 24, fontWeight: 800, letterSpacing: "-0.02em" }}>
-            Aftech<span style={{ color: "var(--text-muted)", fontWeight: 400 }}> RPMS</span>
-          </span>
+        {/* Logo */}
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: 32 }}>
+          <div style={{
+            width: 56, height: 56, borderRadius: "50%",
+            background: "#EEF2FF",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            marginBottom: 24,
+          }}>
+            <Recycle size={26} color="#2563eb" strokeWidth={2.5} />
+          </div>
+
+          <h1 style={{
+            fontSize: 26, fontWeight: 700, color: "#111827",
+            letterSpacing: "-0.02em", margin: 0, textAlign: "center",
+          }}>
+            Selamat datang kembali!
+          </h1>
+          <p style={{ color: "#6B7280", fontSize: 14, marginTop: 8, textAlign: "center" }}>
+            {selectedAccount ? (
+              <>Masuk sebagai <span style={{ color: "#2563eb", fontWeight: 600 }}>{selectedAccount.label}</span></>
+            ) : (
+              <>Masuk ke akun RPMS Anda</>
+            )}
+          </p>
         </div>
 
-        <div style={{ marginBottom: 36, textAlign: "center" }}>
-          <h2 style={{ fontSize: 26, fontWeight: 800, color: "var(--text-primary)", letterSpacing: "-0.03em" }}>Selamat datang kembali</h2>
-          <p style={{ color: "var(--text-secondary)", marginTop: 8, fontSize: 15 }}>Masuk ke akun RPMS Anda untuk melanjutkan</p>
-        </div>
-
+        {/* Error */}
         {error && (
           <div style={{
-            background: "var(--color-red-light)",
-            border: "1px solid var(--color-red)",
+            background: "#FEF2F2",
+            border: "1px solid #FCA5A5",
             borderRadius: 12,
-            padding: "14px 16px",
-            marginBottom: 24,
-            color: "var(--color-red)",
-            fontSize: 14,
+            padding: "12px 16px",
+            marginBottom: 20,
+            color: "#DC2626",
+            fontSize: 13,
             fontWeight: 500,
             display: "flex",
             alignItems: "center",
             gap: 10,
           }}>
-            <ShieldCheck size={18} /> {error}
+            <ShieldCheck size={16} /> {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-          <div>
-            <label htmlFor="email" style={{ display: "block", fontSize: 13, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 8 }}>Alamat Email</label>
-            <div style={{ position: "relative" }}>
-              <div style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }}>
-                <Mail size={18} />
-              </div>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                placeholder="anda@perusahaan.com"
-                required
-                autoComplete="username"
-                style={{ 
-                  width: "100%", padding: "12px 16px 12px 42px", 
-                  border: "1px solid var(--border-medium)", borderRadius: 12, 
-                  fontSize: 14, color: "var(--text-primary)", outline: "none",
-                  background: "var(--bg-card)",
-                  transition: "all 0.2s ease"
-                }}
-                onFocus={e => { e.target.style.borderColor = "var(--color-primary)"; e.target.style.boxShadow = "0 0 0 3px rgba(124,111,224,0.15)"; }}
-                onBlur={e => { e.target.style.borderColor = "var(--border-medium)"; e.target.style.boxShadow = "none"; }}
-              />
-            </div>
+        {/* Form */}
+        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          {/* Email */}
+          <input
+            id="email"
+            type="email"
+            value={email}
+            onChange={e => { setEmail(e.target.value); setError(""); }}
+            placeholder="Email address"
+            required
+            autoComplete="username"
+            style={{
+              width: "100%", padding: "14px 18px",
+              border: "1.5px solid #E5E7EB",
+              borderRadius: 14,
+              fontSize: 14, color: "#111827", outline: "none",
+              background: "#ffffff",
+              transition: "border-color 0.2s, box-shadow 0.2s",
+              boxSizing: "border-box",
+            }}
+            onFocus={e => {
+              e.target.style.borderColor = "#2563eb";
+              e.target.style.boxShadow = "0 0 0 3px rgba(37,99,235,0.1)";
+            }}
+            onBlur={e => {
+              e.target.style.borderColor = "#E5E7EB";
+              e.target.style.boxShadow = "none";
+            }}
+          />
+
+          {/* Password */}
+          <div style={{ position: "relative" }}>
+            <input
+              id="password"
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={e => { setPassword(e.target.value); setError(""); }}
+              placeholder="Password"
+              required
+              autoComplete="current-password"
+              style={{
+                width: "100%", padding: "14px 48px 14px 18px",
+                border: "1.5px solid #E5E7EB",
+                borderRadius: 14,
+                fontSize: 14, color: "#111827", outline: "none",
+                background: "#ffffff",
+                transition: "border-color 0.2s, box-shadow 0.2s",
+                boxSizing: "border-box",
+              }}
+              onFocus={e => {
+                e.target.style.borderColor = "#2563eb";
+                e.target.style.boxShadow = "0 0 0 3px rgba(37,99,235,0.1)";
+              }}
+              onBlur={e => {
+                e.target.style.borderColor = "#E5E7EB";
+                e.target.style.boxShadow = "none";
+              }}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              tabIndex={-1}
+              style={{
+                position: "absolute", right: 16, top: "50%", transform: "translateY(-50%)",
+                background: "none", border: "none", cursor: "pointer",
+                color: "#9CA3AF", display: "flex", padding: 0,
+              }}
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
           </div>
-          <div>
-            <label htmlFor="password" style={{ display: "block", fontSize: 13, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 8 }}>Kata Sandi</label>
-            <div style={{ position: "relative" }}>
-              <div style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }}>
-                <Lock size={18} />
-              </div>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-                autoComplete="current-password"
-                style={{ 
-                  width: "100%", padding: "12px 16px 12px 42px", 
-                  border: "1px solid var(--border-medium)", borderRadius: 12, 
-                  fontSize: 14, color: "var(--text-primary)", outline: "none",
-                  background: "var(--bg-card)",
-                  transition: "all 0.2s ease"
-                }}
-                onFocus={e => { e.target.style.borderColor = "var(--color-primary)"; e.target.style.boxShadow = "0 0 0 3px rgba(124,111,224,0.15)"; }}
-                onBlur={e => { e.target.style.borderColor = "var(--border-medium)"; e.target.style.boxShadow = "none"; }}
-              />
-            </div>
-          </div>
-          
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: -4 }}>
+
+          {/* Remember + Forgot */}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
               <input
                 type="checkbox"
                 checked={remember}
                 onChange={(e) => setRemember(e.target.checked)}
-                style={{ accentColor: "var(--color-primary)", width: 16, height: 16 }}
+                style={{ width: 16, height: 16, accentColor: "#2563eb", borderRadius: 4, cursor: "pointer" }}
               />
-              <span style={{ fontSize: 13, color: "var(--text-secondary)" }}>
-                Ingat saya ({remember ? "30 hari" : "sesi ini saja"})
-              </span>
+              <span style={{ fontSize: 13, color: "#6B7280" }}>Remember me</span>
             </label>
-            <a href="#" style={{ fontSize: 13, fontWeight: 600, color: "var(--color-primary)", textDecoration: "none" }}>Lupa sandi?</a>
+            <a href="#" style={{ fontSize: 13, fontWeight: 600, color: "#2563eb", textDecoration: "none" }}>
+              Forgot password?
+            </a>
           </div>
 
+          {/* Submit */}
           <button
             type="submit"
             disabled={loading}
             style={{
               width: "100%",
               padding: "14px",
-              background: loading ? "var(--text-muted)" : "#4ECDC4",
+              background: loading ? "#93C5FD" : "#2563eb",
               color: "#fff",
               border: "none",
-              borderRadius: 12,
+              borderRadius: 9999,
               fontSize: 15,
               fontWeight: 600,
               cursor: loading ? "not-allowed" : "pointer",
-              marginTop: 8,
+              marginTop: 4,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               gap: 8,
               transition: "all 0.2s ease",
+              letterSpacing: "-0.01em",
             }}
-            onMouseEnter={e => { if(!loading) e.currentTarget.style.background = "#3DB5AD"; }}
-            onMouseLeave={e => { if(!loading) e.currentTarget.style.background = "#4ECDC4"; }}
+            onMouseEnter={e => { if (!loading) e.currentTarget.style.background = "#1d4ed8"; }}
+            onMouseLeave={e => { if (!loading) e.currentTarget.style.background = "#2563eb"; }}
           >
             {loading ? (
               <>
@@ -202,47 +234,122 @@ export default function LoginPage() {
                 Memproses...
               </>
             ) : (
-              <>Masuk ke Dashboard <ArrowRight size={16} /></>
+              "Log in"
             )}
           </button>
         </form>
 
-        {/* Demo Accounts */}
-        <div style={{ marginTop: 40 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
-            <div style={{ flex: 1, height: 1, background: "var(--border-light)" }} />
-            <span style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em" }}>Atau coba demo akses</span>
-            <div style={{ flex: 1, height: 1, background: "var(--border-light)" }} />
-          </div>
-          <div className="rg-2" style={{ gap: 8 }}>
-            {demoAccounts.map((a, i) => (
-              <button
-                type="button"
-                key={i}
-                onClick={() => { setEmail(a.email); setPassword("Admin@123"); }}
-                style={{
-                  display: "flex", alignItems: "center", gap: 10,
-                  textAlign: "left",
-                  padding: "10px 14px",
-                  borderRadius: 10,
-                  border: "1px solid var(--border-light)",
-                  background: "var(--bg-card)",
-                  cursor: "pointer",
-                  transition: "all 0.2s ease",
-                }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = a.color; e.currentTarget.style.background = "var(--bg-hover)"; }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border-light)"; e.currentTarget.style.background = "var(--bg-card)"; }}
-              >
-                <div style={{ width: 6, height: 6, borderRadius: "50%", background: a.color }} />
-                <div>
-                  <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text-primary)" }}>{a.role}</div>
-                  <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>{a.email.split('@')[0]}</div>
-                </div>
-              </button>
-            ))}
-          </div>
+        {/* Divider */}
+        <div style={{ display: "flex", alignItems: "center", gap: 16, margin: "24px 0" }}>
+          <div style={{ flex: 1, height: 1, background: "#E5E7EB" }} />
+          <span style={{ fontSize: 12, color: "#9CA3AF", fontWeight: 600, letterSpacing: "0.05em" }}>OR</span>
+          <div style={{ flex: 1, height: 1, background: "#E5E7EB" }} />
         </div>
+
+        {/* Demo Accounts toggle */}
+        <button
+          type="button"
+          onClick={() => setShowDemoAccounts(!showDemoAccounts)}
+          style={{
+            width: "100%",
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            color: "#2563eb",
+            fontSize: 14,
+            fontWeight: 600,
+            textAlign: "center",
+            padding: "4px 0",
+            letterSpacing: "-0.01em",
+          }}
+        >
+          {showDemoAccounts ? "Sembunyikan akun demo ↑" : "Akses cepat akun demo →"}
+        </button>
+
+        {/* Demo Accounts Grid */}
+        {showDemoAccounts && (
+          <div style={{
+            marginTop: 16,
+            background: "#F9FAFB",
+            border: "1.5px solid #E5E7EB",
+            borderRadius: 16,
+            padding: 16,
+            animation: "fadeInUp 0.2s ease both",
+          }}>
+            <p style={{ fontSize: 11, color: "#9CA3AF", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", margin: "0 0 12px" }}>
+              Pilih akun demo
+            </p>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
+              {DEMO_ACCOUNTS.map((acc, i) => {
+                const isSelected = email === acc.email;
+                return (
+                  <button
+                    type="button"
+                    key={i}
+                    onClick={() => selectAccount(acc)}
+                    style={{
+                      display: "flex", flexDirection: "column", alignItems: "center", gap: 4,
+                      padding: "10px 6px",
+                      borderRadius: 10,
+                      border: isSelected ? "1.5px solid #2563eb" : "1.5px solid #E5E7EB",
+                      background: isSelected ? "#EEF2FF" : "#ffffff",
+                      cursor: "pointer",
+                      transition: "all 0.15s ease",
+                    }}
+                    onMouseEnter={e => {
+                      if (!isSelected) {
+                        e.currentTarget.style.borderColor = "#93C5FD";
+                        e.currentTarget.style.background = "#F5F8FF";
+                      }
+                    }}
+                    onMouseLeave={e => {
+                      if (!isSelected) {
+                        e.currentTarget.style.borderColor = "#E5E7EB";
+                        e.currentTarget.style.background = "#ffffff";
+                      }
+                    }}
+                  >
+                    <div style={{
+                      width: 8, height: 8, borderRadius: "50%",
+                      background: isSelected ? "#2563eb" : "#D1D5DB",
+                    }} />
+                    <div style={{
+                      fontSize: 10, fontWeight: 600,
+                      color: isSelected ? "#2563eb" : "#374151",
+                      textAlign: "center", lineHeight: 1.3,
+                    }}>
+                      {acc.label}
+                    </div>
+                    <div style={{ fontSize: 9, color: "#9CA3AF" }}>
+                      {acc.email.split("@")[0]}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Footer */}
+        <p style={{ textAlign: "center", fontSize: 12, color: "#D1D5DB", marginTop: 32 }}>
+          © 2026 Aftech RPMS — All rights reserved
+        </p>
       </div>
+
+      <style>{`
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(10px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+        @media (max-width: 480px) {
+          [style*="gridTemplateColumns: 1fr 1fr 1fr"] {
+            grid-template-columns: 1fr 1fr !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }
