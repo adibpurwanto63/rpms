@@ -5,7 +5,7 @@ export const ROLE_MODULES: Record<string, string[]> = {
   PROCUREMENT_MANAGER: ["dashboard","purchase","weighbridge","pembelian","material"],
   QC_OFFICER: ["dashboard","qc","weighbridge"],
   PRODUCTION_SUPERVISOR: ["dashboard","production","warehouse","material"],
-  WAREHOUSE_SUPERVISOR: ["dashboard","warehouse","production","material"],
+  WAREHOUSE_SUPERVISOR: ["dashboard","warehouse","production","material","logistics"],
   LOGISTICS_MANAGER: ["dashboard","logistics","warehouse"],
   SUPPLIER: ["supplier-portal"],
 };

@@ -18,11 +18,11 @@ export class LogisticsController {
   getVehicles() { return this.svc.getVehicles(); }
 
   @Post("vehicles")
-  @Roles(UserRole.SUPER_ADMIN, UserRole.LOGISTICS_MANAGER)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.LOGISTICS_MANAGER, UserRole.WAREHOUSE_SUPERVISOR)
   createVehicle(@Body() dto: any) { return this.svc.createVehicle(dto); }
 
   @Put("vehicles/:id")
-  @Roles(UserRole.SUPER_ADMIN, UserRole.LOGISTICS_MANAGER)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.LOGISTICS_MANAGER, UserRole.WAREHOUSE_SUPERVISOR)
   updateVehicle(@Param("id") id: string, @Body() dto: any) { return this.svc.updateVehicle(id, dto); }
 
   @Get("deliveries")
@@ -38,11 +38,11 @@ export class LogisticsController {
   todayStats() { return this.svc.todayStats(); }
 
   @Post("deliveries")
-  @Roles(UserRole.SUPER_ADMIN, UserRole.LOGISTICS_MANAGER)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.LOGISTICS_MANAGER, UserRole.WAREHOUSE_SUPERVISOR)
   create(@Body() dto: any) { return this.svc.createDelivery(dto); }
 
   @Put("deliveries/:id/status")
-  @Roles(UserRole.SUPER_ADMIN, UserRole.LOGISTICS_MANAGER)
+  @Roles(UserRole.SUPER_ADMIN, UserRole.LOGISTICS_MANAGER, UserRole.WAREHOUSE_SUPERVISOR)
   updateStatus(@Param("id") id: string, @Body() dto: { status: DeliveryStatus }) {
     return this.svc.updateStatus(id, dto.status);
   }
