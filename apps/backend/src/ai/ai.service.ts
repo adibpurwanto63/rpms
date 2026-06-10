@@ -58,7 +58,7 @@ Struktur Modul Sistem RPMS:
 
       const completion = await this.groq.chat.completions.create({
         messages,
-        model: 'llama3-8b-8192', // Or 'llama-3.3-70b-versatile'
+        model: 'llama-3.1-8b-instant', // Or 'llama-3.3-70b-versatile'
         temperature: 0.7,
       });
 
