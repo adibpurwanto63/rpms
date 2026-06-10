@@ -18,6 +18,7 @@ import { PenjualanModule } from './penjualan/penjualan.module';
 import { SearchModule } from './search/search.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { MaterialsModule } from './materials/materials.module';
+import { AiModule } from './ai/ai.module';
 
 @Module({
   imports: [

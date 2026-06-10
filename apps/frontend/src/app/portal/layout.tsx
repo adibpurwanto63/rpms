@@ -11,6 +11,7 @@ import {
   Warehouse, Truck, BarChart2, ShieldCheck, Settings,
   Bell, ChevronRight, Home, LogOut, User, HelpCircle, Moon, Package
 } from "lucide-react";
+import ChatWidget from "@/components/layout/ChatWidget";
 
 const navItems = [
   { href: "/portal/dashboard",  Icon: LayoutDashboard, label: "Dashboard",  module: "dashboard",   category: "Core" },
@@ -512,6 +513,7 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
           </RefreshProvider>
         </main>
       </div>
+      <ChatWidget />
     </div>
   );
 }
