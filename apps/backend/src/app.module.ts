@@ -41,6 +41,7 @@ import { AiModule } from './ai/ai.module';
     SearchModule,
     NotificationsModule,
     MaterialsModule,
+    AiModule,
   ],
 })
 export class AppModule {}
