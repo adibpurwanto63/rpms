@@ -231,9 +231,12 @@ export default function DashboardPage() {
                 value={chartFilter}
                 onChange={(e) => setChartFilter(e.target.value)}
                 style={{
-                  padding: "4px 10px", borderRadius: 6, outline: "none",
-                  border: "1px solid var(--border-light)", fontSize: 12,
-                  color: "var(--text-secondary)", cursor: "pointer", background: "transparent"
+                  padding: "6px 12px", borderRadius: 6, outline: "none",
+                  border: "1px solid var(--border-light)", fontSize: 13,
+                  color: "var(--text-secondary)", cursor: "pointer",
+                  background: "var(--bg-card)",
+                  WebkitAppearance: "menulist",
+                  minHeight: 32,
                 }}
               >
                 <option value="Semua">Semua</option>
@@ -242,8 +245,8 @@ export default function DashboardPage() {
               </select>
             </div>
           </div>
-          <div className="db-chart-area" style={{ padding: "1.25rem 1rem 0.5rem" }}>
-            <ResponsiveContainer width="100%" height={220}>
+          <div className="db-chart-area" style={{ padding: "1.25rem 1rem 0.5rem", minHeight: 200, width: "100%", overflow: "hidden" }}>
+            <ResponsiveContainer width="100%" height={220} minWidth={280}>
               <AreaChart data={trend} margin={{ top: 5, right: 5, left: -20, bottom: 5 }}>
                 <defs>
                   <linearGradient id="gPurchase" x1="0" y1="0" x2="0" y2="1">
@@ -256,8 +259,8 @@ export default function DashboardPage() {
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--border-light)" vertical={false} />
-                <XAxis dataKey="date" tick={{ fill: "#9CA3AF", fontSize: 11 }} tickFormatter={d => d.slice(5)} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fill: "#9CA3AF", fontSize: 11 }} tickFormatter={v => `${(v / 1000).toFixed(0)}T`} axisLine={false} tickLine={false} />
+                <XAxis dataKey="date" tick={{ fill: "#9CA3AF", fontSize: 10 }} tickFormatter={d => d.slice(5)} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fill: "#9CA3AF", fontSize: 10 }} tickFormatter={v => `${(v / 1000).toFixed(0)}T`} axisLine={false} tickLine={false} width={35} />
                 <Tooltip
                   contentStyle={{ background: "var(--bg-card)", border: "1px solid var(--border-light)", borderRadius: 8, fontSize: 12, color: "var(--text-primary)", boxShadow: "var(--shadow-dropdown)" }}
                   labelStyle={{ color: "var(--text-secondary)", marginBottom: 4 }}
