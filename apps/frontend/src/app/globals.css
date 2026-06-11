@@ -589,21 +589,24 @@ th, td { text-align: left; }
   /* Prevent horizontal overflow */
   body { overflow-x: hidden; }
 
-  /* Sidebar stays hidden on load */
+  /* Sidebar: full-height slide from left */
   .sidebar-responsive {
     position: fixed !important;
-    top: 52px !important;
+    top: 0 !important;
     left: -280px !important;
-    width: 260px !important;
-    min-height: calc(100vh - 52px) !important;
-    height: calc(100vh - 52px) !important;
+    width: 270px !important;
+    min-height: 100vh !important;
+    height: 100vh !important;
     transition: left 0.3s cubic-bezier(0.4,0,0.2,1) !important;
-    z-index: 50 !important;
+    z-index: 200 !important;
     box-shadow: none !important;
+    background: var(--bg-sidebar) !important;
+    border-right: 1px solid var(--border-light) !important;
+    overflow-y: auto !important;
   }
   .sidebar-responsive.open {
     left: 0 !important;
-    box-shadow: var(--shadow-dropdown) !important;
+    box-shadow: 4px 0 24px rgba(0,0,0,0.15) !important;
   }
 
   /* Main content full width on mobile */
@@ -617,7 +620,7 @@ th, td { text-align: left; }
   header[style*="position: sticky"] {
     padding-left: 12px !important;
     padding-right: 12px !important;
-    z-index: 60 !important;
+    z-index: 100 !important;
   }
 
   /* Hamburger visible */
@@ -633,6 +636,7 @@ th, td { text-align: left; }
   /* Sidebar overlay */
   .sidebar-overlay {
     display: none !important;
+    z-index: 150 !important;
   }
 
   .sidebar-overlay.open {
@@ -642,6 +646,16 @@ th, td { text-align: left; }
   /* Page content */
   .page-content-responsive {
     padding: 16px !important;
+  }
+
+  /* Chart containers need explicit dimensions */
+  .erp-card {
+    overflow: hidden;
+    min-width: 0;
+  }
+
+  .recharts-responsive-container {
+    min-width: 0 !important;
   }
 }
 

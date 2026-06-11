@@ -245,35 +245,37 @@ export default function DashboardPage() {
               </select>
             </div>
           </div>
-          <div className="db-chart-area" style={{ padding: "1.25rem 1rem 0.5rem", minHeight: 200, width: "100%", overflow: "hidden" }}>
-            <ResponsiveContainer width="100%" height={220} minWidth={280}>
-              <AreaChart data={trend} margin={{ top: 5, right: 5, left: -20, bottom: 5 }}>
-                <defs>
-                  <linearGradient id="gPurchase" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#7C6FE0" stopOpacity={0.25} />
-                    <stop offset="95%" stopColor="#7C6FE0" stopOpacity={0} />
-                  </linearGradient>
-                  <linearGradient id="gProd" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#4ECDC4" stopOpacity={0.25} />
-                    <stop offset="95%" stopColor="#4ECDC4" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--border-light)" vertical={false} />
-                <XAxis dataKey="date" tick={{ fill: "#9CA3AF", fontSize: 10 }} tickFormatter={d => d.slice(5)} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fill: "#9CA3AF", fontSize: 10 }} tickFormatter={v => `${(v / 1000).toFixed(0)}T`} axisLine={false} tickLine={false} width={35} />
-                <Tooltip
-                  contentStyle={{ background: "var(--bg-card)", border: "1px solid var(--border-light)", borderRadius: 8, fontSize: 12, color: "var(--text-primary)", boxShadow: "var(--shadow-dropdown)" }}
-                  labelStyle={{ color: "var(--text-secondary)", marginBottom: 4 }}
-                  formatter={(v: any) => [`${(v / 1000).toFixed(2)} Ton`]}
-                />
-                {(chartFilter === "Semua" || chartFilter === "Pembelian") && (
-                  <Area type="monotone" dataKey="purchase" name="Pembelian" stroke="#7C6FE0" fill="url(#gPurchase)" strokeWidth={2.5} dot={false} />
-                )}
-                {(chartFilter === "Semua" || chartFilter === "Penjualan") && (
-                  <Area type="monotone" dataKey="sales" name="Penjualan" stroke="#4ECDC4" fill="url(#gProd)" strokeWidth={2.5} dot={false} />
-                )}
-              </AreaChart>
-            </ResponsiveContainer>
+          <div className="db-chart-area" style={{ padding: "1.25rem 0.5rem 0.5rem", width: "100%", boxSizing: "border-box" }}>
+            <div style={{ width: "100%", height: 220, position: "relative" }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={trend} margin={{ top: 5, right: 10, left: -15, bottom: 5 }}>
+                  <defs>
+                    <linearGradient id="gPurchase" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#7C6FE0" stopOpacity={0.25} />
+                      <stop offset="95%" stopColor="#7C6FE0" stopOpacity={0} />
+                    </linearGradient>
+                    <linearGradient id="gProd" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#4ECDC4" stopOpacity={0.25} />
+                      <stop offset="95%" stopColor="#4ECDC4" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border-light)" vertical={false} />
+                  <XAxis dataKey="date" tick={{ fill: "#9CA3AF", fontSize: 10 }} tickFormatter={d => d.slice(5)} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fill: "#9CA3AF", fontSize: 10 }} tickFormatter={v => `${(v / 1000).toFixed(0)}T`} axisLine={false} tickLine={false} width={35} />
+                  <Tooltip
+                    contentStyle={{ background: "var(--bg-card)", border: "1px solid var(--border-light)", borderRadius: 8, fontSize: 12, color: "var(--text-primary)", boxShadow: "var(--shadow-dropdown)" }}
+                    labelStyle={{ color: "var(--text-secondary)", marginBottom: 4 }}
+                    formatter={(v: any) => [`${(v / 1000).toFixed(2)} Ton`]}
+                  />
+                  {(chartFilter === "Semua" || chartFilter === "Pembelian") && (
+                    <Area type="monotone" dataKey="purchase" name="Pembelian" stroke="#7C6FE0" fill="url(#gPurchase)" strokeWidth={2.5} dot={false} />
+                  )}
+                  {(chartFilter === "Semua" || chartFilter === "Penjualan") && (
+                    <Area type="monotone" dataKey="sales" name="Penjualan" stroke="#4ECDC4" fill="url(#gProd)" strokeWidth={2.5} dot={false} />
+                  )}
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         </div>
 
