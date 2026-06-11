@@ -16,7 +16,7 @@ const DEMO_ACCOUNTS = [
   { email: "supplier@rpms.id", label: "Supplier", icon: "🤝" },
 ];
 
-const DEMO_PASSWORD = "password123";
+const DEMO_PASSWORD = "Admin@123";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("admin@rpms.id");
