@@ -55,12 +55,13 @@ export default function ChatWidget() {
   };
 
   return (
-    <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
+    <div className="chat-widget-container" style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
       {/* Chat Window */}
       {isOpen && (
         <div 
+          className="chat-window"
           style={{ 
-            marginBottom: 16, width: "100%", maxWidth: 380, height: 500, maxHeight: "80vh", 
+            marginBottom: 16, width: "380px", maxWidth: "calc(100vw - 48px)", height: 500, maxHeight: "80vh", 
             display: "flex", flexDirection: "column", background: "rgba(255,255,255,0.95)", 
             backdropFilter: "blur(12px)", border: "1px solid rgba(0,0,0,0.1)", 
             boxShadow: "0 25px 50px -12px rgba(0,0,0,0.25)", borderRadius: 16, overflow: "hidden",
@@ -68,7 +69,7 @@ export default function ChatWidget() {
           }}
         >
           {/* Header */}
-          <div style={{ background: "linear-gradient(to right, #1a365d, #2563eb)", padding: "16px", color: "white", display: "flex", justifyContent: "space-between", alignItems: "center", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1)" }}>
+          <div style={{ background: "linear-gradient(to right, #1a365d, #2563eb)", padding: "16px", color: "white", display: "flex", justifyContent: "space-between", alignItems: "center", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1)", flexShrink: 0 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <div style={{ width: 32, height: 32, borderRadius: "50%", background: "rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <svg style={{ width: 20, height: 20, color: "white" }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -101,7 +102,7 @@ export default function ChatWidget() {
                     borderTopLeftRadius: msg.role === "user" ? 16 : 4,
                   }}
                 >
-                  <p style={{ margin: 0, lineHeight: 1.5, whiteSpace: "pre-wrap" }}>{msg.text}</p>
+                  <p style={{ margin: 0, lineHeight: 1.5, whiteSpace: "pre-wrap", wordBreak: "break-word" }}>{msg.text}</p>
                 </div>
               </div>
             ))}
@@ -118,20 +119,20 @@ export default function ChatWidget() {
           </div>
 
           {/* Input Area */}
-          <div style={{ padding: 12, background: "white", borderTop: "1px solid #f1f5f9" }}>
+          <div style={{ padding: 12, background: "white", borderTop: "1px solid #f1f5f9", flexShrink: 0 }}>
             <form onSubmit={sendMessage} style={{ display: "flex", gap: 8 }}>
               <input
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Tanyakan sesuatu..."
-                style={{ flex: 1, background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 9999, padding: "8px 16px", fontSize: 14, outline: "none" }}
+                style={{ flex: 1, background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 9999, padding: "8px 16px", fontSize: 16, outline: "none" }}
                 disabled={isLoading}
               />
               <button 
                 type="submit" 
                 disabled={!input.trim() || isLoading}
-                style={{ background: "#2563eb", color: "white", border: "none", borderRadius: 9999, width: 40, height: 40, display: "flex", alignItems: "center", justifyContent: "center", cursor: (!input.trim() || isLoading) ? "not-allowed" : "pointer", opacity: (!input.trim() || isLoading) ? 0.5 : 1 }}
+                style={{ background: "#2563eb", color: "white", border: "none", borderRadius: 9999, width: 40, height: 40, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", cursor: (!input.trim() || isLoading) ? "not-allowed" : "pointer", opacity: (!input.trim() || isLoading) ? 0.5 : 1 }}
               >
                 <svg style={{ width: 20, height: 20, marginLeft: 2 }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
@@ -145,7 +146,8 @@ export default function ChatWidget() {
       {/* Floating Toggle Button */}
       <button
         onClick={toggleChat}
-        style={{ width: 56, height: 56, background: "linear-gradient(to right, #1a365d, #2563eb)", borderRadius: "50%", border: "none", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04)", cursor: "pointer", position: "relative", transition: "transform 0.3s" }}
+        className="chat-toggle-btn"
+        style={{ width: 56, height: 56, flexShrink: 0, background: "linear-gradient(to right, #1a365d, #2563eb)", borderRadius: "50%", border: "none", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04)", cursor: "pointer", position: "relative", transition: "transform 0.3s" }}
         onMouseEnter={e => e.currentTarget.style.transform = "scale(1.05)"}
         onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}
       >
@@ -176,6 +178,20 @@ export default function ChatWidget() {
         @keyframes bounce {
           0%, 80%, 100% { transform: scale(0); }
           40% { transform: scale(1); }
+        }
+        
+        @media (max-width: 768px) {
+          .chat-widget-container {
+            bottom: 16px !important;
+            right: 16px !important;
+            left: 16px !important;
+          }
+          .chat-window {
+            max-width: none !important;
+            width: 100% !important;
+            height: calc(100vh - 100px) !important;
+            max-height: none !important;
+          }
         }
       `}} />
     </div>
